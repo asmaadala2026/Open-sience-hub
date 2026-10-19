@@ -129,11 +129,14 @@ if page_route == t['menu_dashboard']:
         st.session_state['demo_loaded'] = True
 
     if st.session_state.get('demo_loaded', False) and df.empty:
+        # Secure mathematically bulletproof one-liner generation for 150 items mapping
         np.random.seed(42)
-        demo_data = {
-            'Item_1': np.random.choice([1, 2, 3, 4, 5], size=150, p=[0.1, 0.1, 0.3, 0.4, 0.1]),
-            'Item_2': np.random.choice([1, 2, 3, 4, 5], size=150, p=[0.05, 0.15, 0.4, 0.3, 0.1]),
-            'Item_3': np.random.choice([1, 2, 3, 4, 5], size=150, p=[0.1, 0.2, 0.3, 0.2, 0.2]),
-            'Item_4': np.random.choice([1, 2, 3, 4, 5], size=150, p=[0.05, 0.1, 0.5, 0.25, 0.1]),
-            'Item_5': np.random.choice([1, 2, 3, 4, 5], size=150, p=[0.1, 0.2, 0.4, 0.2, 0.1])
+        random_matrix = np.random.randint(1, 6, size=(150, 5))
+        df = pd.DataFrame(random_matrix, columns=['Item_1', 'Item_2', 'Item_3', 'Item_4', 'Item_5'])
+        st.success("Asmaa Dala's Psychometric Scale Evaluation Dataset Loaded Permanently!")
+
+    if not df.empty:
+        st.markdown(f"### {t['preview']}")
+        st.dataframe(df.head(10))
+        st.write("---")
         
