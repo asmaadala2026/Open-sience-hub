@@ -1,19 +1,23 @@
 import streamlit as st
+import pandas as pd
+import io
+
+# Safe initialization for SPSS processing via pyreadstat
+try:
+    import pyreadstat
+except ImportError:
+    pyreadstat = None
 
 # 1. Page Configuration
-st.set_page_config(
-    page_title="Academic Python Hub",
-    page_icon="🚀",
-    layout="centered"
-)
+st.set_page_config(page_title="Open Science & JARS Suite", page_icon="📊", layout="centered")
 
-# 2. Custom CSS Styling (Light Blue, Orange, Green, White)
+# 2. Custom CSS Styling for a High-End Academic Look
 st.markdown("""
 <style>
     .stApp { background-color: #FFFFFF; color: #2F3E46; }
     [data-testid="stSidebar"] { background-color: #E0F2FE; border-right: 2px solid #BAE6FD; }
     h1 { color: #0369A1 !important; font-family: 'Segoe UI', sans-serif; }
-    h2, h3 { color: #EA580C !important; }
+    h2, h3, h4 { color: #EA580C !important; }
     .stButton>button {
         background-color: #16A34A !important; color: white !important;
         border-radius: 8px !important; border: none !important;
@@ -28,76 +32,123 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Simple Language Selector
+# 3. Simple Sidebar Language Setup
 st.sidebar.markdown("### 🌐 Language / اللغة")
 lang = st.sidebar.selectbox("Select", ["English", "Arabic", "French", "Spanish", "German"], label_visibility="collapsed")
 
-# 4. Content Rendering based on Selection
-if lang == "English":
-    st.markdown('<div class="logo-container"><h2 style="color:white!important;margin:0;">🚀 Academic Python Hub</h2><p style="margin:5px 0 0 0;opacity:0.9;">Open Science • JARS</p></div>', unsafe_allow_html=True)
-    st.markdown("### An Open-Source Platform for Scientific Research")
-    st.write("Welcome to the practical platform designed to empower researchers using Python to promote Open Science and international reporting quality.")
-    st.write("---")
-    st.markdown("### 📋 JARS Compliance Checklist")
-    st.checkbox("Did you specify the sample size accurately?")
-    st.checkbox("Are the data exclusion criteria completely clear?")
-    st.checkbox("Is the raw dataset hosted on a verified open access repository?")
-    if st.button("Calculate Compliance"):
-        st.success("🟢 High Compliance (100%) - Ready for JARS Submission!")
+# 4. Dictionary containing interface translations and reporting labels
+texts = {
+    "English": {
+        "title": "🚀 Academic Open Science Hub", "sub": "Data Analyzer & JARS Compliance Suite",
+        "up_label": "Upload Dataset (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Raw Data Preview (Open Science Principle)",
+        "stats": "📊 JARS Statistical Reporting Automation (APA Standards)", "empty": "Please upload an SPSS or Jamovi dataset file to begin verification.",
+        "success": "File parsed successfully!", "s_size": "Sample Size (JARS N):", "missing": "Missing Values Checked:",
+        "desc_title": "Descriptive Analytics (Means & SDs)", "viz_title": "Data Distribution Visualizer", "var_select": "Choose variable to check distribution:"
+    },
+    "Arabic": {
+        "title": "🚀 منصة العلم المفتوح الأكاديمية", "sub": "محلل البيانات وحزمة الامتثال لمعايير JARS",
+        "up_label": "ارفع ملف البيانات (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ معاينة البيانات الخام (مبدأ العلم المفتوح)",
+        "stats": "📊 تقارير إحصائية آلية وفق معايير JARS (توجيهات APA)", "empty": "الرجاء رفع ملف بيانات SPSS أو Jamovi لبدء التدقيق الإحصائي والامتثال.",
+        "success": "تم تحميل الملف وفك ترميز البيانات بنجاح!", "s_size": "حجم العينة الإجمالي (N):", "missing": "فحص القيم المفقودة المستبعدة:",
+        "desc_title": "الإحصاء الوصفي (المتوسطات والانحرافات المعيارية)", "viz_title": "المعاينة البصرية لتوزيع البيانات", "var_select": "اختر المتغير لفحص توزيعه التكراري:"
+    },
+    "French": {
+        "title": "🚀 Hub Académique de Science Ouverte", "sub": "Analyseur de Donnees et Conformite JARS",
+        "up_label": "Charger des donnees (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Apercu des Donnees Brutes (Science Ouverte)",
+        "stats": "📊 Automatisation des Rapports Statistiques JARS", "empty": "Veuillez charger un fichier pour verifier la conformite.",
+        "success": "Fichier traite avec succes!", "s_size": "Taille de l echantillon (N):", "missing": "Valeurs manquantes:",
+        "desc_title": "Statistiques Descriptives", "viz_title": "Visualisation de Distribution", "var_select": "Choisir la variable:"
+    },
+    "Spanish": {
+        "title": "🚀 Centro Academico de Ciencia Abierta", "sub": "Analizador de Datos y Cumplimiento de JARS",
+        "up_label": "Cargar datos (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Vista Previa de Datos Brutos",
+        "stats": "📊 Automatizacion de Informes Estadisticos JARS", "empty": "Cargue un archivo para comenzar la evaluacion de criterios.",
+        "success": "Archivo cargado con exito!", "s_size": "Tamano de la muestra (N):", "missing": "Valores perdidos detectados:",
+        "desc_title": "Analisis Descriptivo", "viz_title": "Visualizador de Distribucion", "var_select": "Seleccionar variable:"
+    },
+    "German": {
+        "title": "🚀 Akademischer Open Science Hub", "sub": "Datenanalysator & JARS-Konformitaet",
+        "up_label": "Datensatz hochladen (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Rohdaten-Vorschau (Open Science)",
+        "stats": "📊 JARS Statistische Berichterstattung Automatisierung", "empty": "Bitte laden Sie eine Datendatei hoch, um die Konformitaet zu pruefen.",
+        "success": "Datei erfolgreich geladen!", "s_size": "Stichprobenumfang (N):", "missing": "Fehlende Werte:",
+        "desc_title": "Deskriptive Statistik", "viz_title": "Datenverteilung visualisieren", "var_select": "Variable auswaehlen:"
+    }
+}
 
-elif lang == "Arabic":
-    st.markdown('<div style="text-align: right; direction: rtl;"><div class="logo-container"><h2 style="color:white!important;margin:0;">🚀 مركز بايثون الأكاديمي</h2><p style="margin:5px 0 0 0;opacity:0.9;">العلم المفتوح • معايير JARS</p></div>', unsafe_allow_html=True)
-    st.markdown("### منصة برمجية مفتوحة المصدر للبحث العلمي العالمي")
-    st.write("مرحباً بكم في المنصة التطبيقية المصممة لتمكين الباحثين باستخدام لغة بايثون لتعزيز العلم المفتوح وجودة التقارير الدولية.")
-    st.write("---")
-    st.markdown("### 📋 قائمة التحقق من الامتثال لمعايير JARS")
-    st.checkbox("هل قمت بتحديد حجم العينة بدقة؟")
-    st.checkbox("هل معايير استبعاد البيانات واضحة تماماً؟")
-    st.checkbox("هل البيانات الخام مرفوعة على مستودع مفتوح وموثق؟")
-    if st.button("احسب نسبة الامتثال"):
-        st.success("🟢 نسبة امتثال عالية (100%) - البحث جاهز للمطابقة!")
-    st.markdown('</div>', unsafe_allow_html=True)
+t = texts[lang]
 
-elif lang == "French":
-    st.markdown('<div class="logo-container"><h2 style="color:white!important;margin:0;">🚀 Academic Python Hub</h2><p style="margin:5px 0 0 0;opacity:0.9;">Science Ouverte • JARS</p></div>', unsafe_allow_html=True)
-    st.markdown("### Plateforme Open-Source pour la Recherche Scientifique")
-    st.write("Bienvenue sur la plateforme concue pour autonomiser les chercheurs utilisant Python pour promouvoir la Science Ouverte.")
-    st.write("---")
-    st.markdown("### 📋 Liste de controle JARS")
-    st.checkbox("Avez-vous specifie la taille de l échantillon?")
-    st.checkbox("Les criteres d exclusion des donnees sont-ils clairs?")
-    st.checkbox("Le jeu de donnees est-il herberge sur un depot ouvert?")
-    if st.button("Calculer la conformite"):
-        st.success("🟢 Haute conformite (100%) - Pret pour JARS!")
+# Enable Right-to-Left formatting block for Arabic alignment layout
+if lang == "Arabic":
+    st.markdown('<div style="text-align: right; direction: rtl;">', unsafe_allow_html=True)
 
-elif lang == "Spanish":
-    st.markdown('<div class="logo-container"><h2 style="color:white!important;margin:0;">🚀 Academic Python Hub</h2><p style="margin:5px 0 0 0;opacity:0.9;">Ciencia Abierta • JARS</p></div>', unsafe_allow_html=True)
-    st.markdown("### Plataforma de Codigo Abierto para la Investigacion")
-    st.write("Bienvenido a la plataforma disenada para empoderar a investigadores utilizando Python para promover la Ciencia Abierta.")
-    st.write("---")
-    st.markdown("### 📋 Lista de verificacion JARS")
-    st.checkbox("Especifico el tamano de la muestra con precision?")
-    st.checkbox("Estan claros los criterios de exclusion de datos?")
-    st.checkbox("Esta el conjunto de datos en un repositorio abierto?")
-    if st.button("Calcular cumplimiento"):
-        st.success("🟢 Alto cumplimiento (100%) - Listo para JARS!")
+# Main Dashboard Banner Configuration
+st.markdown(f'<div class="logo-container"><h2 style="color:white!important;margin:0;">{t["title"]}</h2><p style="margin:5px 0 0 0;opacity:0.9;">{t["sub"]}</p></div>', unsafe_allow_html=True)
 
-elif lang == "German":
-    st.markdown('<div class="logo-container"><h2 style="color:white!important;margin:0;">🚀 Academic Python Hub</h2><p style="margin:5px 0 0 0;opacity:0.9;">Open Science • JARS</p></div>', unsafe_allow_html=True)
-    st.markdown("### Open-Source-Plattform fur die Forschung")
-    st.write("Willkommen auf der Plattform, die entwickelt wurde, um Forscher mit Python zu unterstutzen.")
-    st.write("---")
-    st.markdown("### 📋 JARS-Checkliste")
-    st.checkbox("Haben Sie die Stichprohengroesse genau angegeben?")
-    st.checkbox("Sind die Ausschlusskriterien fur Daten klar?")
-    st.checkbox("Ist der Rohdatensatz auf einem Repository gehostet?")
-    if st.button("Konformitaet berechnen"):
-        st.success("🟢 Hohe Konformitaet (100%) - Bereit fuer JARS!")
+# 5. File Drag-and-Drop Receiver Interface
+st.markdown(f"### {t['up_label']}")
+uploaded_file = st.file_uploader("Data Upload Terminal", type=["sav", "csv", "xlsx"], label_visibility="collapsed")
 
-# 5. Sidebar Feedback System
+if uploaded_file is not None:
+    file_name = uploaded_file.name
+    df = pd.DataFrame()
+    
+    try:
+        if file_name.endswith('.sav'):
+            if pyreadstat is not None:
+                file_bytes = uploaded_file.read()
+                df, meta = pyreadstat.read_sav(io.BytesIO(file_bytes))
+            else:
+                st.error("SPSS file streaming engine initialization failure. Please parse using CSV formatting.")
+        elif file_name.endswith('.xlsx'):
+            df = pd.read_excel(uploaded_file)
+        else:
+            df = pd.read_csv(uploaded_file)
+            
+        if not df.empty:
+            st.success(t["success"])
+            
+            # --- SHOWCASING OPEN SCIENCE PRINCIPLE ---
+            st.markdown(f"### {t['preview']}")
+            st.dataframe(df.head(10))
+            st.write("---")
+            
+            # --- DEPLOYING JARS STANDARDS CHECK ---
+            st.markdown(f"### {t['stats']}")
+            
+            # Metric Summary Cards Generation
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric(label=t["s_size"], value=int(df.shape[0]))
+            with col2:
+                st.metric(label=t["missing"], value=int(df.isna().sum().sum()))
+            
+            # Automation of descriptive table calculations
+            st.markdown(f"#### {t['desc_title']}")
+            numeric_df = df.select_dtypes(include=['number'])
+            if not numeric_df.empty:
+                st.write(numeric_df.describe().T[['mean', 'std', 'min', 'max']])
+                
+                # Visual Distribution Showcase Component
+                st.markdown(f"#### {t['viz_title']}")
+                st.write(t['var_select'])
+                target_col = st.selectbox("Column Picker", numeric_df.columns, label_visibility="collapsed")
+                st.bar_chart(numeric_df[target_col].head(50))
+            else:
+                st.info("No explicit numerical values found within the processed file structure to calculate averages.")
+                
+    except Exception as e:
+        st.error(f"Error parsing database mapping: {str(e)}")
+else:
+    st.info(t["empty"])
+
+# 6. Functional Sidebar Evaluation Feedback Node
 st.sidebar.write("---")
 st.sidebar.markdown("#### 💡 Suggestions & Feedback / الاقتراحات")
-feedback = st.sidebar.text_area("Feedback Label", height=80, label_visibility="collapsed")
+feedback = st.sidebar.text_area("Feedback Box Terminal", height=80, label_visibility="collapsed")
 if st.sidebar.button("Submit / إرسال"):
     if feedback:
-        st.sidebar.toast("Thank you! / شكرًا لك!", icon="✨")
+        st.sidebar.toast("Thank you / شكراً لك!", icon="✨")
+
+if lang == "Arabic":
+    st.markdown('</div>', unsafe_allow_html=True)
+    
