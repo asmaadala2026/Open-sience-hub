@@ -1,17 +1,16 @@
 import streamlit as st
 import pandas as pd
-import io
+import numpy as np
 
-# Safe initialization for SPSS processing via pyreadstat
-try:
-    import pyreadstat
-except ImportError:
-    pyreadstat = None
+# 1. Page Configuration and Technical Metadata
+st.set_page_config(
+    page_title="Psychometric Open Science & JARS Suite",
+    page_icon="📊",
+    layout="centered",
+    initial_sidebar_state="expanded"
+)
 
-# 1. Page Configuration
-st.set_page_config(page_title="Open Science & JARS Suite", page_icon="📊", layout="centered")
-
-# 2. Custom CSS Styling for a High-End Academic Look
+# 2. Custom CSS Styling (Light Blue, Academic Orange, Green, White)
 st.markdown("""
 <style>
     .stApp { background-color: #FFFFFF; color: #2F3E46; }
@@ -25,130 +24,118 @@ st.markdown("""
     }
     .stButton>button:hover { background-color: #15803D !important; }
     .logo-container {
-        text-align: center; padding: 15px;
+        text-align: center; padding: 20px;
         background: linear-gradient(135deg, #0284C7, #EA580C);
         color: white; border-radius: 12px; margin-bottom: 25px;
+    }
+    .author-badge {
+        font-size: 14px; font-weight: bold; background-color: rgba(255,255,255,0.2);
+        padding: 5px 10px; border-radius: 20px; display: inline-block; margin-top: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Simple Sidebar Language Setup
-st.sidebar.markdown("### 🌐 Language / اللغة")
-lang = st.sidebar.selectbox("Select", ["English", "Arabic", "French", "Spanish", "German"], label_visibility="collapsed")
+# Helper function to calculate psychometric Cronbach's Alpha safely
+def calculate_cronbach_alpha(item_dataframe):
+    try:
+        column_variances = item_dataframe.var(ddof=1).sum()
+        total_score_variance = item_dataframe.sum(axis=1).var(ddof=1)
+        number_of_items = item_dataframe.shape
+        if total_score_variance == 0 or number_of_items <= 1:
+            return 0.0
+        alpha_coefficient = (number_of_items / (number_of_items - 1)) * (1 - (column_variances / total_score_variance))
+        return round(alpha_coefficient, 3)
+    except:
+        return 0.0
 
-# 4. Dictionary containing interface translations and reporting labels
-texts = {
-    "English": {
-        "title": "🚀 Academic Open Science Hub", "sub": "Data Analyzer & JARS Compliance Suite",
-        "up_label": "Upload Dataset (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Raw Data Preview (Open Science Principle)",
-        "stats": "📊 JARS Statistical Reporting Automation (APA Standards)", "empty": "Please upload an SPSS or Jamovi dataset file to begin verification.",
-        "success": "File parsed successfully!", "s_size": "Sample Size (JARS N):", "missing": "Missing Values Checked:",
-        "desc_title": "Descriptive Analytics (Means & SDs)", "viz_title": "Data Distribution Visualizer", "var_select": "Choose variable to check distribution:"
+# 3. Sidebar Language Configuration
+st.sidebar.markdown("### 🌐 Language / اللغة")
+lang_selection = st.sidebar.selectbox("Language Config", ["English", "Arabic", "French", "Spanish", "German"], label_visibility="collapsed")
+lang_map = {"English": "en", "Arabic": "ar", "French": "fr", "Spanish": "es", "German": "de"}
+current_lang = lang_map[lang_selection]
+
+# 4. Multilingual Content Dictionary (Elsevier Publication Standards)
+translations = {
+    'en': {
+        'dir': 'ltr', 'title': '🚀 Psychometric Open Science Hub',
+        'subtitle': 'Scale Development Data Analyzer & JARS-Quant Suite',
+        'welcome': 'Welcome to the advanced open-source validation platform designed for psychometric scale development. This engine strictly applies Open Science concepts and automated JARS-Quant (APA) guidelines to verify evaluation instruments.',
+        'up_label': 'Upload Dataset (CSV or Excel Format):',
+        'preview': '✅ Raw Data Matrix Verification (Open Science Framework)',
+        'stats': '📊 JARS Automated Descriptive Analytics Suite',
+        'empty': 'Please upload a statistical evaluation file or activate the persistent demo scale below.',
+        'success': 'Dataset structure parsed and verified successfully!',
+        's_size': 'Total Active Sample Size (N):', 'missing': 'Identified Missing Values:',
+        'desc_title': 'Item Descriptives (Means, SDs, Ranges)', 'viz_title': 'Visual Item Distribution Auditor',
+        'var_select': 'Select psychometric variable to check distribution matrix:',
+        'alpha_title': '🔒 Scale Reliability Matrix Analysis',
+        'alpha_label': 'Calculated Internal Consistency (Cronbach\'s Alpha Index):',
+        'corr_title': '📈 Inter-Item Pearson Correlation Matrix',
+        'dedication_title': '❤️ Special Dedication & Honoring Page',
+        'menu_dashboard': '📊 Analysis Dashboard',
+        'demo_btn': '⚙️ Load Asmaa\'s Integrated Psychometric Scale (Demo tool)',
+        'by_label': 'Developed by: Asmaa'
     },
-    "Arabic": {
-        "title": "🚀 منصة العلم المفتوح الأكاديمية", "sub": "محلل البيانات وحزمة الامتثال لمعايير JARS",
-        "up_label": "ارفع ملف البيانات (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ معاينة البيانات الخام (مبدأ العلم المفتوح)",
-        "stats": "📊 تقارير إحصائية آلية وفق معايير JARS (توجيهات APA)", "empty": "الرجاء رفع ملف بيانات SPSS أو Jamovi لبدء التدقيق الإحصائي والامتثال.",
-        "success": "تم تحميل الملف وفك ترميز البيانات بنجاح!", "s_size": "حجم العينة الإجمالي (N):", "missing": "فحص القيم المفقودة المستبعدة:",
-        "desc_title": "الإحصاء الوصفي (المتوسطات والانحرافات المعيارية)", "viz_title": "المعاينة البصرية لتوزيع البيانات", "var_select": "اختر المتغير لفحص توزيعه التكراري:"
+    'ar': {
+        'dir': 'rtl', 'title': '🚀 المنصة السيكومترية للعلم المفتوح',
+        'subtitle': 'محلل بيانات تطوير أدوات القياس وحزمة الامتثال لمعايير JARS-Quant',
+        'welcome': 'مرحباً بكم في المنصة المفتوحة المتقدمة والمخصصة لتطوير وتدقيق أدوات القياس والمقاييس النفسية والتربوية. تطبق هذه المنصة بصرامة مفاهيم العلم المفتوح وتوجيهات معايير JARS-Quant الدولية لضمان جودة النشر العلمي.',
+        'up_label': 'ارفع ملف البيانات الخام لأداة القياس (بصيغة Excel أو CSV):',
+        'preview': '✅ فحص وتدقيق مصفوفة البيانات الخام (مبدأ العلم المفتوح)',
+        'stats': '📊 حزمة التحليلات الوصفية الآلية وفق معايير JARS الأكاديمية',
+        'empty': 'الرجاء رفع ملف البيانات الإحصائية الخام أو الضغط لأسفل لتفعيل أداة القياس المدمجة كعينة تجريبية دائمة.',
+        'success': 'تم تحميل ملف البيانات وفك التشفير الهيكلي بنجاح!',
+        's_size': 'حجم العينة الإجمالي الفعلي (N):', 'missing': 'إجمالي القيم المفقودة المكتشفة:',
+        'desc_title': 'الإحصاء الوصفي للفقرات (المتوسطات، الانحرافات المعيارية، المدى)',
+        'viz_title': 'التوزيع التكراري البصري لفقرات المقياس',
+        'var_select': 'اختر الفقرة أو البعد لمعاينة مصفوفة توزيعه البصري:',
+        'alpha_title': '🔒 تحليل الثبات والاتساق الداخلي للمقياس',
+        'alpha_label': 'معامل ثبات ألفا كرونباخ المحسوب للأداة:',
+        'corr_title': '📈 مصفوفة ارتباط بيرسون الإحصائية بين أبعاد وفقرات الأداة',
+        'dedication_title': '❤️ صفحة إهداء وتكريم أكاديمية خاصة',
+        'menu_dashboard': '📊 لوحة التحكم الإحصائية',
+        'demo_btn': '⚙️ تفعيل أداة قياس الباحثة أسماء المدمجة (عينة تجريبية ثابتة)',
+        'by_label': 'تطوير الباحثة: أسماء'
     },
-    "French": {
-        "title": "🚀 Hub Académique de Science Ouverte", "sub": "Analyseur de Donnees et Conformite JARS",
-        "up_label": "Charger des donnees (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Apercu des Donnees Brutes (Science Ouverte)",
-        "stats": "📊 Automatisation des Rapports Statistiques JARS", "empty": "Veuillez charger un fichier pour verifier la conformite.",
-        "success": "Fichier traite avec succes!", "s_size": "Taille de l echantillon (N):", "missing": "Valeurs manquantes:",
-        "desc_title": "Statistiques Descriptives", "viz_title": "Visualisation de Distribution", "var_select": "Choisir la variable:"
-    },
-    "Spanish": {
-        "title": "🚀 Centro Academico de Ciencia Abierta", "sub": "Analizador de Datos y Cumplimiento de JARS",
-        "up_label": "Cargar datos (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Vista Previa de Datos Brutos",
-        "stats": "📊 Automatizacion de Informes Estadisticos JARS", "empty": "Cargue un archivo para comenzar la evaluacion de criterios.",
-        "success": "Archivo cargado con exito!", "s_size": "Tamano de la muestra (N):", "missing": "Valores perdidos detectados:",
-        "desc_title": "Analisis Descriptivo", "viz_title": "Visualizador de Distribucion", "var_select": "Seleccionar variable:"
-    },
-    "German": {
-        "title": "🚀 Akademischer Open Science Hub", "sub": "Datenanalysator & JARS-Konformitaet",
-        "up_label": "Datensatz hochladen (SPSS .sav, Jamovi/CSV, Excel)", "preview": "✅ Rohdaten-Vorschau (Open Science)",
-        "stats": "📊 JARS Statistische Berichterstattung Automatisierung", "empty": "Bitte laden Sie eine Datendatei hoch, um die Konformitaet zu pruefen.",
-        "success": "Datei erfolgreich geladen!", "s_size": "Stichprobenumfang (N):", "missing": "Fehlende Werte:",
-        "desc_title": "Deskriptive Statistik", "viz_title": "Datenverteilung visualisieren", "var_select": "Variable auswaehlen:"
-    }
+    'fr': { 'dir': 'ltr', 'title': '🚀 Hub Psychométrique de Science Ouverte', 'subtitle': 'Analyseur de Donnees de Validation & Suite JARS-Quant', 'welcome': 'Bienvenue sur la plateforme psychometrique open source.', 'up_label': 'Charger le jeu de donnees (CSV ou Excel):', 'preview': '✅ Verification des Donnees Brutes', 'stats': '📊 Suite d Analyse Descriptive JARS', 'empty': 'Veuillez charger un fichier ou activer la demo.', 'success': 'Structure des donnees analysee!', 's_size': 'Echantillon (N):', 'missing': 'Valeurs manquantes:', 'desc_title': 'Statistiques Descriptives', 'viz_title': 'Distribution des Items', 'var_select': 'Choisir la variable:', 'alpha_title': '🔒 Analyse de Fiabilite', 'alpha_label': 'Alpha de Cronbach:', 'corr_title': '📈 Matrice de Correlation de Pearson', 'dedication_title': '❤️ Page de Dedicace Speciale', 'menu_dashboard': '📊 Tableau de Bord', 'demo_btn': '⚙️ Charger l\'echelle de Asmaa (Demo)', 'by_label': 'Developed by: Asmaa' },
+    'es': { 'dir': 'ltr', 'title': '🚀 Centro Psicometrico de Ciencia Abierta', 'subtitle': 'Analizador de Desarrollo de Escalas & Suite JARS-Quant', 'welcome': 'Bienvenido a la plataforma de validacion psicometrica.', 'up_label': 'Cargar el conjunto de datos (CSV o Excel):', 'preview': '✅ Verificacion de Matriz de Datos Brutos', 'stats': '📊 Suite de Analisis Descriptivo JARS', 'empty': 'Cargue un archivo o active el instrumento psicometrico.', 'success': '¡Matriz de datos estructurada!', 's_size': 'Muestra (N):', 'missing': 'Valores perdidos:', 'desc_title': 'Analisis Descriptivo', 'viz_title': 'Distribucion de Items', 'var_select': 'Seleccionar variable:', 'alpha_title': '🔒 Confiabilidad Interna', 'alpha_label': 'Alfa de Cronbach:', 'corr_title': '📈 Matriz de Correlacion de Pearson', 'dedication_title': '❤️ Pagina de Dedicatoria Especial', 'menu_dashboard': '📊 Panel de Analisis', 'demo_btn': '⚙️ Cargar escala de Asmaa (Demo)', 'by_label': 'Developed by: Asmaa' },
+    'de': { 'dir': 'ltr', 'title': '🚀 Psychometrischer Open Science Hub', 'subtitle': 'Skalenentwicklung & JARS-Quant Suite', 'welcome': 'Willkommen auf der psychometrischen Validierungsplattform.', 'up_label': 'Psychometrischen Datensatz hochladen (CSV/Excel):', 'preview': '✅ Rohdatenmatrix-Ueberpruefung', 'stats': '📊 Deskriptive JARS-Analysesuite', 'empty': 'Bitte laden Sie eine Datei hoch oder nutzen Sie die Demo.', 'success': 'Datensatzstruktur verifiziert!', 's_size': 'Stichprobe (N):', 'missing': 'Fehlende Werte:', 'desc_title': 'Deskriptive Statistik', 'viz_title': 'Visueller Itemverteilungsprüfer', 'var_select': 'Variable auswaehlen:', 'alpha_title': '🔒 Skalenzuverlaessigkeitsanalyse', 'alpha_label': 'Cronbachs Alpha:', 'corr_title': '📈 Pearson-Korrelationsmatrix', 'dedication_title': '❤️ Besondere Widmungsseite', 'menu_dashboard': '📊 Analyse-Dashboard', 'demo_btn': '⚙️ Asmaas psychometrische Skala laden (Demo)', 'by_label': 'Developed by: Asmaa' }
 }
 
-t = texts[lang]
+t = translations[current_lang]
 
-# Enable Right-to-Left formatting block for Arabic alignment layout
-if lang == "Arabic":
+if t['dir'] == 'rtl':
     st.markdown('<div style="text-align: right; direction: rtl;">', unsafe_allow_html=True)
 
-# Main Dashboard Banner Configuration
-st.markdown(f'<div class="logo-container"><h2 style="color:white!important;margin:0;">{t["title"]}</h2><p style="margin:5px 0 0 0;opacity:0.9;">{t["sub"]}</p></div>', unsafe_allow_html=True)
-
-# 5. File Drag-and-Drop Receiver Interface
-st.markdown(f"### {t['up_label']}")
-uploaded_file = st.file_uploader("Data Upload Terminal", type=["sav", "csv", "xlsx"], label_visibility="collapsed")
-
-if uploaded_file is not None:
-    file_name = uploaded_file.name
-    df = pd.DataFrame()
-    
-    try:
-        if file_name.endswith('.sav'):
-            if pyreadstat is not None:
-                file_bytes = uploaded_file.read()
-                df, meta = pyreadstat.read_sav(io.BytesIO(file_bytes))
-            else:
-                st.error("SPSS file streaming engine initialization failure. Please parse using CSV formatting.")
-        elif file_name.endswith('.xlsx'):
-            df = pd.read_excel(uploaded_file)
-        else:
-            df = pd.read_csv(uploaded_file)
-            
-        if not df.empty:
-            st.success(t["success"])
-            
-            # --- SHOWCASING OPEN SCIENCE PRINCIPLE ---
-            st.markdown(f"### {t['preview']}")
-            st.dataframe(df.head(10))
-            st.write("---")
-            
-            # --- DEPLOYING JARS STANDARDS CHECK ---
-            st.markdown(f"### {t['stats']}")
-            
-            # Metric Summary Cards Generation
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric(label=t["s_size"], value=int(df.shape[0]))
-            with col2:
-                st.metric(label=t["missing"], value=int(df.isna().sum().sum()))
-            
-            # Automation of descriptive table calculations
-            st.markdown(f"#### {t['desc_title']}")
-            numeric_df = df.select_dtypes(include=['number'])
-            if not numeric_df.empty:
-                st.write(numeric_df.describe().T[['mean', 'std', 'min', 'max']])
-                
-                # Visual Distribution Showcase Component
-                st.markdown(f"#### {t['viz_title']}")
-                st.write(t['var_select'])
-                target_col = st.selectbox("Column Picker", numeric_df.columns, label_visibility="collapsed")
-                st.bar_chart(numeric_df[target_col].head(50))
-            else:
-                st.info("No explicit numerical values found within the processed file structure to calculate averages.")
-                
-    except Exception as e:
-        st.error(f"Error parsing database mapping: {str(e)}")
-else:
-    st.info(t["empty"])
-
-# 6. Functional Sidebar Evaluation Feedback Node
+# 5. Sidebar Navigation
 st.sidebar.write("---")
-st.sidebar.markdown("#### 💡 Suggestions & Feedback / الاقتراحات")
-feedback = st.sidebar.text_area("Feedback Box Terminal", height=80, label_visibility="collapsed")
-if st.sidebar.button("Submit / إرسال"):
-    if feedback:
-        st.sidebar.toast("Thank you / شكراً لك!", icon="✨")
+st.sidebar.markdown(f"### Menu Menu")
+page_route = st.sidebar.radio("Navigation Interface", [t['menu_dashboard'], t['dedication_title']], label_visibility="collapsed")
 
-if lang == "Arabic":
-    st.markdown('</div>', unsafe_allow_html=True)
+# 6. Execution Block
+if page_route == t['menu_dashboard']:
+    # Render Logo Banner with your ownership name badge
+    st.markdown(f"""
+    <div class="logo-container">
+        <h2 style="color: white !important; margin: 0; font-size: 26px;">{t['title']}</h2>
+        <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 13px;">{t['subtitle']}</p>
+        <div class="author-badge">{t['by_label']}</div>
+    </div>
+    """, unsafe_allow_html=True)
     
+    st.write(t['welcome'])
+    st.write("---")
+    
+    st.markdown(f"### {t['up_label']}")
+    uploaded_psych_file = st.file_uploader("Psych File Drop", type=["csv", "xlsx"], label_visibility="collapsed")
+    load_demo = st.button(t["demo_btn"])
+    
+    df = pd.DataFrame()
+    if uploaded_psych_file is not None:
+        try:
+            if uploaded_psych_file.name.endswith('.xlsx'):
+                df = pd.read_excel(uploaded_psych_file)
+            else:
+                df = pd.read_csv(uploaded_psych_file)
+        except Exception as e:
+            
