@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# 1. Page Configuration and Technical Metadata
+# 1. Page Configuration
 st.set_page_config(
     page_title="Psychometric Open Science & JARS Suite",
     page_icon="📊",
@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Custom CSS Styling (Light Blue, Academic Orange, Green, White)
+# 2. Custom CSS Styling
 st.markdown("""
 <style>
     .stApp { background-color: #FFFFFF; color: #2F3E46; }
@@ -35,26 +35,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Helper function to calculate psychometric Cronbach's Alpha safely
-def calculate_cronbach_alpha(item_dataframe):
-    try:
-        column_variances = item_dataframe.var(ddof=1).sum()
-        total_score_variance = item_dataframe.sum(axis=1).var(ddof=1)
-        number_of_items = item_dataframe.shape
-        if total_score_variance == 0 or number_of_items <= 1:
-            return 0.0
-        alpha_coefficient = (number_of_items / (number_of_items - 1)) * (1 - (column_variances / total_score_variance))
-        return round(alpha_coefficient, 3)
-    except:
-        return 0.0
-
 # 3. Sidebar Language Configuration
 st.sidebar.markdown("### 🌐 Language / اللغة")
 lang_selection = st.sidebar.selectbox("Language Config", ["English", "Arabic", "French", "Spanish", "German"], label_visibility="collapsed")
 lang_map = {"English": "en", "Arabic": "ar", "French": "fr", "Spanish": "es", "German": "de"}
 current_lang = lang_map[lang_selection]
 
-# 4. Multilingual Content Dictionary (Elsevier Publication Standards)
+# 4. Multilingual Content Dictionary
 translations = {
     'en': {
         'dir': 'ltr', 'title': '🚀 Psychometric Open Science Hub',
@@ -114,7 +101,6 @@ page_route = st.sidebar.radio("Navigation Interface", [t['menu_dashboard'], t['d
 
 # 6. Execution Block
 if page_route == t['menu_dashboard']:
-    # Render Logo Banner with your ownership name badge
     st.markdown(f"""
     <div class="logo-container">
         <h2 style="color: white !important; margin: 0; font-size: 26px;">{t['title']}</h2>
@@ -138,4 +124,17 @@ if page_route == t['menu_dashboard']:
             else:
                 df = pd.read_csv(uploaded_psych_file)
         except Exception as e:
-            
+            st.error(f"Error parsing file: {str(e)}")
+    elif load_demo:
+        st.session_state['demo_loaded'] = True
+
+    if st.session_state.get('demo_loaded', False) and df.empty:
+        np.random.seed(42)
+        demo_data = {
+            'Dimension_1_Item1': np.random.choice([1,2,3,4,5], size=150, p=[0.1, 0.1, 0.3, 0.4, 0.1]),
+            'Dimension_1_Item2': np.random.choice([1,2,3,4,5], size=150, p=[0.05, 0.15, 0.4, 0.3, 0.1]),
+            'Dimension_2_Item3': np.random.choice([1,2,3,4,5], size=150, p=[0.1, 0.2, 0.3, 0.2, 0.2]),
+            'Dimension_2_Item4': np.random.choice([1,2,3,4,5], size=150, p=[0.05, 0.1, 0.5, 0.25, 0.1]),
+            'Dimension_3_Item5': np.random.choice([1,2,3,4,5], size=150, p=[0.1, 0.2, 0.4, 0.2, 0.1])
+        }
+        df = pd.DataFrame(demo_data)
