@@ -41,7 +41,7 @@ st.markdown("""
     }
     .logo-container {
         text-align: center;
-        padding: 10px;
+        padding: 15px;
         background: linear-gradient(135deg, #0284C7, #EA580C);
         color: white;
         border-radius: 12px;
@@ -51,119 +51,152 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Language Session State Management
-if 'lang' not in st.session_state:
-    st.session_state.lang = 'English'
+# 3. Language Selection Component
+st.sidebar.markdown("### 🌐 Select Language")
+lang_choice = st.sidebar.selectbox(
+    "Language Select",
+    ["English", "Arabic", "French", "Spanish", "German"],
+    label_visibility="collapsed"
+)
 
-st.sidebar.markdown("### 🌐 Language / اللغة")
-if st.sidebar.button("Switch Language / تغيير اللغة"):
-    st.session_state.lang = 'العربية' if st.session_state.lang == 'English' else 'English'
+# Mapping selection to internal language code
+lang_map = {
+    "English": "en",
+    "Arabic": "ar",
+    "French": "fr",
+    "Spanish": "es",
+    "German": "de"
+}
+current_lang = lang_map[lang_choice]
 
-# 4. Translations Dictionary
+# 4. Multilingual Dictionary Dataset (All Written in English alphabet)
 translations = {
-    'English': {
+    'en': {
         'dir': 'ltr',
         'title': '🚀 Academic Python Hub',
         'subtitle': 'An Open-Source Software Platform for Global Scientific Research',
-        'welcome': 'Welcome to the practical platform designed to empower researchers and academics using Python. This hub is fully built on free and open-source tools to promote **Open Science** and international reporting quality.',
-        'objectives': '🎯 Platform Objectives:',
-        'obj1': '💡 **Enhance Transparency:** Free tools to host, share, and verify raw datasets.',
-        'obj2': '📊 **JARS Compliance:** Simplifying statistical reporting according to APA guidelines.',
-        'obj3': '🛠️ **Support Free Software:** Demonstrating Python\'s capability as a premium alternative to proprietary suites.',
+        'welcome': 'Welcome to the practical platform designed to empower researchers and academics using Python. This hub is fully built on free and open-source tools to promote Open Science and international reporting quality.',
+        'objectives': 'Platform Objectives:',
+        'obj1': 'Enhance Transparency: Free tools to host, share, and verify raw datasets.',
+        'obj2': 'JARS Compliance: Simplifying statistical reporting according to APA guidelines.',
+        'obj3': 'Support Free Software: Demonstrating Pythons capability as a premium alternative to proprietary suites.',
         'menu_title': 'Navigation Menu:',
-        'menu_home': '🏠 Home & Open Science',
-        'menu_jars': '📊 JARS Data Analyzer',
-        'menu_auditor': '📋 Open Science Auditor',
-        'feedback_title': '💡 Suggestions & Feedback',
+        'menu_home': 'Home and Open Science',
+        'menu_jars': 'JARS Data Analyzer',
+        'menu_auditor': 'Open Science Auditor',
+        'feedback_title': 'Suggestions and Feedback',
         'feedback_label': 'Help us improve the platform:',
         'feedback_btn': 'Submit Feedback',
         'feedback_success': 'Thank you! Your feedback has been received.',
         'upload_label': 'Upload your research dataset (CSV file):',
-        'audit_title': 'Open Science & JARS Compliance Checklist'
+        'audit_title': 'Open Science and JARS Compliance Checklist',
+        'q1': 'Did you specify the sample size accurately?',
+        'q2': 'Are the data exclusion criteria completely clear?',
+        'q3': 'Is the raw dataset hosted on a verified open access repository?',
+        'calc_btn': 'Calculate Compliance',
+        'audit_success': 'High Compliance (100%) - Ready for JARS Submission!'
     },
-    'العربية': {
+    'ar': {
         'dir': 'rtl',
-        'title': '🚀 مركز بايثون الأكاديمي',
-        'subtitle': 'منصة برمجية مفتوحة المصدر للبحث العلمي العالمي',
-        'welcome': 'مرحباً بكم في المنصة التطبيقية المصممة لتمكين الباحثين والأكاديميين باستخدام لغة بايثون. تم بناء هذا المركز بالكامل على أدوات مجانية ومفتوحة المصدر لتعزيز **العلم المفتوح** وجودة التقارير الدولية.',
-        'objectives': '🎯 أهداف المنصة:',
-        'obj1': '💡 **تعزيز الشفافية:** أدوات مجانية لاستضافة ومشاركة والتحقق من مجموعات البيانات الخام.',
-        'obj2': '📊 **الامتثال لمعايير JARS:** تبسيط التقارير الإحصائية وفقاً لتوجيهات الجمعية الأمريكية لعلم النفس (APA).',
-        'obj3': '🛠️ **دعم البرمجيات الحرة:** إثبات قدرة بايثون كبديل متميز للحزم الاحتكارية المغلقة.',
-        'menu_title': 'قائمة التنقل:',
-        'menu_home': '🏠 الرئيسية والعلم المفتوح',
-        'menu_jars': '📊 محلل بيانات JARS',
-        'menu_auditor': '📋 مدقق العلم المفتوح',
-        'feedback_title': '💡 الاقتراحات والآراء',
-        'feedback_label': 'ساعدنا في تطوير المنصة:',
-        'feedback_btn': 'إرسال الاقتراح',
-        'feedback_success': 'شكرًا لك! تم استلام اقتراحك بنجاح.',
-        'upload_label': 'قم برفع ملف البيانات الخاص ببحثك (بصيغة CSV):',
-        'audit_title': 'قائمة التحقق من الامتثال لمعايير العلم المفتوح و JARS'
+        'title': '🚀 Markaz Python Al-Akadimi',
+        'subtitle': 'Minassa Barmajiyya Maftouhat Al-Masdar Lil-Bahth Al-Ilmi Al-Alami',
+        'welcome': 'Marhaban bikum fi al-minassa al-tatbiqiyya al-musammamah li-tamkin al-bahithin wa al-akadimiyyin bi-istikhdam lughat Python.',
+        'objectives': 'Ahdaf Al-Minassa:',
+        'obj1': 'Taaziz al-shafafiyya: Adawat majaniyyah li-istidhafat wa musharakat al-bayanat.',
+        'obj2': 'Al-imtithal li-maaiir JARS: Tabsit al-taqarir al-ihsaiyyah wifqan li-tawjihat APA.',
+        'obj3': 'Dahm al-barmajiyyat al-hurra: Ithbat qudrat Python ka-badil mutamayiz.',
+        'menu_title': 'Qaimat Al-Tanaqqul:',
+        'menu_home': 'Al-Raisiyyah wa Al-Ilm Al-Maftouh',
+        'menu_jars': 'Muhallil Bayanat JARS',
+        'menu_auditor': 'Mudaqqiq Al-Ilm Al-Maftouh',
+        'feedback_title': 'Al-Iqtirahāt wa Al-Arā',
+        'feedback_label': 'Saidna fi tatwir al-minassa:',
+        'feedback_btn': 'Irsal Al-Iqtirah',
+        'feedback_success': 'Shukran lak! Tam istilam iqtirahuka bi-najah.',
+        'upload_label': 'Qum bi-raf milaf al-bayanat (CSV):',
+        'audit_title': 'Qaimat al-tahaqquq min al-imtithal li-maaiir JARS',
+        'q1': 'Hal qumta bi-tahdid hajm al-ayyinah bi-diqqah?',
+        'q2': 'Hal maaiir istibhād al-bayanat wadhihah?',
+        'q3': 'Hal al-bayanat al-kham marfouah ala mustawda maftouh?',
+        'calc_btn': 'Ihsib Nisbat Al-Imtithal',
+        'audit_success': 'Nisbat imtithal aliyah (100%) - Al-bahth jahiz!'
+    },
+    'fr': {
+        'dir': 'ltr',
+        'title': '🚀 Academic Python Hub',
+        'subtitle': 'Une plateforme logicielle open source pour la recherche scientifique mondiale',
+        'welcome': 'Bienvenue sur la plateforme pratique concue pour autonomiser les chercheurs et les universitaires utilisant Python.',
+        'objectives': 'Objectifs de la plateforme:',
+        'obj1': 'Ameliorer la transparence: Outils gratuits pour herberger et partager les donnees.',
+        'obj2': 'Conformite JARS: Simplifier les rapports statistiques selon les directives de l APA.',
+        'obj3': 'Soutenir les logiciels libres: Demontrer la capacite de Python comme alternative.',
+        'menu_title': 'Menu de navigation:',
+        'menu_home': 'Accueil et Science Ouverte',
+        'menu_jars': 'Analyseur de donnees JARS',
+        'menu_auditor': 'Auditeur de Science Ouverte',
+        'feedback_title': 'Suggestions et Commentaires',
+        'feedback_label': 'Aidez-nous a ameliorer la plateforme:',
+        'feedback_btn': 'Envoyer les commentaires',
+        'feedback_success': 'Merci! Vos commentaires ont ete recus.',
+        'upload_label': 'Telechargez votre ensemble de donnees de recherche (fichier CSV):',
+        'audit_title': 'Liste de controle de conformite Science Ouverte et JARS',
+        'q1': 'Avez-vous specifie la taille de l echantillon avec precision?',
+        'q2': 'Les criteres d exclusion des donnees sont-ils clairs?',
+        'q3': 'Le jeu de donnees brutes est-il herberge sur un depot ouvert verifie?',
+        'calc_btn': 'Calculer la conformite',
+        'audit_success': 'Haute conformite (100%) - Pret pour la soumission JARS!'
+    },
+    'es': {
+        'dir': 'ltr',
+        'title': '🚀 Academic Python Hub',
+        'subtitle': 'Una plataforma de software de codigo abierto para la investigacion cientifica global',
+        'welcome': 'Bienvenido a la plataforma practica disenada para empoderar a investigadores y academicos utilizando Python.',
+        'objectives': 'Objetivos de la plataforma:',
+        'obj1': 'Mejorar la transparencia: Herramientas gratuitas para alojar y compartir datos.',
+        'obj2': 'Cumplimiento de JARS: Simplificar los informes estadisticos de acuerdo con APA.',
+        'obj3': 'Apoyar el software libre: Demostrar la capacidad de Python como alternativa.',
+        'menu_title': 'Menu de navegacion:',
+        'menu_home': 'Inicio y Ciencia Abierta',
+        'menu_jars': 'Analizador de datos JARS',
+        'menu_auditor': 'Auditor de Ciencia Abierta',
+        'feedback_title': 'Sugerencias y comentarios',
+        'feedback_label': 'Ayudanos a mejorar la plataforma:',
+        'feedback_btn': 'Enviar comentarios',
+        'feedback_success': 'Gracias! Tus comentarios han sido recibidos.',
+        'upload_label': 'Cargue su conjunto de datos de investigacion (archivo CSV):',
+        'audit_title': 'Lista de verificacion de cumplimiento de Ciencia Abierta y JARS',
+        'q1': 'Especifico el tamano de la muestra con precision?',
+        'q2': 'Estan claros los criterios de exclusion de datos?',
+        'q3': 'Esta el conjunto de datos brutos alojado en un repositorio abierto verificado?',
+        'calc_btn': 'Calcular cumplimiento',
+        'audit_success': 'Alto cumplimiento (100%) - Listo para JARS!'
+    },
+    'de': {
+        'dir': 'ltr',
+        'title': '🚀 Academic Python Hub',
+        'subtitle': 'Eine Open-Source-Softwareplattform fur die weltweite wissenschaftliche Forschung',
+        'welcome': 'Willkommen auf der praktischen Plattform, die entwickelt wurde, um Forscher und Akademiker mit Python zu unterstutzen.',
+        'objectives': 'Ziele der Plattform:',
+        'obj1': 'Transparenz verbessern: Kostenlose Tools zum Hosten und Teilen von Rohdaten.',
+        'obj2': 'JARS-Konformitat: Vereinfachung der statistischen Berichterstattung nach APA.',
+        'obj3': 'Freie Software unterstutzen: Demonstration der Fahigkeiten von Python.',
+        'menu_title': 'Navigationsmenu:',
+        'menu_home': 'Startseite und Open Science',
+        'menu_jars': 'JARS-Datenanalysator',
+        'menu_auditor': 'Open Science Auditor',
+        'feedback_title': 'Vorschlage und Feedback',
+        'feedback_label': 'Helfen Sie uns, die Plattform zu verbessern:',
+        'feedback_btn': 'Feedback senden',
+        'feedback_success': 'Vielen Dank! Ihr Feedback wurde empfangen.',
+        'upload_label': 'Laden Sie Ihren Forschungsdatensatz hoch (CSV-Datei):',
+        'audit_title': 'Checkliste fur Open Science und JARS-Konformitat',
+        'q1': 'Haben Sie die Stichprobengroesse genau angegeben?',
+        'q2': 'Sind die Ausschlusskriterien fur Daten klar?',
+        'q3': 'Ist der Rohdatensatz auf einem verifizierten Open-Access-Repository gehostet?',
+        'calc_btn': 'Konformitaet berechnen',
+        'audit_success': 'Hohe Konformitaet (100%) - Bereit fuer JARS!'
     }
 }
 
-t = translations[st.session_state.lang]
+t = translations[current_lang]
 
-# Apply Right-to-Left styling if Arabic is selected
-if t['dir'] == 'rtl':
-    st.markdown('<div style="text-align: right; direction: rtl;">', unsafe_allow_html=True)
-
-# 5. Sidebar Navigation Menu
-st.sidebar.markdown(f"### {t['menu_title']}")
-page = st.sidebar.radio(
-    "",
-    [t['menu_home'], t['menu_jars'], t['menu_auditor']],
-    label_visibility="collapsed"
-)
-
-# 6. Page Content Rendering
-if page == t['menu_home']:
-    st.markdown(f"""
-    <div class="logo-container">
-        <h2 style="color: white !important; margin: 0; font-size: 28px;">{t['title']}</h2>
-        <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 14px;">Open Science • JARS • Python</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown(f"### {t['subtitle']}")
-    st.write(t['welcome'])
-    
-    st.write("---")
-    st.markdown(f"### {t['objectives']}")
-    st.markdown(t['obj1'])
-    st.markdown(t['obj2'])
-    st.markdown(t['obj3'])
-
-elif page == t['menu_jars']:
-    st.title(t['menu_jars'])
-    st.write(t['upload_label'])
-    
-    uploaded_file = st.file_uploader("", type=["csv"], label_visibility="collapsed")
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-        st.markdown("### ✅ Data Preview / معاينة البيانات")
-        st.dataframe(df.head())
-        st.markdown("### 📊 Statistical Summary / التلخيص الإحصائي")
-        st.write(df.describe())
-
-elif page == t['menu_auditor']:
-    st.title(t['audit_title'])
-    st.checkbox("Did you specify the sample size? / هل قمت بتحديد حجم العينة بدقة؟")
-    st.checkbox("Are the exclusion criteria clear? / هل معايير استبعاد البيانات واضحة؟")
-    st.checkbox("Is the raw data hosted on an open repository? / هل البيانات الخام مرفوعة على مستودع مفتوح؟")
-    if st.button("Calculate Compliance / احسب نسبة الامتثال"):
-        st.success("🟢 High Compliance (100%) - Ready for JARS Submission!")
-
-# 7. Feedback System in Sidebar
-st.sidebar.write("---")
-st.sidebar.markdown(f"#### {t['feedback_title']}")
-feedback_text = st.sidebar.text_area(t['feedback_label'], height=80, label_visibility="collapsed")
-if st.sidebar.button(t['feedback_btn']):
-    if feedback_text:
-        st.sidebar.toast(t['feedback_success'], icon="✨")
-
-# Close Right-to-Left styling div if applicable
-if t['dir'] == 'rtl':
-    st.markdown('</div>', unsafe_allow_html=True)
-            
