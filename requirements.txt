@@ -1,4 +1,7 @@
 streamlit
 pandas
 pyreadstat
-openpyxl
+factor_analyzer
+matplotlib
+seaborn
+scipy
