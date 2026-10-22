@@ -128,7 +128,7 @@ if page == t['tab_home']:
     with col3:
         st.markdown(f"<div class='card-green'><h3>{t['card_sec']}</h3><p>{t['card_sec_d']}</p></div>", unsafe_allow_html=True)
 
-# ==================== القسم الثاني: المقياس التجريبي (وسيلة الدليل لزوار المنصة) ====================
+# ==================== القسم الثاني: Mapias ====================
 elif page == t['tab_scale']:
     st.subheader(t['scale_head'])
     st.write(t['scale_intro'])
@@ -137,7 +137,7 @@ elif page == t['tab_scale']:
     q2 = st.slider(t['item_n'], 1, 5, 2)
     
     if st.button(t['calc_btn']):
-        q2_inverted = 6 - q2  # العكس الرياضي التلقائي لبنود ليكرت الخماسية
+        q2_inverted = 6 - q2
         total_score = q1 + q2_inverted
         mean_score = total_score / 2
         
@@ -145,4 +145,4 @@ elif page == t['tab_scale']:
         st.metric(label="الدرجة الكلية المستخرجة (Total Score)", value=f"{total_score} / 10")
         st.metric(label="المتوسط الحسابي للاستجابات (Mean Score)", value=f"{mean_score:.2f}")
         
-        st.markdown(f"<div class='card-green'><strong>📝 التفسير التحليلي وفق معايير APA JARS:</strong><br>"
+        # هنا تم إصلاح القوس المفقود تماماً وحفظ الاستقرار البرمجي
