@@ -1,9 +1,5 @@
 streamlit
-numpy
 pandas
+numpy
 plotly
 scipy
-matplotlib
-seaborn
-pyreadstat
-factor_analyzer
