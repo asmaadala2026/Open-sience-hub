@@ -5,7 +5,6 @@ os.system("pip install pingouin")
 os.system("pip install matplotlib")
 
 
-from __future__ import annotations
 
 import io
 import hashlib
