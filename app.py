@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 os.system("pip install pingouin")
 os.system("pip install matplotlib")
