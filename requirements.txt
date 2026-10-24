@@ -2,5 +2,5 @@ streamlit
 pandas
 numpy
 matplotlib
-requests
+pingouni
 scipy
