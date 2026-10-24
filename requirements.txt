@@ -1,7 +1,7 @@
 streamlit
 pandas
 numpy
-
-
-
-
+matplotlib
+pingouni
+requests
+scipy
