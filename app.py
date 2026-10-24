@@ -1,4 +1,7 @@
 from __future__ import annotations
+import os
+os.system("pip install scipy==1.11.4")
+os.system("pip install pingouin==0.5.4")
 
 
 
