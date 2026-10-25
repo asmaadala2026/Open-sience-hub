@@ -705,8 +705,15 @@ with st.sidebar:
         help="GitHub inputs support public HTTPS file links only. Private repositories and tokenized links are not supported.",
     )
     st.markdown("#### Study data")
-    phase1_data: pd.DataFrame | None = None
-    phase2_data: pd.DataFrame | None = None
+    try:
+    with open("demo_phase1.sav", "rb") as f1:
+        phase1_data = read_uploaded_data("demo_phase1.sav", f1.read())
+    with open("demo_phase2.sav", "rb") as f2:
+        phase2_data = read_uploaded_data("demo_phase2.sav", f2.read())
+except Exception as e:
+    phase1_data = None
+    phase2_data = None
+
 
     if source_mode == "Two phase files":
         if data_source == "Upload from device":
