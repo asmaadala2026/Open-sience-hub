@@ -400,12 +400,9 @@ def efa_result(
     eigenvalues = np.linalg.eigvalsh(correlation.to_numpy())[::-1]
     kmo_per_item, kmo_model = calculate_kmo(complete)
     bartlett_chi2, bartlett_p = calculate_bartlett_sphericity(complete)
-    model = FactorAnalyzer(
-        n_factors=factor_count,
-        rotation=rotation,
-        method="minres",
-    (
+        model = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method="minres")
     model.fit_covariance(complete.corr(), n_obs=len(complete))
+
 
     loading_table = pd.DataFrame(
         model.loadings_,
