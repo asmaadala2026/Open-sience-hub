@@ -32,6 +32,41 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+# ------------------ Multi-Language & Developer Settings ------------------
+if 'lang' not in st.session_state:
+    st.session_state.lang = 'English'
+
+translations = {
+    'English': {
+        'developer': "👩‍💻 Platform Developer: Asmaa Dala",
+        'select_lang': "Select Language / اختر اللغة",
+    },
+    'العربية': {
+        'developer': "👩‍💻 مطورة المنصة: الطالبة أسماء دالة",
+        'select_lang': "اختر اللغة / Select Language",
+    },
+    'Français': {
+        'developer': "👩‍💻 Développeuse: Asmaa Dala",
+        'select_lang': "Choisir la langue",
+    }
+}
+
+# Add language selection dropdown at the top of the sidebar
+selected_language = st.sidebar.selectbox(
+    translations[st.session_state.lang]['select_lang'],
+    ['English', 'العربية', 'Français'],
+    index=['English', 'العربية', 'Français'].index(st.session_state.lang)
+)
+st.session_state.lang = selected_language
+lang_dict = translations[st.session_state.lang]
+
+# Display your name as the developer in a beautifully styled sidebar card
+st.sidebar.markdown(f"""
+<div style="background-color: #f0f2f6; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #d1d5db; text-align: center;">
+    <h4 style="margin: 0; color: #1f2937; font-family: sans-serif; font-size: 14px;">{lang_dict['developer']}</h4>
+</div>
+""", unsafe_allow_html=True)
+# -------------------------------------------------------------------------
 
 
 st.markdown(
