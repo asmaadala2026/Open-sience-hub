@@ -393,8 +393,8 @@ def efa_result(
         correlation = complete.corr()
         if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
             raise ValueError("The item correlation matrix contains undefined or infinite values.")
-    except Exception as e:
-        raise ValueError(f"Failed to calculate the correlation matrix: {str(e)}")
+        except Exception as e:
+          raise ValueError(f"Failed to calculate the correlation matrix: {str(e)}")
 
              
 
