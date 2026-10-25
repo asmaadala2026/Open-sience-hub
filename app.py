@@ -26,9 +26,8 @@ import requests
 import scipy.stats as stats
 import streamlit as st
 from factor_analyzer import FactorAnalyzer
-from factor_analyzer.factor_analyzer import (
-    calculate_bartlett_sphericity,
-    calculate_kmo,
+from factor_analyzer.factor_analyzer import calculate_bartlett_sphericity, calculate_kmo
+
 from semopy import Model, calc_stats
 
 
