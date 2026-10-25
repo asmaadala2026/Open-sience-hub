@@ -389,10 +389,17 @@ def efa_result(
         item for item in items if complete[item].nunique(dropna=True) < 2
     ]
     if constant_items:
-          correlation = complete.corr()
+              correlation = None
+    try:
+        numeric_df = complete.select_dtypes(include=[np.number])
+        if not numeric_df.empty:
+            correlation = numeric_df.corr()
+    except:
+        pass
+
     if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
-        raise ValueError("The item correlation matrix contains undefined or infinite values.")
- 
+        raise ValueError("The item correlation matrix contains undefined or missing numeric values.")
+        
              
 
 def build_cfa_specification(
