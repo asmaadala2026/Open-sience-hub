@@ -404,23 +404,8 @@ def efa_result(
     loading_table = pd.DataFrame(model.loadings_, index=items, columns=[f"Factor {index + 1}" for index in range(model.loadings_.shape[1])])
     loading_table.index.name = "Item"
 
-        "n_complete": int(len(complete)),
-        "kmo": float(kmo_model),
-        "kmo_items": pd.Series(kmo_per_item, index=items, name="KMO"),
-        "bartlett_chi2": float(bartlett_chi2),
-        "bartlett_p": float(bartlett_p),
-        "eigenvalues": pd.DataFrame(
-            {
-                "Component": [f"Component {index + 1}" for index in range(len(eigenvalues))],
-                "Eigenvalue": eigenvalues,
-                "Kaiser > 1": eigenvalues > 1,
-            }
-        ),
-        "loadings": loading_table,
-        "factor_count": factor_count,
-        "rotation": rotation,
-        "method": "Minimum residual (MINRES)",
-    }
+    return {"n_complete": int(len(complete)), "kmo": float(kmo_model), "kmo_items": pd.Series(kmo_per_item, index=items, name="KMO"), "bartlett_chi2": float(bartlett_chi2), "bartlett_p": float(bartlett_p), "eigenvalues": pd.DataFrame({"Component": [f"Component {index + 1}" for index in range(len(eigenvalues))], "Eigenvalue": eigenvalues, "Kaiser > 1": eigenvalues > 1}), "loadings": loading_table, "factor_count": factor_count, "rotation": rotation, "method": "Minimum residual (MINRES)"}
+
 
 
 def build_cfa_specification(
