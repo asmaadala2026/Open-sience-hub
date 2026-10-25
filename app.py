@@ -800,43 +800,45 @@ if phase1_data is None and phase2_data is None:
     st.stop()
 
 
-available_data = [data for data in (phase1_data, phase2_data) if data is not None]
-common_columns = set(available_data[0].columns)
-for data in available_data[1:]:
-    common_columns &= set(data.columns)
-numeric_items = [
-    column
-    for column in available_data[0].select_dtypes(include="number").columns
-    if column in common_columns
-    and not any(
-        token in str(column).lower()
-        for token in ("id", "participant", "respondent", "case", "index", "phase", "group")
+    available_data = [data for data in (phase1_data, phase2_data) if data is not None]
+    common_columns = set(available_data[0].columns) if available_data else set()
+    for data in available_data[1:]:
+        common_columns &= set(data.columns)
+    
+    numeric_items = []
+    if available_data:
+        excluded_keywords = ['id', 'participant', 'case', 'total', 'gender', 'sex', 'الجنس', 'المجموع']
+        numeric_items = [
+            col for col in available_data[0].select_dtypes(include=[np.number]).columns
+            if col in common_columns and not any(kw in str(col).lower() for kw in excluded_keywords)
+        ]
+    
+    if not numeric_items:
+        st.error("No shared numeric item columns were found across the phase files.")
+        st.stop()
+        
+    with st.expander("Review uploaded data before selecting items"):
+        if phase1_data is not None:
+            st.caption(f"Phase 1 · {len(phase1_data)} rows extracted")
+            st.dataframe(phase1_data.head(6), use_container_width=True)
+        if phase2_data is not None:
+            st.caption(f"Phase 2 · {len(phase2_data)} rows extracted")
+            st.dataframe(phase2_data.head(6), use_container_width=True)
+            
+    st.markdown("### Select scale items")
+    st.caption("Explicitly choose only the response items belonging to your psychometric scale.")
+    
+    default_items = [col for col in numeric_items if str(col).lower().startswith('s')]
+    if not default_items and numeric_items:
+        default_items = numeric_items[:min(10, len(numeric_items))]
+        
+    selected_items = st.multiselect(
+        "Scale item columns",
+        options=numeric_items,
+        default=default_items,
+        format_func=str,
     )
-]
-if not numeric_items:
-    st.error(
-        "No shared numeric item columns were detected. Check that the item responses are numeric in each phase file."
-    )
-    st.stop()
 
-with st.expander("Review uploaded data before selecting items"):
-    if phase1_data is not None:
-        st.caption(f"Phase 1 · {len(phase1_data)} rows")
-        st.dataframe(phase1_data.head(6), width="stretch", hide_index=True)
-    if phase2_data is not None:
-        st.caption(f"Phase 2 · {len(phase2_data)} rows")
-        st.dataframe(phase2_data.head(6), width="stretch", hide_index=True)
-
-st.markdown("### Select scale items")
-st.caption(
-    "Explicitly choose only the response items belonging to the scale. Numeric IDs, demographics, and grouping variables should be excluded."
-)
-selected_items = st.multiselect(
-    "Scale item columns",
-    options=numeric_items,
-    default=[],
-    format_func=str,
-)
 if not selected_items:
     st.warning(
         "Select the scale response columns to continue. No analysis runs until you choose them."
