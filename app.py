@@ -405,7 +405,8 @@ def efa_result(
         rotation=rotation,
         method="minres",
     )
-    model.fit(complete)
+        model.fit_covariance(complete.corr(), n_obs=len(complete))
+
     loading_table = pd.DataFrame(
         model.loadings_,
         index=items,
