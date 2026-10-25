@@ -1,3 +1,10 @@
+import sklearn.utils
+import sklearn.utils.validation
+if not hasattr(sklearn.utils, 'force_all_finite'):
+    sklearn.utils.force_all_finite = True
+if not hasattr(sklearn.utils.validation, 'force_all_finite'):
+    sklearn.utils.validation.force_all_finite = True
+    
 from __future__ import annotations
 
 
@@ -22,7 +29,6 @@ from factor_analyzer import FactorAnalyzer
 from factor_analyzer.factor_analyzer import (
     calculate_bartlett_sphericity,
     calculate_kmo,
-)
 from semopy import Model, calc_stats
 
 
