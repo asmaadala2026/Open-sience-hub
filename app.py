@@ -1,3 +1,4 @@
+from __future__ import annotations
 import sklearn.utils
 import sklearn.utils.validation
 if not hasattr(sklearn.utils, 'force_all_finite'):
@@ -5,7 +6,6 @@ if not hasattr(sklearn.utils, 'force_all_finite'):
 if not hasattr(sklearn.utils.validation, 'force_all_finite'):
     sklearn.utils.validation.force_all_finite = True
     
-from __future__ import annotations
 
 
 
