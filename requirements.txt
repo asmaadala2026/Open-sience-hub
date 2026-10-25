@@ -2,5 +2,9 @@ streamlit
 pandas
 numpy
 matplotlib
-
-
+scipy
+pingouin
+pyreadstat
+factor_analyzer
+semopy
+requests
