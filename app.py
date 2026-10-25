@@ -705,7 +705,7 @@ with st.sidebar:
         help="GitHub inputs support public HTTPS file links only. Private repositories and tokenized links are not supported.",
     )
     st.markdown("#### Study data")
-    try:
+try:
     with open("demo_phase1.sav", "rb") as f1:
         phase1_data = read_uploaded_data("demo_phase1.sav", f1.read())
     with open("demo_phase2.sav", "rb") as f2:
@@ -714,62 +714,47 @@ except Exception as e:
     phase1_data = None
     phase2_data = None
 
+if source_mode == "Two phase files":
+    if data_source == "Upload from device":
+        phase1_file = st.file_uploader(
+            "Phase 1 - EFA sample",
+            type=SUPPORTED_TYPES,
+            key="phase1_upload",
+            help="Planned sample: 150 cases. Supported: SPSS, Excel, CSV."
+        )
+        phase2_file = st.file_uploader(
+            "Phase 2 - CFA sample",
+            type=SUPPORTED_TYPES,
+            key="phase2_upload",
+            help="Planned sample: 150 cases. Supported: SPSS, Excel, CSV."
+        )
+        for uploaded, label in ((phase1_file, "Phase 1"), (phase2_file, "Phase 2")):
+            if uploaded is not None:
+                try:
+                    loaded = read_uploaded_data(uploaded.name, uploaded.getvalue())
+                    if label == "Phase 1":
+                        phase1_data = loaded
+                    else:
+                        phase2_data = loaded
+                except Exception as error:
+                    st.error(f"Could not read the {label} file: {error}")
+    else:
+        st.caption("Paste public GitHub blob or raw file URLs. Private repositories, query strings, and files over 50 MB are not supported.")
+        phase1_url = st.text_input("Phase 1 - GitHub file URL", placeholder="https://github.com", key="phase1_github_url")
+        phase2_url = st.text_input("Phase 2 - GitHub file URL", placeholder="https://github.com/owner/repo/blob/main/phase2.sav", key="phase2_github_url")
+        for url, label, cache_key in ((phase1_url, "Phase 1", "phase1"), (phase2_url, "Phase 2", "phase2")):
+            if url.strip():
+                try:
+                    with st.spinner(f"Fetching the public {label} file from GitHub..."):
+                        loaded = read_github_data(url, cache_key)
+                        if label == "Phase 1":
+                            phase1_data = loaded
+                        else:
+                            phase2_data = loaded
+                except Exception as error:
+                    st.error(f"Could not load the {label} GitHub file: {error}")
+                    
 
-    if source_mode == "Two phase files":
-        if data_source == "Upload from device":
-            phase1_file = st.file_uploader(
-                "Phase 1 · EFA sample",
-                type=SUPPORTED_TYPES,
-                key="phase1_upload",
-                help="Planned sample: 150 cases. Supported: SPSS, Excel, CSV.",
-            )
-            phase2_file = st.file_uploader(
-                "Phase 2 · CFA sample",
-                type=SUPPORTED_TYPES,
-                key="phase2_upload",
-                help="Planned sample: 150 cases. Supported: SPSS, Excel, CSV.",
-            )
-            for uploaded, label in (
-                (phase1_file, "Phase 1"),
-                (phase2_file, "Phase 2"),
-            ):
-                if uploaded is not None:
-                    try:
-                        loaded = read_uploaded_data(uploaded.name, uploaded.getvalue())
-                        if label == "Phase 1":
-                            phase1_data = loaded
-                        else:
-                            phase2_data = loaded
-                    except Exception as error:
-                        st.error(f"Could not read the {label} file: {error}")
-        else:
-            st.caption(
-                "Paste public GitHub blob or raw file URLs. Private repositories, query strings, and files over 50 MB are not supported."
-            )
-            phase1_url = st.text_input(
-                "Phase 1 · GitHub file URL",
-                placeholder="https://github.com/owner/repo/blob/main/phase1.sav",
-                key="phase1_github_url",
-            )
-            phase2_url = st.text_input(
-                "Phase 2 · GitHub file URL",
-                placeholder="https://github.com/owner/repo/blob/main/phase2.sav",
-                key="phase2_github_url",
-            )
-            for url, label, cache_key in (
-                (phase1_url, "Phase 1", "phase1"),
-                (phase2_url, "Phase 2", "phase2"),
-            ):
-                if url.strip():
-                    try:
-                        with st.spinner(f"Fetching the public {label} file from GitHub…"):
-                            loaded = read_github_data(url, cache_key)
-                        if label == "Phase 1":
-                            phase1_data = loaded
-                        else:
-                            phase2_data = loaded
-                    except Exception as error:
-                        st.error(f"Could not load the {label} GitHub file: {error}")
     else:
         combined_data = None
         if data_source == "Upload from device":
