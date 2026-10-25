@@ -389,24 +389,14 @@ def efa_result(
         item for item in items if complete[item].nunique(dropna=True) < 2
     ]
     if constant_items:
-        raise ValueError(
-            "These selected items have no variability among complete cases: "
-            + ", ".join(map(str, constant_items))
-            + ". Remove or correct them before running EFA."
-        )
+       try:
         correlation = complete.corr()
-    if not np.isfinite(correlation.to_numpy()).all(): raise ValueError("The item correlation matrix contains undefined values.")
-    eigenvalues = np.linalg.eigvalsh(correlation.to_numpy())[::-1]
-    kmo_per_item, kmo_model = calculate_kmo(complete)
-    bartlett_chi2, bartlett_p = calculate_bartlett_sphericity(complete)
-    model = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method="minres")
-    model.fit_covariance(correlation, n_obs=len(complete))
-    loading_table = pd.DataFrame(model.loadings_, index=items, columns=[f"Factor {index + 1}" for index in range(model.loadings_.shape[1])])
-    loading_table.index.name = "Item"
+        if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
+            raise ValueError("The item correlation matrix contains undefined or infinite values.")
+    except Exception as e:
+        raise ValueError(f"Failed to calculate the correlation matrix: {str(e)}")
 
-    return {"n_complete": int(len(complete)), "kmo": float(kmo_model), "kmo_items": pd.Series(kmo_per_item, index=items, name="KMO"), "bartlett_chi2": float(bartlett_chi2), "bartlett_p": float(bartlett_p), "eigenvalues": pd.DataFrame({"Component": [f"Component {index + 1}" for index in range(len(eigenvalues))], "Eigenvalue": eigenvalues, "Kaiser > 1": eigenvalues > 1}), "loadings": loading_table, "factor_count": factor_count, "rotation": rotation, "method": "Minimum residual (MINRES)"}
-
-
+             
 
 def build_cfa_specification(
     factor_assignments: dict[str, list[str]],
