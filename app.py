@@ -755,64 +755,6 @@ if source_mode == "Two phase files":
                     st.error(f"Could not load the {label} GitHub file: {error}")
                     
 
-    else:
-        combined_data = None
-        if data_source == "Upload from device":
-            combined_file = st.file_uploader(
-                "Combined dataset",
-                type=SUPPORTED_TYPES,
-                key="combined_upload",
-                help="Your file needs a column that identifies Phase 1 and Phase 2.",
-            )
-            if combined_file is not None:
-                try:
-                    combined_data = read_uploaded_data(
-                        combined_file.name, combined_file.getvalue()
-                    )
-                except Exception as error:
-                    st.error(f"Could not read the combined file: {error}")
-        else:
-            st.caption(
-                "Paste a public GitHub blob or raw file URL. Files over 50 MB are not supported; the file must contain a phase-identification column."
-            )
-            combined_url = st.text_input(
-                "Combined dataset · GitHub file URL",
-                placeholder="https://github.com/owner/repo/blob/main/study.sav",
-                key="combined_github_url",
-            )
-            if combined_url.strip():
-                try:
-                    with st.spinner("Fetching the public combined file from GitHub…"):
-                        combined_data = read_github_data(combined_url, "combined")
-                except Exception as error:
-                    st.error(f"Could not load the combined GitHub file: {error}")
-
-        if combined_data is not None:
-            phase_column = st.selectbox(
-                "Phase-identification column",
-                options=combined_data.columns.tolist(),
-                format_func=str,
-                key="combined_phase_column",
-            )
-            phase_values = combined_data[phase_column].dropna().unique().tolist()
-            if len(phase_values) < 2:
-                st.warning("The selected column needs at least two distinct phase values.")
-            else:
-                default_phase2 = min(1, len(phase_values) - 1)
-                phase1_value = st.selectbox(
-                    "Value for Phase 1",
-                    options=phase_values,
-                    index=0,
-                    format_func=str,
-                    key="combined_phase1_value",
-                )
-                phase2_value = st.selectbox(
-                    "Value for Phase 2",
-                    options=phase_values,
-                    index=default_phase2,
-                    format_func=str,
-                    key="combined_phase2_value",
-                )
                 if phase1_value == phase2_value:
                     st.error("Choose two different values for the study phases.")
                 else:
