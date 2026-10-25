@@ -404,8 +404,8 @@ def efa_result(
         n_factors=factor_count,
         rotation=rotation,
         method="minres",
-    )
-        model.fit_covariance(complete.corr(), n_obs=len(complete))
+    (
+    model.fit_covariance(complete.corr(), n_obs=len(complete))
 
     loading_table = pd.DataFrame(
         model.loadings_,
