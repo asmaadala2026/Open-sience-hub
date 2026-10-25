@@ -799,6 +799,7 @@ if phase1_data is None and phase2_data is None:
     )
     st.stop()
 
+selected_items = []
 
     available_data = [data for data in (phase1_data, phase2_data) if data is not None]
     common_columns = set(available_data[0].columns) if available_data else set()
