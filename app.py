@@ -1,13 +1,4 @@
 from __future__ import annotations
-import streamlit as st
-import os
-
-@st.cache_resource
-def install_packages():
-    os.system("pip install scipy==1.11.4")
-    os.system("pip install pingouin==0.5.4")
-
-install_packages()
 
 
 
