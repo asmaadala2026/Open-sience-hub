@@ -394,23 +394,16 @@ def efa_result(
             + ", ".join(map(str, constant_items))
             + ". Remove or correct them before running EFA."
         )
-    correlation = complete.corr()
-    if not np.isfinite(correlation.to_numpy()).all():
-        raise ValueError("The item correlation matrix contains undefined values.")
+        correlation = complete.corr()
+    if not np.isfinite(correlation.to_numpy()).all(): raise ValueError("The item correlation matrix contains undefined values.")
     eigenvalues = np.linalg.eigvalsh(correlation.to_numpy())[::-1]
     kmo_per_item, kmo_model = calculate_kmo(complete)
     bartlett_chi2, bartlett_p = calculate_bartlett_sphericity(complete)
-        model = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method="minres")
-    model.fit_covariance(complete.corr(), n_obs=len(complete))
-
-
-    loading_table = pd.DataFrame(
-        model.loadings_,
-        index=items,
-        columns=[f"Factor {index + 1}" for index in range(model.loadings_.shape[1])],
-    )
+    model = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method="minres")
+    model.fit_covariance(correlation, n_obs=len(complete))
+    loading_table = pd.DataFrame(model.loadings_, index=items, columns=[f"Factor {index + 1}" for index in range(model.loadings_.shape[1])])
     loading_table.index.name = "Item"
-    return {
+
         "n_complete": int(len(complete)),
         "kmo": float(kmo_model),
         "kmo_items": pd.Series(kmo_per_item, index=items, name="KMO"),
