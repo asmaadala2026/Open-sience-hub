@@ -39,15 +39,24 @@ if 'lang' not in st.session_state:
 translations = {
     'English': {
         'developer': "👩‍💻 Platform Developer: Asmaa Dala",
-        'select_lang': "Select Language / اختر اللغة",
+        'select_lang': "Select Language",
+        'main_title': "Attitude Lab",
+        'subtitle': "Explore the measurement quality of employee attitudes toward generative AI...",
+        'start_text': "Start with your study data"
     },
     'العربية': {
         'developer': "👩‍💻 مطورة المنصة: الطالبة أسماء دالة",
-        'select_lang': "اختر اللغة / Select Language",
+        'select_lang': "اختر اللغة",
+        'main_title': "مختبر الاتجاهات (Attitude Lab)",
+        'subtitle': "استكشف جودة قياس اتجاهات الموظفين نحو الذكاء الاصطناعي التوليدي...",
+        'start_text': "ابدأ ببيانات دراستك"
     },
     'Français': {
         'developer': "👩‍💻 Développeuse: Asmaa Dala",
         'select_lang': "Choisir la langue",
+        'main_title': "Attitude Lab",
+        'subtitle': "Explorez la qualité de la mesure des attitudes des employés envers l'IA générative...",
+        'start_text': "Commencez avec vos données d'étude"
     }
 }
 
@@ -66,7 +75,7 @@ st.sidebar.markdown(f"""
     <h4 style="margin: 0; color: #1f2937; font-family: sans-serif; font-size: 14px;">{lang_dict['developer']}</h4>
 </div>
 """, unsafe_allow_html=True)
-# -------------------------------------------------------------------------
+
 
 
 st.markdown(
