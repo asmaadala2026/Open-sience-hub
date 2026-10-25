@@ -389,13 +389,10 @@ def efa_result(
         item for item in items if complete[item].nunique(dropna=True) < 2
     ]
     if constant_items:
-       try:
-        correlation = complete.corr()
-        if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
-            raise ValueError("The item correlation matrix contains undefined or infinite values.")
-        except Exception as e:
-          raise ValueError(f"Failed to calculate the correlation matrix: {str(e)}")
-
+          correlation = complete.corr()
+    if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
+        raise ValueError("The item correlation matrix contains undefined or infinite values.")
+ 
              
 
 def build_cfa_specification(
