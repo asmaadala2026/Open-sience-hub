@@ -29,7 +29,8 @@ from factor_analyzer import FactorAnalyzer
 from factor_analyzer.factor_analyzer import calculate_bartlett_sphericity, calculate_kmo
 
 from semopy import Model, calc_stats
-
+phase1_data = None
+phase2_data = None
 
 st.set_page_config(
     page_title="Attitude Lab · Psychometric Analysis",
