@@ -399,7 +399,51 @@ def efa_result(
 
     if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
         raise ValueError("The item correlation matrix contains undefined or missing numeric values.")
-        
+    # Import necessary libraries
+    from factor_analyzer import FactorAnalyzer
+    from factor_analyzer.factor_analyzer import calculate_kmo, calculate_bartlett_sphericity
+    import pandas as pd
+    import numpy as np
+
+    # 1. Calculate KMO and Bartlett's test
+    try:
+        kmo_all, kmo_model = calculate_kmo(complete)
+        bartlett_chi2, bartlett_p = calculate_bartlett_sphericity(complete)
+    except Exception:
+        kmo_all = np.full(len(items), np.nan)
+        kmo_model = np.nan
+        bartlett_chi2 = np.nan
+        bartlett_p = np.nan
+
+    kmo_items = pd.Series(kmo_all, index=items)
+
+    # 2. Fit EFA using Principal Component Analysis (PCA) to match SPSS
+    fa = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method='principal')
+    fa.fit(complete)
+
+    # 3. Extract factor loadings
+    loadings = pd.DataFrame(fa.loadings_, index=items, columns=[f"Factor {i+1}" for i in range(factor_count)])
+
+    # 4. Extract eigenvalues
+    ev, _ = fa.get_eigenvalues()
+    eigenvalues_df = pd.DataFrame({
+        "Component": range(1, len(ev) + 1),
+        "Eigenvalue": ev
+    })
+
+    # 5. Return the results dictionary
+    return {
+        "n_complete": len(complete),
+        "kmo": kmo_model,
+        "kmo_items": kmo_items,
+        "bartlett_chi2": bartlett_chi2,
+        "bartlett_p": bartlett_p,
+        "method": "PCA (Principal Component Analysis)",
+        "rotation": rotation,
+        "factor_count": factor_count,
+        "loadings": loadings,
+        "eigenvalues": eigenvalues_df
+    }    
              
 
 def build_cfa_specification(
