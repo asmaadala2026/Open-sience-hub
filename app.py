@@ -394,7 +394,7 @@ def efa_result(
         pass
     try:
         numeric_df = complete.select_dtypes(include=[np.number])
-            if not numeric_df.empty:
+        if not numeric_df.empty:
                 # Remove zero-variance columns to prevent division by zero
                 numeric_df = numeric_df.loc[:, numeric_df.std(ddof=0) > 0]
                 # Calculate correlation and replace any remaining NaNs with 0
