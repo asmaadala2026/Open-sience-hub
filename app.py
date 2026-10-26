@@ -392,7 +392,7 @@ def efa_result(
     correlation = None
     if constant_items:
         pass
-  try:
+    try:
             numeric_df = complete.select_dtypes(include=[np.number])
             if not numeric_df.empty:
                 numeric_df = numeric_df.loc[:, numeric_df.std(ddof=0) > 0]
