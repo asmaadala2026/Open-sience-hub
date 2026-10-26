@@ -1,8 +1,8 @@
 streamlit
 pandas
-numpy
-scikit-learn==1.2.2
-factor-analyzer==0.4.1
+numpy<2.0.0
+scikit-learn
+factor-analyzer==0.5.1
 pingouin
 pyreadstat
 semopy
