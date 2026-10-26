@@ -730,6 +730,8 @@ with st.sidebar:
 try:
     with open("demo_phase1.sav", "rb") as f1:
         phase1_data = read_uploaded_data("demo_phase1.sav", f1.read())
+    with open("demo_phase2.sav", "rb") as f2:
+        phase2_data = read_uploaded_data("demo_phase2.sav", f2.read())
 except Exception as e:
     pass
         
@@ -845,7 +847,7 @@ with st.expander("Review uploaded data before selecting items"):
 st.markdown("### Select scale items")
 st.caption("Explicitly choose only the response items belonging to your psychometric scale.")
 
-default_items = [col for col in numeric_items if str(col).lower().startswith('s')]
+default_items = [col for col in numeric_items if str(col).lower().startswith('s') and str(col).lower() not in ["some", "some1", "some2"]]
 if not default_items and numeric_items:
     default_items = numeric_items[:min(10, len(numeric_items))]
 
