@@ -395,6 +395,8 @@ def efa_result(
     try:
         numeric_df = complete.select_dtypes(include=[np.number])
         if not numeric_df.empty:
+            # Remove columns with zero variance to prevent correlation errors
+            numeric_df = numeric_df.loc[:, numeric_df.std() > 0]
             correlation = numeric_df.corr()
     except:
         pass
