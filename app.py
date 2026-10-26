@@ -389,8 +389,9 @@ def efa_result(
     constant_items = [
         item for item in items if complete[item].nunique(dropna=True) < 2
     ]
+    correlation = None
     if constant_items:
-              correlation = None
+        pass
     try:
         numeric_df = complete.select_dtypes(include=[np.number])
         if not numeric_df.empty:
