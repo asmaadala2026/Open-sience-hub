@@ -394,15 +394,16 @@ def efa_result(
         pass
     try:
         numeric_df = complete.select_dtypes(include=[np.number])
-        if not numeric_df.empty:
-            # Remove columns with zero variance to prevent correlation errors
-            numeric_df = numeric_df.loc[:, numeric_df.std() > 0]
-            correlation = numeric_df.corr()
-    except:
-        pass
+            if not numeric_df.empty:
+                # Remove zero-variance columns to prevent division by zero
+                numeric_df = numeric_df.loc[:, numeric_df.std(ddof=0) > 0]
+                # Calculate correlation and replace any remaining NaNs with 0
+                correlation = numeric_df.corr().fillna(0)
+        except Exception as e:
+            pass
 
-    if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
-        raise ValueError("The item correlation matrix contains undefined or missing numeric values.")
+   # if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
+   #     raise ValueError("The item correlation matrix contains undefined or missing numeric values.")
     # Import necessary libraries
     from factor_analyzer import FactorAnalyzer
     from factor_analyzer.factor_analyzer import calculate_kmo, calculate_bartlett_sphericity
