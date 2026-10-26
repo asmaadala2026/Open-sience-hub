@@ -721,10 +721,11 @@ with st.sidebar:
         help="Use two uploads when each phase is in a separate file, or a combined file with one column identifying the phase.",
     )
     data_source = st.radio(
-        "Where are the files?",
-        ["Upload from device", "Public GitHub URLs"],
-        help="GitHub inputs support public HTTPS file links only. Private repositories and tokenized links are not supported.",
-    )
+    "Where are the files?",
+    ["Upload from device", "Public GitHub URLs"],
+    index=1,
+    help="GitHub inputs support public HTTPS file links only. Private repositories and tokenized links are not supported.",
+   )
     st.markdown("#### Study data")
 try:
     with open("demo_phase1.sav", "rb") as f1:
