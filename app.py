@@ -932,11 +932,11 @@ with tabs[1]:
                 int(factor_count),
                 rotation,
             
-            )
+            
                 
                 "Bartlett χ²",
                 f"{efa_output['bartlett_chi2']:.2f}",
-            )
+            
             metrics[3].metric("Bartlett p", f"{efa_output['bartlett_p']:.4g}")
             st.markdown("#### Eigenvalues")
             st.dataframe(
