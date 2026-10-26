@@ -979,7 +979,7 @@ with tabs[1]:
                 rotation,
             )
             
-                
+            metrics[2].metric(
                 "Bartlett χ²",
                 f"{efa_output['bartlett_chi2']:.2f}",
             
