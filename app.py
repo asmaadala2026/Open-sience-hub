@@ -977,7 +977,7 @@ with tabs[1]:
                 selected_items,
                 int(factor_count),
                 rotation,
-            
+            )
             
                 
                 "Bartlett χ²",
