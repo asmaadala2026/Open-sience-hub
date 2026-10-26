@@ -683,9 +683,11 @@ with st.sidebar:
 try:
     with open("demo_phase1.sav", "rb") as f1:
         phase1_data = read_uploaded_data("demo_phase1.sav", f1.read())
+except Exception as e:
+    pass
         
-
 if source_mode == "Two phase files":
+    
     if data_source == "Upload from device":
         phase1_file = st.file_uploader(
             "Phase 1 - EFA sample",
