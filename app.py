@@ -683,11 +683,7 @@ with st.sidebar:
 try:
     with open("demo_phase1.sav", "rb") as f1:
         phase1_data = read_uploaded_data("demo_phase1.sav", f1.read())
-    with open("demo_phase2.sav", "rb") as f2:
-        phase2_data = read_uploaded_data("demo_phase2.sav", f2.read())
-except Exception as e:
-    phase1_data = None
-    phase2_data = None
+        
 
 if source_mode == "Two phase files":
     if data_source == "Upload from device":
@@ -935,11 +931,9 @@ with tabs[1]:
                 selected_items,
                 int(factor_count),
                 rotation,
+            
             )
-            metrics = st.columns(4)
-            metrics[0].metric("Complete-case n", efa_output["n_complete"])
-            metrics[1].metric("Overall KMO", f"{efa_output['kmo']:.3f}")
-            metrics[2].metric(
+                
                 "Bartlett χ²",
                 f"{efa_output['bartlett_chi2']:.2f}",
             )
