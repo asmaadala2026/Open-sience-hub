@@ -392,15 +392,13 @@ def efa_result(
     correlation = None
     if constant_items:
         pass
-    try:
-        numeric_df = complete.select_dtypes(include=[np.number])
-        if not numeric_df.empty:
-                # Remove zero-variance columns to prevent division by zero
+  try:
+            numeric_df = complete.select_dtypes(include=[np.number])
+            if not numeric_df.empty:
                 numeric_df = numeric_df.loc[:, numeric_df.std(ddof=0) > 0]
-                # Calculate correlation and replace any remaining NaNs with 0
                 correlation = numeric_df.corr().fillna(0)
-        except Exception as e:
-            pass
+  except Exception as e:
+      pasS
 
    # if correlation is None or correlation.empty or not np.isfinite(correlation.to_numpy()).all():
    #     raise ValueError("The item correlation matrix contains undefined or missing numeric values.")
