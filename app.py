@@ -1012,6 +1012,13 @@ with tabs[1]:
                 efa_output["loadings"].style.format("{:.3f}"),
                 width="stretch",
             )
+            st.markdown("#### McDonald's Omega (ω)")
+        omegas = []
+        for factor in efa_output["loadings"].columns:
+            L = efa_output["loadings"][factor]
+            omega = (L.sum() ** 2) / ((L.sum() ** 2) + (1 - L**2).sum())
+            omegas.append({"Factor": factor, "McDonald's Omega": omega})
+        st.dataframe(pd.DataFrame(omegas).style.format({"McDonald's Omega": "{:.3f}"}), width="stretch", hide_index=True)
             st.markdown("#### Item-level KMO")
             st.dataframe(
                 efa_output["kmo_items"].rename_axis("Item").reset_index().style.format(
