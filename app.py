@@ -1002,13 +1002,7 @@ with tabs[1]:
                 width="stretch",
                 hide_index=True,
             )
-            st.markdown("#### McDonald's Omega (ω)")
-        omegas = []
-        for factor in efa_output["loadings"].columns:
-            L = efa_output["loadings"][factor]
-            omega = (L.sum() ** 2) / ((L.sum() ** 2) + (1 - L**2).sum())
-            omegas.append({"Factor": factor, "McDonald's Omega": omega})
-            st.dataframe(pd.DataFrame(omegas).style.format({"McDonald's Omega": "{:.3f}"}), width="stretch", hide_index=True)
+            
             st.markdown("#### Factor loadings")
             st.caption(
                 f"{efa_output['method']} extraction · {efa_output['rotation']} rotation · "
