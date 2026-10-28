@@ -33,7 +33,7 @@ import scipy.stats as stats
 import streamlit as st
 from factor_analyzer import FactorAnalyzer
 from factor_analyzer.factor_analyzer import calculate_bartlett_sphericity, calculate_kmo
-metrics = {}
+
 from semopy import Model, calc_stats
 phase1_data = None
 phase2_data = None
@@ -990,7 +990,7 @@ with tabs[1]:
                 int(factor_count),
                 rotation,
             )
-            
+            metrics = st.columns(4)
             metrics[2].metric(
                 "Bartlett χ²",
                 f"{efa_output['bartlett_chi2']:.2f}",
