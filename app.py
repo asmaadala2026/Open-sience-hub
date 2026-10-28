@@ -981,7 +981,7 @@ with tabs[1]:
             with controls[1]:
                 rotation = st.selectbox(
                     "Rotation",
-                    ["oblimin", "varimax"],
+                    ["oblimin"],
                     help="Oblimin allows factors to correlate; varimax constrains factor correlations to zero.",
                 )
             efa_output = efa_result(
