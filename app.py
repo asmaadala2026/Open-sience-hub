@@ -1000,6 +1000,8 @@ with tabs[1]:
             st.dataframe(
                 efa_output["eigenvalues"].style.format({"Eigenvalue": "{:.3f}"}),
                 width="stretch",
+                hide_index=True,
+            )
             st.markdown("#### McDonald's Omega (ω)")
         omegas = []
         for factor in efa_output["loadings"].columns:
