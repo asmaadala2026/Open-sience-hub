@@ -1,14 +1,18 @@
 from __future__ import annotations
 import sklearn.utils.validation
-_original_check_array = sklearn.utils.validation.check_array
+import sklearn.utils
+import factor_analyzer.factor_analyzer
 
-def _patched_check_array(*args, **kwargs):
+_orig = sklearn.utils.validation.check_array
+
+def _patched(*args, **kwargs):
     if 'force_all_finite' in kwargs:
         kwargs['ensure_all_finite'] = kwargs.pop('force_all_finite')
-    return _original_check_array(*args, **kwargs)
+    return _orig(*args, **kwargs)
 
-sklearn.utils.validation.check_array = _patched_check_array
-
+sklearn.utils.validation.check_array = _patched
+sklearn.utils.check_array = _patched
+factor_analyzer.factor_analyzer.check_array = _patched
 
 
 import io
