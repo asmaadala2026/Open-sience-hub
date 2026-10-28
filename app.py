@@ -1,11 +1,13 @@
 from __future__ import annotations
-import sklearn.utils
 import sklearn.utils.validation
-if not hasattr(sklearn.utils, 'force_all_finite'):
-    sklearn.utils.force_all_finite = True
-if not hasattr(sklearn.utils.validation, 'force_all_finite'):
-    sklearn.utils.validation.force_all_finite = True
-    
+_original_check_array = sklearn.utils.validation.check_array
+
+def _patched_check_array(*args, **kwargs):
+    if 'force_all_finite' in kwargs:
+        kwargs['ensure_all_finite'] = kwargs.pop('force_all_finite')
+    return _original_check_array(*args, **kwargs)
+
+sklearn.utils.validation.check_array = _patched_check_array
 
 
 
