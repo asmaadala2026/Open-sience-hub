@@ -1165,28 +1165,13 @@ with tabs[2]:
             phase2_normality,
             phase2_reliability,
         )
-        metric_cols = st.columns(3)
+        metric_cols = st.columns(2)
         metric_cols[0].metric("Scale items", len(selected_items))
         metric_cols[1].metric(
             "Complete cases for alpha",
             phase2_reliability["n_complete"],
         )
-        metric_cols[2].metric(
-            "Cronbach's alpha",
-            (
-                f"{phase2_reliability['alpha']:.3f}"
-                if pd.notna(phase2_reliability["alpha"])
-                else "Unavailable"
-            ),
-            help="Listwise-complete cases across the selected items.",
-        )
-        if pd.notna(phase2_reliability["alpha"]):
-            st.caption(
-                f"95% CI [{phase2_reliability['ci_low']:.3f}, {phase2_reliability['ci_high']:.3f}] · "
-                f"{phase2_reliability['note']}"
-            )
-        else:
-            st.warning(phase2_reliability["note"])
+        
         st.markdown("#### Descriptive statistics")
         st.dataframe(
             phase2_descriptives.style.format(
@@ -1453,8 +1438,87 @@ with tabs[2]:
                 st.caption(
                     "Fit indices do not have universal pass/fail cutoffs. Interpret model fit, parameter estimates, confidence intervals, residuals, and theory together; report the estimator and item treatment explicitly."
                 )
-
-                add_report_rows(
+# --- Calculate and Display CR and AVE ---
+        st.markdown("#### Convergent Validity (CR & AVE)")
+        
+        try:
+            # 1. Extract standardized estimates (loadings) from the CFA parameters table
+            loadings = cfa_output["parameters"]
+            std_loadings = loadings[loadings['Operator'] == '=~']['Standardized estimate'].astype(float)
+            
+            # 2. Mathematical calculations for CR and AVE
+            sum_loadings_sq = (std_loadings.sum())**2  
+            sum_sq_loadings = (std_loadings**2).sum()  
+            sum_errors = (1 - std_loadings**2).sum()   
+            
+            # 3. Calculate final CR and AVE values
+            cr_value = sum_loadings_sq / (sum_loadings_sq + sum_errors)
+            ave_value = sum_sq_loadings / len(std_loadings)
+            
+            # Check if it is the specific demo scale to name the construct properly
+            is_demo_scale = "s2" in selected_items and "s30" in selected_items
+            construct_name = "General Attitude towards AI" if is_demo_scale else "Factor 1"
+            
+            # 4. Display the results in a clean dataframe
+            validity_df = pd.DataFrame({
+                "Construct": [construct_name],
+                "Composite Reliability (CR)": [f"{cr_value:.3f}"],
+                "Average Variance Extracted (AVE)": [f"{ave_value:.3f}"],
+                "Interpretation": ["Good" if ave_value >= 0.50 and cr_value >= 0.70 else "Needs Review"]
+            })
+            
+            st.dataframe(validity_df, width="stretch", hide_index=True)
+            
+        except Exception as e:
+            st.info("Could not calculate CR and AVE. Ensure the model has valid standardized estimates.")
+            # --- Calculate and Display Discriminant Validity (Multi-factor models only) ---
+        if cfa_factor_count > 1:
+            st.markdown("#### Discriminant Validity (Fornell-Larcker Criterion)")
+            try:
+                loadings_df = cfa_output["parameters"]
+                
+                # 1. Extract factors and calculate the square root of AVE for each factor
+                factors_list = loadings_df[loadings_df['Operator'] == '=~']['Left'].unique()
+                ave_dict = {}
+                for f in factors_list:
+                    f_loadings = loadings_df[(loadings_df['Operator'] == '=~') & (loadings_df['Left'] == f)]['Standardized estimate'].astype(float)
+                    if len(f_loadings) > 0:
+                        ave_dict[f] = (f_loadings**2).sum() / len(f_loadings)
+                
+                # 2. Extract inter-factor correlations
+                correlations = loadings_df[(loadings_df['Operator'] == '~~') & (loadings_df['Left'] != loadings_df['Right'])]
+                
+                # 3. Compare and output status
+                if not correlations.empty:
+                    disc_results = []
+                    for _, row in correlations.iterrows():
+                        f1 = row['Left']
+                        f2 = row['Right']
+                        if f1 in ave_dict and f2 in ave_dict:
+                            corr_val = abs(float(row['Standardized estimate']))
+                            sqrt_ave_f1 = ave_dict[f1] ** 0.5
+                            sqrt_ave_f2 = ave_dict[f2] ** 0.5
+                            
+                            # Condition: Sqrt(AVE) must be greater than correlation
+                            passed = (corr_val < sqrt_ave_f1) and (corr_val < sqrt_ave_f2)
+                            
+                            disc_results.append({
+                                "Pair": f"{f1} ↔ {f2}",
+                                "Correlation": f"{corr_val:.3f}",
+                                f"Sqrt AVE ({f1})": f"{sqrt_ave_f1:.3f}",
+                                f"Sqrt AVE ({f2})": f"{sqrt_ave_f2:.3f}",
+                                "Status": "Achieved" if passed else "Not Achieved"
+                            })
+                            
+                    if disc_results:
+                        disc_df = pd.DataFrame(disc_results)
+                        st.dataframe(disc_df, width="stretch", hide_index=True)
+                        st.caption("Fornell-Larcker criterion: The square root of AVE for each factor must be greater than its correlation with other factors.")
+                else:
+                    st.info("No inter-factor correlations found to evaluate discriminant validity.")
+            except Exception as e:
+                st.info("Could not calculate Discriminant Validity. Ensure the model output contains valid correlations.")
+            add_report_rows(
                     report_rows,
                     PHASE_LABELS["phase2"],
                     "CFA status",
@@ -1463,7 +1527,7 @@ with tabs[2]:
                     cfa_output["n_complete"],
                     cfa_output["estimator"],
                 )
-                add_report_rows(
+              add_report_rows(
                     report_rows,
                     PHASE_LABELS["phase2"],
                     "CFA model syntax",
@@ -1472,7 +1536,7 @@ with tabs[2]:
                     cfa_output["n_complete"],
                     "Simple-structure model; no cross-loadings or correlated residuals.",
                 )
-                add_report_rows(
+              add_report_rows(
                     report_rows,
                     PHASE_LABELS["phase2"],
                     "CFA executable syntax",
