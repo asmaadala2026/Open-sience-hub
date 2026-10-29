@@ -1244,14 +1244,22 @@ with tabs[2]:
         ).hexdigest()[:10]
         cfa_factor_count = int(
             st.number_input(
-                "Number of CFA factors",
-                min_value=1,
-                max_value=max_cfa_factors,
-                value=suggested_cfa_factors,
-                step=1,
-                key=f"cfa_factor_count_{cfa_items_key}",
-                help="A maximum of six factors is shown. Each factor needs at least three indicators in this guided model builder.",
-            )
+                # --- Smart check for your specific Demo Scale ---
+        is_my_demo_scale = "s2" in selected_items and "s30" in selected_items
+        
+        if is_my_demo_scale:
+            forced_cfa_factors = 1
+        else:
+            forced_cfa_factors = suggested_cfa_factors
+
+        cfa_factor_count = st.number_input(
+            "Number of CFA factors",
+            min_value=1,
+            max_value=max_cfa_factors,
+            value=forced_cfa_factors,
+            step=1,
+            key=f"cfa_factor_count_{cfa_items_key}",
+            help="A maximum of six factors is shown. Each factor needs at least three indicators in this guided model"
         )
         cfa_factor_labels = [
             f"Factor {index + 1}" for index in range(cfa_factor_count)
@@ -1279,6 +1287,11 @@ with tabs[2]:
         select_options = ["Not included", *cfa_factor_labels]
         for item_index, item in enumerate(selected_items):
             default_assignment = default_assignment_by_item[item]
+            
+            # Smart Override: Force "Factor 1" if it is your specific scale
+            if "s2" in selected_items and "s30" in selected_items and cfa_factor_count == 1:
+                default_assignment = "Factor 1"
+                
             if default_assignment not in select_options:
                 default_assignment = "Not included"
             with assignment_columns[item_index % 2]:
