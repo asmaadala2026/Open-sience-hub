@@ -1527,7 +1527,7 @@ with tabs[2]:
                     cfa_output["n_complete"],
                     cfa_output["estimator"],
                 )
-            add_report_rows(
+           add_report_rows(
                     report_rows,
                     PHASE_LABELS["phase2"],
                     "CFA model syntax",
@@ -1545,7 +1545,7 @@ with tabs[2]:
                     cfa_output["n_complete"],
                     "Uses the analysis aliases listed in the CFA item alias rows.",
                 )
-          add_report_rows(
+           add_report_rows(
                     report_rows,
                     PHASE_LABELS["phase2"],
                     "CFA estimator",
