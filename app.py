@@ -1141,20 +1141,7 @@ with tabs[1]:
             phase1_plot_item,
             PHASE_LABELS["phase1"],
         )
-        st.markdown("#### Phase 1 reliability")
-        if pd.notna(phase1_reliability["alpha"]):
-            st.metric(
-                "Cronbach's alpha",
-                f"{phase1_reliability['alpha']:.3f}",
-                help="Listwise-complete cases across the selected items.",
-            )
-            st.caption(
-                f"95% CI [{phase1_reliability['ci_low']:.3f}, "
-                f"{phase1_reliability['ci_high']:.3f}] · "
-                f"{phase1_reliability['note']}"
-            )
-        else:
-            st.warning(phase1_reliability["note"])
+        
 
 
 with tabs[2]:
