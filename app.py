@@ -1242,8 +1242,7 @@ with tabs[2]:
         cfa_items_key = hashlib.sha1(
             "|".join(map(str, selected_items)).encode("utf-8")
         ).hexdigest()[:10]
-        cfa_factor_count = int(
-            st.number_input(
+        
                 # --- Smart check for your specific Demo Scale ---
         is_my_demo_scale = "s2" in selected_items and "s30" in selected_items
         
