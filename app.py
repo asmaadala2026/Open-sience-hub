@@ -1013,37 +1013,8 @@ with tabs[1]:
                 width="stretch",
             )
             
-            st.markdown("#### Scale Reliability Metrics (Cronbach's $\alpha$ & McDonald's $\omega$)")
-        reliability_data = []
-        try:
-            if 'phase1_reliability' in locals() and pd.notna(phase1_reliability.get("alpha")):
-                reliability_data.append({
-                    "Component / Scale": "Overall Scale (Total)",
-                    "Metric Type": "Cronbach's Alpha",
-                    "Value": phase1_reliability["alpha"]
-                })
-        except Exception:
-            pass
-            
-        try:
-            for factor in efa_output["loadings"].columns:
-                L = efa_output["loadings"][factor]
-                omega = (L.sum() ** 2) / ((L.sum() ** 2) + (1 - L**2).sum())
-                reliability_data.append({
-                    "Component / Scale": factor,
-                    "Metric Type": "McDonald's Omega",
-                    "Value": omega
-                })
-        except Exception:
-            pass
-            
-        if reliability_data:
-            df_rel = pd.DataFrame(reliability_data)
-            st.dataframe(
-                df_rel.style.format({"Value": "{:.3f}"}), 
-                width="stretch", 
-                hide_index=True
-            )
+            st.markdown("#### Scale Reliability Metrics (Cronbach's α & McDonald's ω)")
+            st.dataframe(pd.DataFrame([{"Component / Scale": "Overall Scale", "Metric Type": "Cronbach's Alpha", "Value": phase1_reliability.get("alpha", 0)}] + [{"Component / Scale": col, "Metric Type": "McDonald's Omega", "Value": (efa_output["loadings"][col].sum()**2) / ((efa_output["loadings"][col].sum()**2) + (1 - efa_output["loadings"][col]**2).sum())} for col in efa_output["loadings"].columns]).style.format({"Value": "{:.3f}"}), width="stretch", hide_index=True)
             st.markdown("#### Item-level KMO")
             st.dataframe(
                 efa_output["kmo_items"].rename_axis("Item").reset_index().style.format(
