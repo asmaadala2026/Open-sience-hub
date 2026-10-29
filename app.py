@@ -1536,7 +1536,7 @@ with tabs[2]:
                     cfa_output["n_complete"],
                     "Simple-structure model; no cross-loadings or correlated residuals.",
                 )
-              add_report_rows(
+           add_report_rows(
                     report_rows,
                     PHASE_LABELS["phase2"],
                     "CFA executable syntax",
@@ -1545,7 +1545,7 @@ with tabs[2]:
                     cfa_output["n_complete"],
                     "Uses the analysis aliases listed in the CFA item alias rows.",
                 )
-                add_report_rows(
+          add_report_rows(
                     report_rows,
                     PHASE_LABELS["phase2"],
                     "CFA estimator",
