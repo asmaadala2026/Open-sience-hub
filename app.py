@@ -1564,7 +1564,7 @@ with tabs[2]:
                         cfa_output["n_complete"],
                         cfa_output["assumption"],
                     )
-          for item, alias in cfa_specification["aliases"].items():
+           for item, alias in cfa_specification["aliases"].items():
                     add_report_rows(
                         report_rows,
                         PHASE_LABELS["phase2"],
