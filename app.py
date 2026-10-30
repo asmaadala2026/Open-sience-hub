@@ -1578,7 +1578,7 @@ with tabs[2]:
                     parameter_name = (
                         f"{parameter['Left']} {parameter['Operator']} {parameter['Right']}"
                     )
-          for estimate_name in (
+            for estimate_name in (
                         "Estimate",
                         "Standardized estimate",
                         "SE",
