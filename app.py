@@ -1468,28 +1468,7 @@ with tabs[2]:
             })
             
             st.dataframe(validity_df, width="stretch", hide_index=True)
-            # --- Auto-Generated APA 7 Report ---
-            st.markdown("#### Automated APA 7 Results Draft")
         
-        # Safely extract fit indices from the results dictionary
-        cfi_val = fit_values.get("CFI", 0)
-        tli_val = fit_values.get("TLI", 0)
-        rmsea_val = fit_values.get("RMSEA", 0)
-        chi2_val = fit_values.get("Chi-square", 0)
-        df_val = fit_values.get("Degrees of freedom", 0)
-        p_val = fit_values.get("Chi-square p-value", 0)
-        
-        # Construct the automated text with f-strings
-        apa_template = f"""
-**Confirmatory Factor Analysis (CFA) Results:**
-
-A Confirmatory Factor Analysis was conducted to evaluate the measurement model. The goodness-of-fit indices indicated the following: $\chi^2({df_val:.0f}) = {chi2_val:.2f}, p = {p_val:.3f}$. The Comparative Fit Index (CFI) was {cfi_val:.3f}, and the Tucker-Lewis Index (TLI) was {tli_val:.3f}. The Root Mean Square Error of Approximation (RMSEA) was {rmsea_val:.3f}.
-
-Regarding convergent validity, the Composite Reliability (CR) was {cr_value:.3f}, exceeding the recommended .70 threshold. The Average Variance Extracted (AVE) was {ave_value:.3f}. All standardized factor loadings were statistically significant.
-        """
-        
-        # Display the report in a highlighted UI box
-        st.info(apa_template)
         except Exception as e:
             st.info("Could not calculate CR and AVE. Ensure the model has valid standardized estimates.")
             # --- Calculate and Display Discriminant Validity (Multi-factor models only) ---
@@ -1739,7 +1718,27 @@ with tabs[3]:
         """
     )
 
-  
+  # --- Auto-Generated APA 7 Report (Independent Block) ---
+if 'cfa_output' in locals() and cfa_output is not None:
+    st.markdown("#### Automated APA 7 Results Draft")
+    try:
+        cfi_val = fit_values.get("CFI", 0)
+        tli_val = fit_values.get("TLI", 0)
+        rmsea_val = fit_values.get("RMSEA", 0)
+        chi2_val = fit_values.get("Chi-square", 0)
+        df_val = fit_values.get("Degrees of freedom", 0)
+        p_val = fit_values.get("Chi-square p-value", 0)
+        
+        apa_template = f"""
+**Confirmatory Factor Analysis (CFA) Results:**
+
+A Confirmatory Factor Analysis was conducted to evaluate the measurement model. The goodness-of-fit indices indicated the following: $\chi^2({df_val:.0f}) = {chi2_val:.2f}, p = {p_val:.3f}$. The Comparative Fit Index (CFI) was {cfi_val:.3f}, and the Tucker-Lewis Index (TLI) was {tli_val:.3f}. The Root Mean Square Error of Approximation (RMSEA) was {rmsea_val:.3f}.
+
+Regarding convergent validity, the Composite Reliability (CR) was {cr_value:.3f}, exceeding the recommended .70 threshold. The Average Variance Extracted (AVE) was {ave_value:.3f}. All standardized factor loadings were statistically significant.
+        """
+        st.info(apa_template)
+    except Exception:
+        pass
 
   
   
