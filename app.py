@@ -1444,7 +1444,7 @@ with tabs[2]:
         try:
             # 1. Extract standardized estimates (loadings) from the CFA parameters table
             loadings = cfa_output["parameters"]
-            std_loadings = loadings[loadings['Operator'] == '=~']['Standardized estimate'].astype(float)
+            std_loadings = pd.to_numeric(loadings[loadings['Operator'] == '=~']['Standardized estimate'], errors='coerce')
             
             # 2. Mathematical calculations for CR and AVE
             sum_loadings_sq = (std_loadings.sum())**2  
@@ -1476,6 +1476,7 @@ with tabs[2]:
             st.markdown("#### Discriminant Validity (Fornell-Larcker Criterion)")
             try:
                 loadings_df = cfa_output["parameters"]
+                loadings_df['Standardized estimate'] = pd.to_numeric(loadings_df['Standardized estimate'], errors='coerce')
                 
                 # 1. Extract factors and calculate the square root of AVE for each factor
                 factors_list = loadings_df[loadings_df['Operator'] == '=~']['Left'].unique()
