@@ -134,8 +134,7 @@ selected_language = st.sidebar.selectbox(
 )
 st.session_state.lang = selected_language
 lang_dict = translations[st.session_state.lang]
-# --- Main Page Attractive Hero Banner & Developer Credit ---
-st.markdown(f"""
+
 # --- Clean Main UI (No Duplicates) with Statistical Icon 📊 ---
 st.markdown(f"""
     <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 25px; border-radius: 16px; border: 1px solid #cbd5e1; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
