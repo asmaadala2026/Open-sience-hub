@@ -136,26 +136,37 @@ st.session_state.lang = selected_language
 lang_dict = translations[st.session_state.lang]
 # --- Main Page Attractive Hero Banner & Developer Credit ---
 st.markdown(f"""
+# --- Clean Main UI (No Duplicates) with Statistical Icon 📊 ---
+st.markdown(f"""
     <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 25px; border-radius: 16px; border: 1px solid #cbd5e1; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
             <div>
-                <h1 style="color: #0f172a; margin: 0; font-size: 28px; font-weight: 800;">🔬 {lang_dict.get('main_title', 'Attitude Lab')}</h1>
-                <p style="color: #334155; font-size: 14px; margin: 8px 0 0 0; line-height: 1.5;">
-                    {lang_dict.get('subtitle', 'Explore the measurement quality of psychometric scales through rigorous Exploratory (EFA) and Confirmatory (CFA) Factor Analysis.')}
-                </p>
+                <h1 style="color: #0f172a; margin: 0; font-size: 28px; font-weight: 800;">📊 {lang_dict.get('main_title', 'Attitude Lab')}</h1>
+                <p style="color: #334155; font-size: 14px; margin: 8px 0 0 0; line-height: 1.5;">{lang_dict.get('subtitle', '')}</p>
             </div>
             <div style="background: #ffffff; padding: 10px 18px; border-radius: 10px; border: 1px solid #94a3b8; margin-top: 10px;">
-                <span style="font-size: 12px; color: #64748b; display: block;">Platform Developer</span>
+                <span style="font-size: 12px; color: #64748b; display: block; text-align: center;">{lang_dict.get('developer', 'Platform Developer: Asmaa Dala').split(':')[0]}</span>
                 <strong style="color: #0f172a; font-size: 14px;">👩‍💻 Asmaa Dala</strong>
             </div>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
+# --- "Scale Guide" Integration (Practical Guide for Researchers) ---
+with st.expander("📖 Scale Guide (Practical Guide for Researchers)", expanded=False):
+    st.markdown("""
+    ### Employee Generative AI Attitude Scale (EGAIS)
+    This scale was built and adapted based on the structural framework of the **(ATAIES)** scale by researcher *Philip Dorsah*, tailored to measure employee responses in an actual work environment (an Algerian energy sector economic enterprise).
+    
+    **Summary of Psychometric Properties (Phase 1 - EFA):**
+    * **Sample Size:** 150 employees.
+    * **Extracted Factor Structure:** Two main dimensions (AI Anxiety and Perceived Efficacy).
+    * **Explanatory Power:** The 23-item structure explains **67.045%** of the total variance.
 
-
-st.markdown(
-    """
+    **⚠️ Phase 2 Results (CFA) - Notice for Researchers:**
+    * Phase 2 (CFA) analyses revealed a **lack of full Discriminant Validity** between the dimensions.
+    * **Practical Guidance:** Researchers are advised to account for the overlap between the two dimensions when using the scale. It is recommended to conduct further item modifications or re-evaluate the structural model in future samples to better differentiate between "Anxiety" and "Perceived Efficacy".
+    """)
     <style>
     :root {
       --ink: #17324d;
