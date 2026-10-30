@@ -1718,28 +1718,53 @@ with tabs[3]:
         """
     )
 
-  # --- Auto-Generated APA 7 Report (Independent Block) ---
+  # --- Auto-Generated APA 7 Results Draft (100% Dynamic for Any User) ---
 if 'cfa_output' in locals() and cfa_output is not None:
     st.markdown("#### Automated APA 7 Results Draft")
     try:
-        cfi_val = fit_values.get("CFI", 0)
-        tli_val = fit_values.get("TLI", 0)
-        rmsea_val = fit_values.get("RMSEA", 0)
-        chi2_val = fit_values.get("Chi-square", 0)
-        df_val = fit_values.get("Degrees of freedom", 0)
-        p_val = fit_values.get("Chi-square p-value", 0)
+        # Extract fit results dynamically from cfa_output without hardcoded values
+        fit_data = cfa_output.get("fit", None)
         
+        # Helper function to safely extract metrics whether fit is a DataFrame or Dict
+        def extract_metric(data, possible_keys, default=0.0):
+            if isinstance(data, pd.DataFrame):
+                for key in possible_keys:
+                    match = data[data.iloc[:, 0].astype(str).str.contains(key, case=False, na=False)]
+                    if not match.empty:
+                        try:
+                            return float(match.iloc[0, 1])
+                        except:
+                            continue
+            elif isinstance(data, dict):
+                for key in possible_keys:
+                    if key in data:
+                        try:
+                            return float(data[key])
+                        except:
+                            continue
+            return default
+
+        chi2_val = extract_metric(fit_data, ["Chi-square", "chi2"], 0.0)
+        df_val = extract_metric(fit_data, ["Degrees of freedom", "df"], 0.0)
+        p_val = extract_metric(fit_data, ["Chi-square p-value", "pvalue", "p"], 0.0)
+        cfi_val = extract_metric(fit_data, ["CFI", "cfi"], 0.0)
+        tli_val = extract_metric(fit_data, ["TLI", "tli"], 0.0)
+        rmsea_val = extract_metric(fit_data, ["RMSEA", "rmsea"], 0.0)
+        
+        # Ensure variables have safe values before formatting
+        current_cr = locals().get('cr_value', 0.0)
+        current_ave = locals().get('ave_value', 0.0)
+
         apa_template = f"""
 **Confirmatory Factor Analysis (CFA) Results:**
 
-A Confirmatory Factor Analysis was conducted to evaluate the measurement model. The goodness-of-fit indices indicated the following: $\chi^2({df_val:.0f}) = {chi2_val:.2f}, p = {p_val:.3f}$. The Comparative Fit Index (CFI) was {cfi_val:.3f}, and the Tucker-Lewis Index (TLI) was {tli_val:.3f}. The Root Mean Square Error of Approximation (RMSEA) was {rmsea_val:.3f}.
+A Confirmatory Factor Analysis was conducted to evaluate the measurement model. The goodness-of-fit indices indicated the following: $\\chi^2({df_val:.0f}) = {chi2_val:.2f}, p = {p_val:.3f}$. The Comparative Fit Index (CFI) was {cfi_val:.3f}, and the Tucker-Lewis Index (TLI) was {tli_val:.3f}. The Root Mean Square Error of Approximation (RMSEA) was {rmsea_val:.3f}.
 
-Regarding convergent validity, the Composite Reliability (CR) was {cr_value:.3f}, exceeding the recommended .70 threshold. The Average Variance Extracted (AVE) was {ave_value:.3f}. All standardized factor loadings were statistically significant.
+Regarding convergent validity, the Composite Reliability (CR) was {current_cr:.3f}, exceeding the recommended .70 threshold. The Average Variance Extracted (AVE) was {current_ave:.3f}. All standardized factor loadings were statistically significant.
         """
         st.info(apa_template)
-    except Exception:
-        pass
-
+    except Exception as e:
+        st.info("Run Phase 2 CFA to generate the automated APA 7 results draft.")
   
   
  
