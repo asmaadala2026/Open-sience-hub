@@ -1479,10 +1479,10 @@ with tabs[2]:
                 loadings_df['Standardized estimate'] = pd.to_numeric(loadings_df['Standardized estimate'], errors='coerce')
                 
                 # 1. Extract factors and calculate the square root of AVE for each factor
-                factors_list = loadings_df[loadings_df['Operator'] == '=~']['Left'].unique()
+                factors_list = loadings_df[loadings_df['Operator'] == '~']['Left'].unique()
                 ave_dict = {}
                 for f in factors_list:
-                    f_loadings = loadings_df[(loadings_df['Operator'] == '=~') & (loadings_df['Left'] == f)]['Standardized estimate'].astype(float)
+                    f_loadings = loadings_df[(loadings_df['Operator'] == '~') & (loadings_df['Left'] == f)]['Standardized estimate'].astype(float)
                     if len(f_loadings) > 0:
                         ave_dict[f] = (f_loadings**2).sum() / len(f_loadings)
                 
