@@ -47,7 +47,17 @@ st.set_page_config(
 # ------------------ Multi-Language & Developer Settings ------------------
 if 'lang' not in st.session_state:
     st.session_state.lang = 'English'
-
+# --- Professional Welcome & Platform Intro Sidebar ---
+with st.sidebar:
+    st.markdown("### 🔬 Psychometric Lab Hub")
+    st.markdown(
+        """
+        **Welcome, Researchers!**  
+        This platform is designed to assist researchers in evaluating, validating, adapting, and constructing psychometric scales through rigorous **Exploratory (EFA)** and **Confirmatory (CFA)** Factor Analysis.
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown("---")
 translations = {
     'English': {
         'developer': "👩‍💻 Platform Developer: Asmaa Dala",
@@ -71,7 +81,14 @@ translations = {
         'start_text': "Commencez avec vos données d'étude"
     }
 }
-
+# --- Platform Logo & Branding ---
+    st.sidebar.markdown("""
+        <div style="text-align: center; background: linear-gradient(135deg, #f0f2f6 0%, #e6e9ef 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #d1d5db;">
+            <div style="font-size: 36px;">🔬📊</div>
+            <h2 style="color: #1f2937; margin: 5px 0 0 0; font-size: 20px; font-weight: bold;">Attitude Lab</h2>
+            <p style="color: #4b5563; font-size: 11px; margin: 3px 0 0 0;">Psychometric Scale Hub</p>
+        </div>
+    """, unsafe_allow_html=True)
 # Add language selection dropdown at the top of the sidebar
 selected_language = st.sidebar.selectbox(
     translations[st.session_state.lang]['select_lang'],
