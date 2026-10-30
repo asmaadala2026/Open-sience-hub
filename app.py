@@ -47,16 +47,7 @@ st.set_page_config(
 # ------------------ Multi-Language & Developer Settings ------------------
 if 'lang' not in st.session_state:
     st.session_state.lang = 'English'
-# --- Professional Welcome & Platform Intro Sidebar ---
-with st.sidebar:
-    st.markdown("### 🔬 Psychometric Lab Hub")
-    st.markdown(
-        """
-        **Welcome, Researchers!**  
-        This platform is designed to assist researchers in evaluating, validating, adapting, and constructing psychometric scales through rigorous **Exploratory (EFA)** and **Confirmatory (CFA)** Factor Analysis.
-        """,
-        unsafe_allow_html=True
-    )
+
     st.markdown("---")
 translations = {
     'English': {
@@ -162,10 +153,6 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 # Display your name as the developer in a beautifully styled sidebar card
 st.sidebar.markdown(f"""
-<div style="background-color: #f0f2f6; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #d1d5db; text-align: center;">
-    <h4 style="margin: 0; color: #1f2937; font-family: sans-serif; font-size: 14px;">{lang_dict['developer']}</h4>
-</div>
-""", unsafe_allow_html=True)
 
 
 
