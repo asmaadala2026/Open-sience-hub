@@ -1564,7 +1564,7 @@ with tabs[2]:
                         cfa_output["n_complete"],
                         cfa_output["assumption"],
                     )
-         for item, alias in cfa_specification["aliases"].items():
+              for item, alias in cfa_specification["aliases"].items():
                     add_report_rows(
                         report_rows,
                         PHASE_LABELS["phase2"],
@@ -1574,11 +1574,11 @@ with tabs[2]:
                         cfa_output["n_complete"],
                         "Maps the original data column to the model syntax identifier.",
                     )
-         for _, parameter in cfa_output["parameters"].iterrows():
+            for _, parameter in cfa_output["parameters"].iterrows():
                     parameter_name = (
                         f"{parameter['Left']} {parameter['Operator']} {parameter['Right']}"
                     )
-        for estimate_name in (
+          for estimate_name in (
                         "Estimate",
                         "Standardized estimate",
                         "SE",
