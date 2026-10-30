@@ -151,8 +151,6 @@ st.markdown(f"""
         </div>
     </div>
 """, unsafe_allow_html=True)
-# Display your name as the developer in a beautifully styled sidebar card
-st.sidebar.markdown(f"""
 
 
 
