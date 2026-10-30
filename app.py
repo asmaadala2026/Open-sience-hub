@@ -1574,7 +1574,7 @@ with tabs[2]:
                         cfa_output["n_complete"],
                         "Maps the original data column to the model syntax identifier.",
                     )
-          for _, parameter in cfa_output["parameters"].iterrows():
+           for _, parameter in cfa_output["parameters"].iterrows():
                     parameter_name = (
                         f"{parameter['Left']} {parameter['Operator']} {parameter['Right']}"
                     )
