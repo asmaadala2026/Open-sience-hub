@@ -81,13 +81,7 @@ translations = {
         'start_text': "Commencez avec vos données d'étude"
     }
 }
-st.sidebar.markdown("""
-<div style="text-align: center; background: linear-gradient(135deg, #f0f2f6 0%, #e6e9ef 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #d1d5db;">
-    <div style="font-size: 36px;">🔬📊</div>
-    <h2 style="color: #1f2937; margin: 5px 0 0 0; font-size: 20px; font-weight: bold;">Attitude Lab</h2>
-    <p style="color: #4b5563; font-size: 11px; margin: 3px 0 0 0;">Psychometric Scale Hub</p>
-</div>
-""", unsafe_allow_html=True)
+
 # Add language selection dropdown at the top of the sidebar
 selected_language = st.sidebar.selectbox(
     translations[st.session_state.lang]['select_lang'],
@@ -96,7 +90,23 @@ selected_language = st.sidebar.selectbox(
 )
 st.session_state.lang = selected_language
 lang_dict = translations[st.session_state.lang]
-
+# --- Main Page Attractive Hero Banner & Developer Credit ---
+st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 25px; border-radius: 16px; border: 1px solid #cbd5e1; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+            <div>
+                <h1 style="color: #0f172a; margin: 0; font-size: 28px; font-weight: 800;">🔬 {lang_dict.get('main_title', 'Attitude Lab')}</h1>
+                <p style="color: #334155; font-size: 14px; margin: 8px 0 0 0; line-height: 1.5;">
+                    {lang_dict.get('subtitle', 'Explore the measurement quality of psychometric scales through rigorous Exploratory (EFA) and Confirmatory (CFA) Factor Analysis.')}
+                </p>
+            </div>
+            <div style="background: #ffffff; padding: 10px 18px; border-radius: 10px; border: 1px solid #94a3b8; margin-top: 10px;">
+                <span style="font-size: 12px; color: #64748b; display: block;">Platform Developer</span>
+                <strong style="color: #0f172a; font-size: 14px;">👩‍💻 Asmaa Dala</strong>
+            </div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 # Display your name as the developer in a beautifully styled sidebar card
 st.sidebar.markdown(f"""
 <div style="background-color: #f0f2f6; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #d1d5db; text-align: center;">
