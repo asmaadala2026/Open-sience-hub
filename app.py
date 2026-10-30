@@ -1444,7 +1444,7 @@ with tabs[2]:
         try:
             # 1. Extract standardized estimates (loadings) from the CFA parameters table
             loadings = cfa_output["parameters"]
-            std_loadings = pd.to_numeric(loadings[loadings['Operator'] == '=~']['Standardized estimate'], errors='coerce')
+            std_loadings = pd.to_numeric(loadings[loadings['Operator'] == '~']['Standardized estimate'], errors='coerce')  
             
             # 2. Mathematical calculations for CR and AVE
             sum_loadings_sq = (std_loadings.sum())**2  
