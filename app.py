@@ -1554,7 +1554,7 @@ with tabs[2]:
                     cfa_output["n_complete"],
                     cfa_output["assumption"],
                 )
-          for metric_name, metric_value in fit_values.items():
+           for metric_name, metric_value in fit_values.items():
                     add_report_rows(
                         report_rows,
                         PHASE_LABELS["phase2"],
