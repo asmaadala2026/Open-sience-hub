@@ -1469,7 +1469,7 @@ with tabs[2]:
             
             st.dataframe(validity_df, width="stretch", hide_index=True)
             # --- Auto-Generated APA 7 Report ---
-        st.markdown("#### Automated APA 7 Results Draft")
+            st.markdown("#### Automated APA 7 Results Draft")
         
         # Safely extract fit indices from the results dictionary
         cfi_val = fit_values.get("CFI", 0)
