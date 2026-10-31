@@ -166,6 +166,9 @@ with st.expander("📖 Scale Guide (Practical Guide for Researchers)", expanded=
     * Phase 2 (CFA) analyses revealed a **lack of full Discriminant Validity** between the dimensions.
     * **Practical Guidance:** Researchers are advised to account for the overlap between the two dimensions when using the scale. It is recommended to conduct further item modifications or re-evaluate the structural model in future samples to better differentiate between "Anxiety" and "Perceived Efficacy".
     """)
+    """)
+
+st.markdown("""
     <style>
     :root {
       --ink: #17324d;
