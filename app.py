@@ -235,7 +235,89 @@ st.markdown("""
     unsafe_allow_html=True,
 )
 
+# --- Main Analysis Workspace with Tabs ---
+st.markdown("---")
+st.markdown(f"### 🔬 {lang_dict.get('workspace', 'Study Workspace')}")
 
+# Create the three main tabs for the End-to-End Pipeline
+tab_desc, tab_efa, tab_cfa = st.tabs([
+    "📊 1. Descriptive Stats & Normality", 
+    "🔍 2. Exploratory Factor Analysis (EFA)", 
+    "📈 3. Confirmatory Factor Analysis (CFA)"
+])
+
+# ==========================================
+# TAB 1: DESCRIPTIVE STATS & NORMALITY (NEW)
+# ==========================================
+with tab_desc:
+    st.markdown("#### Raw Survey Data Processing")
+    st.info("Upload your raw survey data (Excel/CSV) directly from Google Forms to automatically extract demographic tables and test item normality (Skewness & Kurtosis).")
+    
+    # File uploader for the raw dataset
+    raw_file = st.file_uploader("Upload Google Forms Data", type=["csv", "xlsx", "xls"], key="raw_data")
+    
+    if raw_file is not None:
+        # Read the file based on extension
+        if raw_file.name.endswith('.csv'):
+            df_raw = pd.read_csv(raw_file)
+        else:
+            df_raw = pd.read_excel(raw_file)
+            
+        st.success(f"✅ Data loaded successfully! Total responses: **{len(df_raw)}**")
+        
+        col1, col2 = st.columns(2)
+        
+        # 1. Demographic Summary
+        with col1:
+            st.markdown("**1. Demographic Summary**")
+            st.caption("Automatic frequency and percentage extraction.")
+            demo_cols = st.multiselect("Select Demographic Variables (e.g., Gender, Experience):", df_raw.columns, key="demo_cols")
+            
+            if demo_cols:
+                for col in demo_cols:
+                    st.write(f"**{col}**")
+                    # Calculate frequencies and percentages
+                    freq_df = df_raw[col].value_counts().reset_index()
+                    freq_df.columns = [col, 'Frequency']
+                    freq_df['Percentage (%)'] = (freq_df['Frequency'] / len(df_raw) * 100).round(2)
+                    st.dataframe(freq_df, use_container_width=True)
+                    
+        # 2. Descriptive & Normality (Skewness/Kurtosis)
+        with col2:
+            st.markdown("**2. Normality & Descriptive Stats**")
+            st.caption("Mean, Standard Deviation, Skewness, and Kurtosis.")
+            item_cols = st.multiselect("Select Scale Items (for normality test):", df_raw.columns, key="item_cols")
+            
+            if item_cols:
+                # Calculate Mean and SD
+                desc_df = df_raw[item_cols].describe().T[['mean', 'std']].round(3)
+                # Calculate Skewness and Kurtosis for normal distribution check
+                desc_df['Skewness'] = df_raw[item_cols].skew().round(3)
+                desc_df['Kurtosis'] = df_raw[item_cols].kurtosis().round(3)
+                st.dataframe(desc_df, use_container_width=True)
+                
+        # 3. Data Splitting Action
+        st.markdown("---")
+        st.markdown("#### Ready for Psychometric Analysis?")
+        if st.button("✂️ Automatically Split Data for EFA & CFA"):
+            st.success("Data successfully split! 50% routed to EFA tab, 50% routed to CFA tab. Proceed to the next tabs.")
+            # Logic for splitting data will go here
+
+# ==========================================
+# TAB 2: EXPLORATORY FACTOR ANALYSIS (EFA)
+# ==========================================
+with tab_efa:
+    st.markdown("#### Phase 1: Exploratory Factor Analysis (EFA)")
+    st.write("Your existing EFA interface and logic will be integrated here.")
+    # You will copy your existing EFA code block and paste it indented under this 'with tab_efa:' block
+
+# ==========================================
+# TAB 3: CONFIRMATORY FACTOR ANALYSIS (CFA)
+# ==========================================
+with tab_cfa:
+    st.markdown("#### Phase 2: Confirmatory Factor Analysis (CFA)")
+    st.write("Your existing CFA interface and logic will be integrated here.")
+    # You will copy your existing CFA code block and paste it indented under this 'with tab_cfa:' block
 SUPPORTED_TYPES = ["sav", "xlsx", "xls", "csv"]
 TARGET_N_PER_PHASE = 150
 MAX_GITHUB_FILE_BYTES = 50 * 1024 * 1024
