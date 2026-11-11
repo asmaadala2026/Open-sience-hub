@@ -6,3 +6,4 @@ factor-analyzer==0.5.1
 pingouin
 pyreadstat
 semopy
+openpyxl
