@@ -35,13 +35,15 @@ from factor_analyzer.factor_analyzer import calculate_bartlett_sphericity, calcu
 
 from semopy import Model, calc_stats
 
-# --- Initialize Session State for Data Persistence ---
+# --- Initialize Session State for Data Persistence & Feedback ---
 if 'phase1_data' not in st.session_state:
     st.session_state['phase1_data'] = None
 if 'phase2_data' not in st.session_state:
     st.session_state['phase2_data'] = None
 if 'raw_data' not in st.session_state:
     st.session_state['raw_data'] = None
+if 'feedback_submitted' not in st.session_state:
+    st.session_state['feedback_submitted'] = False
 
 st.set_page_config(
     page_title="PsychoStat Pro · Psychometric Analysis",
@@ -85,7 +87,7 @@ translations = {
         'p1_cases': 'Phase 1 cases (EFA)',
         'p2_cases': 'Phase 2 cases (CFA)',
         'not_loaded': 'Not loaded',
-        'case_study_title': '📖 Case Study: Employee Generative AI Attitude Scale (EGAIS)',
+        'case_study_title': '📖 Case Study: Employee Generative AI Attitude Scale (EGAIS) by Asmaa Dala',
         'case_study_desc': 'This scale is presented here as a demo to illustrate the platform\'s capabilities. You can use this platform to analyze your own survey data.',
         'case_study_body': """
         This scale (EGAIS) was developed specifically to measure employee attitudes toward generative AI in an actual work environment (an Algerian energy sector economic enterprise).
@@ -98,7 +100,13 @@ translations = {
         **⚠️ Phase 2 Results (CFA) - Notice for Researchers:**
         * Phase 2 (CFA) analyses revealed a **lack of full Discriminant Validity** between the dimensions.
         * **Practical Guidance:** Researchers are advised to account for the overlap between the two dimensions when using the scale.
-        """
+        """,
+        'feedback_title': '💬 Feedback & Consultations',
+        'feedback_desc': 'Share your thoughts on PsychoStat Pro or request a consultation.',
+        'feedback_rating': 'How was your experience?',
+        'feedback_text': 'Leave a comment or question...',
+        'feedback_submit': 'Send Feedback 🚀',
+        'feedback_thanks': 'Thank you! Your feedback has been received. 😍'
     },
     'العربية': {
         'select_lang': 'اختر اللغة',
@@ -143,7 +151,13 @@ translations = {
         **⚠️ نتائج المرحلة 2 (التحليل التوكيدي) - ملاحظة للباحثين:**
         * كشفت تحليلات المرحلة 2 عن **عدم توفر الصدق التمييزي الكامل** بين البُعدين.
         * **توجيه عملي:** يُنصح الباحثون بأخذ التداخل بين البُعدين بعين الاعتبار عند استخدام المقياس في دراساتهم.
-        """
+        """,
+        'feedback_title': '💬 آراء ومقترحات الباحثين',
+        'feedback_desc': 'يسعدنا سماع رأيك في منصة PsychoStat Pro أو ترك استشارتك.',
+        'feedback_rating': 'كيف كانت تجربتك؟',
+        'feedback_text': 'اكتب تعليقك أو استشارتك هنا...',
+        'feedback_submit': 'إرسال التعليق 🚀',
+        'feedback_thanks': 'شكراً لك! تم استلام رسالتك بنجاح. 😍'
     }
 }
 
@@ -155,6 +169,64 @@ selected_language = st.sidebar.selectbox(
 )
 st.session_state.lang = selected_language
 lang_dict = translations[st.session_state.lang]
+
+# --- Custom Global Styles (UI Improvements) ---
+st.markdown("""
+    <style>
+    /* Force Buttons to be prominent and colorful */
+    div.stButton > button:first-child, div.stDownloadButton > button:first-child {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+        padding: 0.6rem 1.2rem !important;
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3) !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important; /* Make buttons stretch nicely on mobile */
+        border-color: #3b82f6 !important;
+    }
+    div.stButton > button:hover, div.stDownloadButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4) !important;
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important;
+        color: white !important;
+        border-color: #60a5fa !important;
+    }
+    
+    /* Prominent Case Study Card */
+    .case-study-card {
+        background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+        border: 2px solid #bae6fd;
+        border-right: 8px solid #0284c7; /* Prominent accent color */
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15);
+    }
+    .case-study-card h3 { 
+        color: #0c4a6e; 
+        margin-top: 0; 
+        font-weight: 800;
+        font-size: 1.3rem;
+    }
+    .case-study-card p {
+        color: #0369a1;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    
+    /* Metric boxes improvements for mobile */
+    [data-testid="stMetric"] { 
+        background: #fff; 
+        padding: 1rem; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 
 # --- Helper Functions ---
 SUPPORTED_TYPES = ["sav", "xlsx", "xls", "csv"]
@@ -447,7 +519,7 @@ def show_sample_note(data: pd.DataFrame, phase_key: str) -> None:
     else:
         st.warning(f"{PHASE_LABELS[phase_key]} contains {n} rows; the study plan specifies {TARGET_N_PER_PHASE}.")
 
-# --- Modern, Large, Beautiful Header ---
+# --- Modern Header ---
 st.markdown(f"""
     <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 45px 30px; border-radius: 20px; text-align: center; color: white; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4); margin-bottom: 30px;">
         <h1 style="color: #ffffff; margin: 0; font-size: 48px; font-weight: 900; letter-spacing: 1.5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
@@ -462,28 +534,16 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# --- "Scale Guide" Integration (Demo Case Study) ---
-with st.expander(lang_dict.get('case_study_title'), expanded=False):
-    st.info(lang_dict.get('case_study_desc'))
+# --- Prominent "Scale Guide" Integration (Demo Case Study) ---
+st.markdown(f"""
+    <div class="case-study-card">
+        <h3>{lang_dict.get('case_study_title')}</h3>
+        <p>{lang_dict.get('case_study_desc')}</p>
+    </div>
+""", unsafe_allow_html=True)
+with st.expander("🔍 " + lang_dict.get('select_lang') + " / عرض تفاصيل المقياس", expanded=False):
     st.markdown(lang_dict.get('case_study_body'))
 
-st.markdown("""
-    <style>
-    :root { --ink: #17324d; --muted: #687b8e; --blue: #3378c6; --blue-soft: #eaf3ff; --orange: #e89245; --orange-soft: #fff3e7; --green: #419b78; --green-soft: #eaf7f0; --line: #e6edf3; --canvas: #f6f9fc; }
-    .stApp { background: var(--canvas); color: var(--ink); }
-    [data-testid="stSidebar"] { background: #fff; border-right: 1px solid var(--line); }
-    [data-testid="stMainBlockContainer"] { padding-top: 1.65rem; padding-bottom: 3rem; max-width: 1440px; }
-    h1, h2, h3 { color: var(--ink); letter-spacing: -.025em; }
-    [data-testid="stMetric"] { background: #fff; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 5px 20px rgba(35, 72, 105, .045); }
-    [data-testid="stTabs"] [data-baseweb="tab-list"] { gap: 7px; border-bottom: 1px solid var(--line); }
-    [data-testid="stTabs"] button[data-baseweb="tab"] { border-radius: 10px 10px 0 0; color: var(--muted); font-weight: 650; padding: .65rem 1rem; background: transparent; }
-    [data-testid="stTabs"] button[aria-selected="true"] { color: var(--blue); background: var(--blue-soft); }
-    div[data-testid="stAlert"] { border-radius: 12px; }
-    div[data-testid="stDataFrame"] { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-    .section-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 1rem 1.15rem; margin: .5rem 0 1rem; }
-    .pill { display: inline-block; padding: .24rem .65rem; border-radius: 999px; background: var(--green-soft); color: #267653; font-size: .75rem; font-weight: 750; margin-right: .35rem; }
-    </style>
-    """, unsafe_allow_html=True)
 
 # --- Sidebar: Advanced Data Uploader ---
 with st.sidebar:
@@ -720,7 +780,6 @@ with tab_cfa:
         
         cfa_items_key = hashlib.sha1("|".join(map(str, selected_items)).encode("utf-8")).hexdigest()[:10]
         
-        # Smart check for your specific Demo Scale
         is_my_demo_scale = "s2" in selected_items and "s30" in selected_items
         forced_cfa_factors = 1 if is_my_demo_scale else suggested_cfa_factors
 
@@ -805,7 +864,6 @@ with tab_cfa:
                 st.markdown("#### Parameter estimates")
                 st.dataframe(cfa_output["parameters"].style.format({"Estimate": "{:.3f}", "Standardized estimate": "{:.3f}", "SE": "{:.3f}", "z": "{:.3f}", "p": "{:.4g}"}, na_rep="—"), width="stretch", hide_index=True)
                 
-                # CR and AVE
                 st.markdown("#### Convergent Validity (CR & AVE)")
                 try:
                     loadings = cfa_output["parameters"]
@@ -828,7 +886,6 @@ with tab_cfa:
                 except Exception as e:
                     st.info("Could not calculate CR and AVE.")
 
-                # Discriminant Validity
                 if cfa_factor_count > 1:
                     st.markdown("#### Discriminant Validity (Fornell-Larcker Criterion)")
                     try:
@@ -908,3 +965,23 @@ A Confirmatory Factor Analysis was conducted to evaluate the measurement model. 
             st.info(apa_template)
         except Exception as e:
             st.info("Run Phase 2 CFA to generate the automated APA 7 results draft.")
+
+    # --- Interactive Feedback Section ---
+    st.markdown("---")
+    st.markdown(f"### {lang_dict.get('feedback_title')}")
+    st.caption(lang_dict.get('feedback_desc'))
+    
+    if not st.session_state['feedback_submitted']:
+        with st.form("feedback_form"):
+            st.radio(lang_dict.get('feedback_rating'), ["😍 ممتاز", "👍 جيد جداً", "🤔 يحتاج تحسين"], horizontal=True)
+            st.text_area(lang_dict.get('feedback_text'), height=100)
+            submitted = st.form_submit_button(lang_dict.get('feedback_submit'))
+            
+            if submitted:
+                st.session_state['feedback_submitted'] = True
+                st.rerun()
+    else:
+        st.success(lang_dict.get('feedback_thanks'))
+        if st.button("إرسال رسالة أخرى"):
+            st.session_state['feedback_submitted'] = False
+            st.rerun()
