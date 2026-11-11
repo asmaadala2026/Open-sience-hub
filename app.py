@@ -45,98 +45,113 @@ if 'raw_data' not in st.session_state:
 
 st.set_page_config(
     page_title="PsychoStat Pro · Psychometric Analysis",
-    page_icon="◈",
+    page_icon="💠",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ------------------ Multi-Language & Developer Settings ------------------
+# ------------------ Multi-Language Dictionary ------------------
 if 'lang' not in st.session_state:
-    st.session_state.lang = 'English'
+    st.session_state.lang = 'العربية'
 
 translations = {
     'English': {
         'select_lang': 'Select Language',
-        'main_title': 'PsychoStat Pro',
+        'main_title': '💠 PsychoStat Pro',
         'subtitle': 'Explore the measurement quality of employee attitudes toward generative AI, with transparent samples, methods, and exportable results.',
         'developer': 'Platform Developer: Asmaa Dala',
-        'workspace': 'Study workspace',
+        'adv_workspace': 'Advanced Study Workspace',
+        'adv_desc': 'Upload pre-split Phase 1 & 2 files manually (for advanced users).',
         'data_org': 'How is your data organized?',
-        'two_phases': 'Two phase files (Phase 1 & Phase 2)',
-        'one_combined': 'One combined file',
-        'file_locations': 'Where are the files?',
         'upload_device': 'Upload from device',
         'github_urls': 'Public GitHub URLs',
-        'study_data': 'Study data',
-        'phase1_url': 'Phase 1 - GitHub file URL',
-        'phase2_url': 'Phase 2 - GitHub file URL',
-        'select_items': 'Select scale items',
-        'overview': 'Study overview',
-        'phase1_efa': 'Phase 1 - EFA (Exploratory Factor Analysis)',
-        'phase2_cfa': 'Phase 2 - CFA (Confirmatory Factor Analysis & Replication)',
-        'open_report': 'Open exportable APA 7 report',
-        'run_efa': 'Run Exploratory Factor Analysis',
-        'run_cfa': 'Run Confirmatory Factor Analysis',
-        'reliability': 'Reliability Analysis (Cronbach & McDonald Omega)',
-        'model_fit': 'Model Fit Indices',
+        'phase1_sample': 'Phase 1 - EFA sample',
+        'phase2_sample': 'Phase 2 - CFA sample',
+        'tab1': '📊 1. Raw Data & Descriptives',
+        'tab2': '🔍 2. Exploratory Factor Analysis (EFA)',
+        'tab3': '📈 3. Confirmatory Factor Analysis (CFA)',
+        'tab4': '📄 4. Analysis Report',
+        'raw_processing': 'Raw Survey Data Processing',
+        'raw_info': 'Upload your raw survey data (Excel/CSV) directly from Google Forms to automatically extract demographic tables and split data for EFA/CFA.',
+        'upload_forms': 'Upload Google Forms Data',
+        'demo_summary': '1. Demographic Summary',
+        'select_demo': 'Select Demographic Variables:',
+        'normality_desc': '2. Normality & Descriptive Stats',
+        'select_normality': 'Select Scale Items (for normality test):',
+        'ready_split': 'Ready for Psychometric Analysis?',
+        'split_btn': '✂️ Automatically Split Data for EFA & CFA (50/50)',
+        'study_overview': 'Study Overview',
+        'total_cases': 'Total available cases',
+        'p1_cases': 'Phase 1 cases (EFA)',
+        'p2_cases': 'Phase 2 cases (CFA)',
+        'not_loaded': 'Not loaded',
+        'case_study_title': '📖 Case Study: Employee Generative AI Attitude Scale (EGAIS)',
+        'case_study_desc': 'This scale is presented here as a demo to illustrate the platform\'s capabilities. You can use this platform to analyze your own survey data.',
+        'case_study_body': """
+        This scale (EGAIS) was developed specifically to measure employee attitudes toward generative AI in an actual work environment (an Algerian energy sector economic enterprise).
+        
+        **Summary of Psychometric Properties (Phase 1 - EFA):**
+        * **Sample Size:** 150 employees.
+        * **Extracted Factor Structure:** Two main dimensions (AI Anxiety and Perceived Efficacy).
+        * **Explanatory Power:** The 23-item structure explains **67.045%** of the total variance.
+
+        **⚠️ Phase 2 Results (CFA) - Notice for Researchers:**
+        * Phase 2 (CFA) analyses revealed a **lack of full Discriminant Validity** between the dimensions.
+        * **Practical Guidance:** Researchers are advised to account for the overlap between the two dimensions when using the scale.
+        """
     },
     'العربية': {
         'select_lang': 'اختر اللغة',
-        'main_title': 'PsychoStat Pro (مُحلل القياس النفسي)',
+        'main_title': '💠 PsychoStat Pro',
         'subtitle': 'استكشف جودة قياس اتجاهات الموظفين نحو الذكاء الاصطناعي التوليدي، مع عينات وأساليب ونتائج علمية دقيقة وقابلة للتصدير.',
         'developer': 'مطورة المنصة: أسماء دالة',
-        'workspace': 'مساحة الدراسة',
+        'adv_workspace': 'مساحة العمل المتقدمة',
+        'adv_desc': 'رفع ملفات المرحلة 1 و 2 المقسمة مسبقاً يدوياً (للباحثين المتمرسين).',
         'data_org': 'كيف تنظم بياناتك؟',
-        'two_phases': 'ملفان لمرحلتين (المرحلة 1 والمرحلة 2)',
-        'one_combined': 'ملف واحد مدمج',
-        'file_locations': 'أين توجد الملفات؟',
         'upload_device': 'رفع من الجهاز',
         'github_urls': 'روابط غيت هاب العامة',
-        'study_data': 'بيانات الدراسة',
-        'phase1_url': 'رابط ملف المرحلة الأولى - GitHub',
-        'phase2_url': 'رابط ملف المرحلة الثانية - GitHub',
-        'select_items': 'تحديد فقرات المقياس',
-        'overview': 'نظرة عامة على الدراسة',
-        'phase1_efa': 'المرحلة الأولى - التحليل الاستكشافي (EFA)',
-        'phase2_cfa': 'المرحلة الثانية - التحليل التوكيدي (CFA) والنسخ',
-        'open_report': 'فتح تقرير APA 7 القابل للتصدير',
-        'run_efa': 'تشغيل التحليل العاملي الاستكشافي',
-        'run_cfa': 'تشغيل التحليل العاملي التوكيدي',
-        'reliability': 'تحليل الثبات (ألفا كرونباخ ومكدونالد أوميغا)',
-        'model_fit': 'مؤشرات جودة المطابقة للنموذج',
-    },
-    'Français': {
-        'select_lang': 'Choisir la langue',
-        'main_title': 'PsychoStat Pro',
-        'subtitle': 'Explorez la qualité de la mesure des attitudes des employés envers l’IA générative, avec des échantillons, méthodes et résultats exportables.',
-        'developer': 'Développeuse: Asmaa Dala',
-        'workspace': 'Espace d\'étude',
-        'data_org': 'Comment vos données sont-elles organisées ?',
-        'two_phases': 'Fichiers en deux phases',
-        'one_combined': 'Un fichier combiné',
-        'file_locations': 'Où sont les fichiers ?',
-        'upload_device': 'Télécharger depuis l\'appareil',
-        'github_urls': 'URLs GitHub publiques',
-        'study_data': 'Données d\'étude',
-        'phase1_url': 'Phase 1 - URL du fichier GitHub',
-        'phase2_url': 'Phase 2 - URL du fichier GitHub',
-        'select_items': 'Sélectionner les items de l\'échelle',
-        'overview': 'Aperçu de l\'étude',
-        'phase1_efa': 'Phase 1 - EFA (Analyse Factorielle Exploratoire)',
-        'phase2_cfa': 'Phase 2 - CFA (Analyse Factorielle Confirmatoire & Réplication)',
-        'open_report': 'Ouvrir le rapport APA 7 exportable',
-        'run_efa': 'Exécuter l\'analyse factorielle exploratoire',
-        'run_cfa': 'Exécuter l\'analyse factorielle confirmatoire',
-        'reliability': 'Analyse de fiabilité (Alpha & Omega)',
-        'model_fit': 'Indice d\'adéquation du modèle',
+        'phase1_sample': 'عينة المرحلة 1 - التحليل الاستكشافي',
+        'phase2_sample': 'عينة المرحلة 2 - التحليل التوكيدي',
+        'tab1': '📊 1. البيانات الخام والإحصاء الوصفي',
+        'tab2': '🔍 2. التحليل العاملي الاستكشافي (EFA)',
+        'tab3': '📈 3. التحليل العاملي التوكيدي (CFA)',
+        'tab4': '📄 4. تقرير التحليل',
+        'raw_processing': 'معالجة بيانات الاستبيان الخام',
+        'raw_info': 'قم برفع بيانات الاستبيان الخام (Excel/CSV) مباشرة من نماذج جوجل لاستخراج الجداول الديموغرافية تلقائياً وتقسيم البيانات لمرحلتي EFA و CFA.',
+        'upload_forms': 'رفع بيانات نماذج جوجل',
+        'demo_summary': '1. الملخص الديموغرافي',
+        'select_demo': 'اختر المتغيرات الديموغرافية:',
+        'normality_desc': '2. الإحصاء الوصفي والاعتدالية',
+        'select_normality': 'اختر فقرات المقياس (لاختبار الاعتدالية):',
+        'ready_split': 'هل أنت جاهز للتحليل السيكومتري؟',
+        'split_btn': '✂️ تقسيم البيانات تلقائياً لـ EFA و CFA (بنسبة 50/50)',
+        'study_overview': 'نظرة عامة على الدراسة',
+        'total_cases': 'إجمالي الحالات المتاحة',
+        'p1_cases': 'حالات المرحلة 1 (EFA)',
+        'p2_cases': 'حالات المرحلة 2 (CFA)',
+        'not_loaded': 'لم يتم التحميل',
+        'case_study_title': '📖 مثال تطبيقي: تحليل مقياس (EGAIS) للباحثة أسماء دالة',
+        'case_study_desc': 'هذا المقياس معروض هنا كنموذج (دراسة حالة) لتوضيح قدرة المنصة على استخراج الخصائص السيكومترية. يمكنك استخدام المنصة لتحليل بيانات استبيانك الخاص بكل حرية.',
+        'case_study_body': """
+        تم بناء وتطوير هذا المقياس (EGAIS) خصيصاً لقياس اتجاهات الموظفين نحو الذكاء الاصطناعي التوليدي في بيئة العمل الفعلية (مؤسسة اقتصادية بقطاع الطاقة الجزائري).
+        
+        **ملخص الخصائص السيكومترية (المرحلة 1 - التحليل الاستكشافي):**
+        * **حجم العينة:** 150 موظفاً.
+        * **الهيكل العاملي المستخرج:** بُعدان رئيسيان (القلق من الذكاء الاصطناعي، والفعالية المدركة).
+        * **القوة التفسيرية:** يفسر الهيكل المكون من 23 فقرة **67.045%** من التباين الكلي.
+
+        **⚠️ نتائج المرحلة 2 (التحليل التوكيدي) - ملاحظة للباحثين:**
+        * كشفت تحليلات المرحلة 2 عن **عدم توفر الصدق التمييزي الكامل** بين البُعدين.
+        * **توجيه عملي:** يُنصح الباحثون بأخذ التداخل بين البُعدين بعين الاعتبار عند استخدام المقياس في دراساتهم.
+        """
     }
 }
 
 # Sidebar Language Selection
 selected_language = st.sidebar.selectbox(
     translations[st.session_state.lang]['select_lang'],
-    ['English', 'العربية', 'Français'],
-    index=['English', 'العربية', 'Français'].index(st.session_state.lang)
+    ['العربية', 'English'],
+    index=['العربية', 'English'].index(st.session_state.lang)
 )
 st.session_state.lang = selected_language
 lang_dict = translations[st.session_state.lang]
@@ -432,36 +447,25 @@ def show_sample_note(data: pd.DataFrame, phase_key: str) -> None:
     else:
         st.warning(f"{PHASE_LABELS[phase_key]} contains {n} rows; the study plan specifies {TARGET_N_PER_PHASE}.")
 
-# --- Clean Main UI Header ---
+# --- Modern, Large, Beautiful Header ---
 st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 25px; border-radius: 16px; border: 1px solid #cbd5e1; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-            <div>
-                <h1 style="color: #0f172a; margin: 0; font-size: 28px; font-weight: 800;">📊 {lang_dict.get('main_title', 'PsychoStat Pro')}</h1>
-                <p style="color: #334155; font-size: 14px; margin: 8px 0 0 0; line-height: 1.5;">{lang_dict.get('subtitle', '')}</p>
-            </div>
-            <div style="background: #ffffff; padding: 10px 18px; border-radius: 10px; border: 1px solid #94a3b8; margin-top: 10px;">
-                <span style="font-size: 12px; color: #64748b; display: block; text-align: center;">{lang_dict.get('developer', 'Platform Developer: Asmaa Dala').split(':')[0]}</span>
-                <strong style="color: #0f172a; font-size: 14px;">👩‍💻 Asmaa Dala</strong>
-            </div>
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 45px 30px; border-radius: 20px; text-align: center; color: white; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4); margin-bottom: 30px;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 48px; font-weight: 900; letter-spacing: 1.5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+            {lang_dict.get('main_title')}
+        </h1>
+        <p style="font-size: 18px; margin: 15px auto 0 auto; max-width: 800px; opacity: 0.95; line-height: 1.6;">
+            {lang_dict.get('subtitle')}
+        </p>
+        <div style="margin-top: 25px; display: inline-block; background: rgba(255, 255, 255, 0.15); padding: 8px 24px; border-radius: 50px; font-size: 15px; font-weight: 600; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2);">
+            👩‍💻 {lang_dict.get('developer')}
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- "Scale Guide" Integration ---
-with st.expander("📖 Scale Guide (Case Study: Employee Generative AI Attitude Scale - EGAIS)", expanded=False):
-    st.markdown("""
-    This scale was built and adapted based on the structural framework of the **(ATAIES)** scale by researcher *Philip Dorsah*, tailored to measure employee responses in an actual work environment (an Algerian energy sector economic enterprise).
-    
-    **Summary of Psychometric Properties (Phase 1 - EFA):**
-    * **Sample Size:** 150 employees.
-    * **Extracted Factor Structure:** Two main dimensions (AI Anxiety and Perceived Efficacy).
-    * **Explanatory Power:** The 23-item structure explains **67.045%** of the total variance.
-
-    **⚠️ Phase 2 Results (CFA) - Notice for Researchers:**
-    * Phase 2 (CFA) analyses revealed a **lack of full Discriminant Validity** between the dimensions.
-    * **Practical Guidance:** Researchers are advised to account for the overlap between the two dimensions when using the scale.
-    """)
+# --- "Scale Guide" Integration (Demo Case Study) ---
+with st.expander(lang_dict.get('case_study_title'), expanded=False):
+    st.info(lang_dict.get('case_study_desc'))
+    st.markdown(lang_dict.get('case_study_body'))
 
 st.markdown("""
     <style>
@@ -483,14 +487,14 @@ st.markdown("""
 
 # --- Sidebar: Advanced Data Uploader ---
 with st.sidebar:
-    st.markdown("### Advanced Study Workspace")
-    st.caption("Upload pre-split Phase 1 & 2 files manually.")
+    st.markdown(f"### {lang_dict.get('adv_workspace')}")
+    st.caption(lang_dict.get('adv_desc'))
     st.markdown("---")
-    source_mode = st.radio("How is your data organized?", ["Upload from device", "Public GitHub URLs"])
+    source_mode = st.radio(lang_dict.get('data_org'), [lang_dict.get('upload_device'), lang_dict.get('github_urls')])
     
-    if source_mode == "Upload from device":
-        phase1_file = st.file_uploader("Phase 1 - EFA sample", type=SUPPORTED_TYPES, key="phase1_upload")
-        phase2_file = st.file_uploader("Phase 2 - CFA sample", type=SUPPORTED_TYPES, key="phase2_upload")
+    if source_mode == lang_dict.get('upload_device'):
+        phase1_file = st.file_uploader(lang_dict.get('phase1_sample'), type=SUPPORTED_TYPES, key="phase1_upload")
+        phase2_file = st.file_uploader(lang_dict.get('phase2_sample'), type=SUPPORTED_TYPES, key="phase2_upload")
         for uploaded, label in ((phase1_file, "Phase 1"), (phase2_file, "Phase 2")):
             if uploaded is not None:
                 try:
@@ -531,18 +535,16 @@ if available_data:
     numeric_items = [col for col in available_data[0].select_dtypes(include=[np.number]).columns if col in common_columns and not any(kw in str(col).lower() for kw in excluded_keywords)]
     
     if numeric_items:
-        st.markdown("### Select Scale Items")
-        st.caption("Choose the response items belonging to your psychometric scale to apply them across all tabs.")
         default_items = [col for col in numeric_items if str(col).lower().startswith('s') and str(col).lower() not in ["some", "some1", "some2"]]
         if not default_items: default_items = numeric_items[:min(10, len(numeric_items))]
-        selected_items = st.multiselect("Scale item columns", options=numeric_items, default=default_items, format_func=str)
+        selected_items = st.multiselect("📌 " + lang_dict.get('select_normality').split('(')[0], options=numeric_items, default=default_items, format_func=str)
 
 # --- Main Workspace Tabs ---
 tab_desc, tab_efa, tab_cfa, tab_report = st.tabs([
-    "📊 1. Raw Data & Descriptives", 
-    "🔍 2. Exploratory Factor Analysis (EFA)", 
-    "📈 3. Confirmatory Factor Analysis (CFA)",
-    "📄 4. Analysis Report"
+    lang_dict.get('tab1'), 
+    lang_dict.get('tab2'), 
+    lang_dict.get('tab3'),
+    lang_dict.get('tab4')
 ])
 
 # Variables to hold states for the report
@@ -555,10 +557,10 @@ cfa_error = None
 # TAB 1: DESCRIPTIVE STATS & RAW DATA
 # ==========================================
 with tab_desc:
-    st.markdown("#### Raw Survey Data Processing")
-    st.info("Upload your raw survey data (Excel/CSV) directly from Google Forms to automatically extract demographic tables and split data for EFA/CFA.")
+    st.markdown(f"#### {lang_dict.get('raw_processing')}")
+    st.info(lang_dict.get('raw_info'))
     
-    raw_file = st.file_uploader("Upload Google Forms Data", type=["csv", "xlsx", "xls"], key="raw_data_uploader")
+    raw_file = st.file_uploader(lang_dict.get('upload_forms'), type=["csv", "xlsx", "xls"], key="raw_data_uploader")
     
     if raw_file is not None:
         if raw_file.name.endswith('.csv'):
@@ -571,8 +573,8 @@ with tab_desc:
         
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown("**1. Demographic Summary**")
-            demo_cols = st.multiselect("Select Demographic Variables (e.g., Gender, Experience):", df_raw.columns, key="demo_cols")
+            st.markdown(f"**{lang_dict.get('demo_summary')}**")
+            demo_cols = st.multiselect(lang_dict.get('select_demo'), df_raw.columns, key="demo_cols")
             if demo_cols:
                 for col in demo_cols:
                     st.write(f"**{col}**")
@@ -582,8 +584,8 @@ with tab_desc:
                     st.dataframe(freq_df, use_container_width=True)
                     
         with col2:
-            st.markdown("**2. Normality & Descriptive Stats**")
-            item_cols = st.multiselect("Select Scale Items (for normality test):", df_raw.columns, key="item_cols_desc", default=selected_items if selected_items else None)
+            st.markdown(f"**{lang_dict.get('normality_desc')}**")
+            item_cols = st.multiselect(lang_dict.get('select_normality'), df_raw.columns, key="item_cols_desc", default=selected_items if selected_items else None)
             if item_cols:
                 desc_df = df_raw[item_cols].describe().T[['mean', 'std']].round(3)
                 desc_df['Skewness'] = df_raw[item_cols].skew().round(3)
@@ -592,8 +594,8 @@ with tab_desc:
                 
         # Data Splitting Action
         st.markdown("---")
-        st.markdown("#### Ready for Psychometric Analysis?")
-        if st.button("✂️ Automatically Split Data for EFA & CFA (50/50)"):
+        st.markdown(f"#### {lang_dict.get('ready_split')}")
+        if st.button(lang_dict.get('split_btn')):
             df_shuffled = df_raw.sample(frac=1, random_state=42).reset_index(drop=True)
             split_idx = len(df_shuffled) // 2
             st.session_state['phase1_data'] = df_shuffled.iloc[:split_idx]
@@ -602,22 +604,21 @@ with tab_desc:
 
     # Study Overview Summary
     st.markdown("---")
-    st.markdown("#### Study Overview")
+    st.markdown(f"#### {lang_dict.get('study_overview')}")
     phase_cols = st.columns(3)
     p1_len = len(st.session_state['phase1_data']) if st.session_state['phase1_data'] is not None else 0
     p2_len = len(st.session_state['phase2_data']) if st.session_state['phase2_data'] is not None else 0
     
-    phase_cols[0].metric("Total available cases", p1_len + p2_len)
-    phase_cols[1].metric("Phase 1 cases (EFA)", p1_len if p1_len > 0 else "Not loaded")
-    phase_cols[2].metric("Phase 2 cases (CFA)", p2_len if p2_len > 0 else "Not loaded")
+    phase_cols[0].metric(lang_dict.get('total_cases'), p1_len + p2_len)
+    phase_cols[1].metric(lang_dict.get('p1_cases'), p1_len if p1_len > 0 else lang_dict.get('not_loaded'))
+    phase_cols[2].metric(lang_dict.get('p2_cases'), p2_len if p2_len > 0 else lang_dict.get('not_loaded'))
 
 # ==========================================
 # TAB 2: EXPLORATORY FACTOR ANALYSIS (EFA)
 # ==========================================
 with tab_efa:
     phase1_data = st.session_state['phase1_data']
-    st.markdown("#### Phase 1: Exploratory Factor Analysis (EFA)")
-    st.caption("Phase 1 is the designated discovery sample. EFA is fitted to listwise-complete responses for the selected items.")
+    st.markdown(f"#### {lang_dict.get('phase1_efa')}")
     
     if phase1_data is None:
         st.info("Upload data in the first tab and click 'Split', or upload a Phase 1 file in the sidebar.")
@@ -647,9 +648,9 @@ with tab_efa:
             
             controls = st.columns(2)
             with controls[0]:
-                factor_count = st.number_input("Factors to retain", min_value=1, max_value=max_factors, value=recommended, step=1, help=f"Kaiser criterion suggests {suggested_factors} component(s) with eigenvalue > 1.")
+                factor_count = st.number_input("Factors to retain", min_value=1, max_value=max_factors, value=recommended, step=1)
             with controls[1]:
-                rotation = st.selectbox("Rotation", ["varimax"], help="varimax constrains factor correlations to zero.")
+                rotation = st.selectbox("Rotation", ["varimax"])
             
             efa_output = efa_result(phase1_data, selected_items, int(factor_count), rotation)
             
@@ -661,7 +662,6 @@ with tab_efa:
             st.dataframe(efa_output["eigenvalues"].style.format({"Eigenvalue": "{:.3f}"}), width="stretch", hide_index=True)
             
             st.markdown("#### Factor loadings")
-            st.caption(f"{efa_output['method']} extraction · {efa_output['rotation']} rotation · {efa_output['factor_count']} factor(s).")
             st.dataframe(efa_output["loadings"].style.format("{:.3f}"), width="stretch")
             
             st.markdown("#### Scale Reliability Metrics (Cronbach's α & McDonald's ω)")
@@ -697,8 +697,7 @@ with tab_efa:
 # ==========================================
 with tab_cfa:
     phase2_data = st.session_state['phase2_data']
-    st.markdown("#### Phase 2: Confirmatory Factor Analysis (CFA)")
-    st.caption("Fit the reviewed measurement structure on the independent Phase 2 sample.")
+    st.markdown(f"#### {lang_dict.get('phase2_cfa')}")
     
     if phase2_data is None:
         st.info("Upload data in the first tab and click 'Split', or upload a Phase 2 file in the sidebar.")
