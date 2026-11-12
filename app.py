@@ -341,12 +341,21 @@ with tab_cfa:
             assign = {}
             cols = st.columns(2)
             
-            # --- إصلاح مشكلة AttributeError هنا ---
+            # --- تعديل التوزيع التلقائي هنا لحل مشكلة عدم تحديد القائمة المنسدلة ---
+            assignments = st.session_state.get('item_assignments') or {}
+            
             for i, item in enumerate(selected_items):
-                assignments = st.session_state.get('item_assignments') or {}
                 pre_assigned = assignments.get(item, "غير مدرج (Not included)")
-                idx = options.index(pre_assigned) if pre_assigned in options else 0
-                assign[item] = cols[i%2].selectbox(str(item), options, index=idx, key=f"cfa_{item}")
+                if pre_assigned in options:
+                    idx = options.index(pre_assigned)
+                else:
+                    idx = 0
+                assign[item] = cols[i%2].selectbox(
+                    label=str(item), 
+                    options=options, 
+                    index=idx, 
+                    key=f"cfa_select_{item}"
+                )
             
             if st.button(lang['run_cfa']):
                 f_assign = {f: [i for i, a in assign.items() if a == f] for f in labels}
@@ -402,7 +411,7 @@ with tab_cfa:
                         
                         if cr_ave_data:
                             val_data = []
-                            issues_found = [] # لتسجيل الأخطاء وتوجيه المستخدم
+                            issues_found = [] 
                             
                             for factor, metrics in cr_ave_data.items():
                                 alpha, omega = calc_alpha_omega(st.session_state['phase2_data'], f_assign[factor])
@@ -417,7 +426,6 @@ with tab_cfa:
                                     "التباين المستخرج (AVE)": ave_val
                                 })
                                 
-                                # فحص المعايير وتسجيل الملاحظات
                                 if ave_val < 0.50:
                                     issues_found.append(f"العامل **{factor}**: قيمة AVE ({ave_val:.3f}) أقل من 0.50.")
                                 if cr_val < 0.70:
@@ -426,7 +434,6 @@ with tab_cfa:
                             val_df = pd.DataFrame(val_data).set_index("العامل (Factor)")
                             st.dataframe(val_df.style.format("{:.3f}"), use_container_width=True)
                             
-                            # عرض رسائل التوجيه بناءً على النتائج
                             if issues_found:
                                 st.error("❌ **تحذير معايير JARS:** لم يتحقق الصدق التقاربي أو الثبات في بعض العوامل.")
                                 for issue in issues_found:
@@ -440,12 +447,10 @@ with tab_cfa:
                         
                         disc_df = pd.DataFrame(index=factors_list, columns=factors_list, dtype=float)
                         
-                        # ملء القطر بـ جذر AVE
                         for f in factors_list:
                             if f in cr_ave_data:
                                 disc_df.loc[f, f] = np.sqrt(cr_ave_data[f]['AVE'])
                                 
-                        # جلب الارتباطات بين العوامل
                         corrs = params_df[(params_df['op'] == '~~') & (params_df['lval'].isin(factors_list)) & (params_df['rval'].isin(factors_list)) & (params_df['lval'] != params_df['rval'])]
                         for _, row in corrs.iterrows():
                             f1, f2 = row['lval'], row['rval']
@@ -453,14 +458,12 @@ with tab_cfa:
                             disc_df.loc[f1, f2] = val
                             disc_df.loc[f2, f1] = val
                                 
-                        # تنسيق الجدول لتمييز القطر الرئيسي (الجذر التربيعي لـ AVE)
                         def highlight_diag(df):
                             attr = 'background-color: #d1fae5; font-weight: bold; color: #065f46;'
                             return pd.DataFrame(np.where(np.eye(df.shape[0], dtype=bool), attr, ''), index=df.index, columns=df.columns)
                             
                         st.dataframe(disc_df.style.apply(highlight_diag, axis=None).format("{:.3f}", na_rep="—"), use_container_width=True)
                         
-                        # التشخيص الآلي للصدق التمييزي
                         disc_issues = []
                         for i, f1 in enumerate(factors_list):
                             for j, f2 in enumerate(factors_list):
