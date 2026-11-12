@@ -218,7 +218,6 @@ if st.session_state['raw_data'] is not None:
     if num_cols: 
         selected_items = st.multiselect(lang['select_normality'], num_cols, default=num_cols[:10])
 
-# إنشاء التبويبات بشكل صريح
 tab_desc, tab_efa, tab_cfa, tab_report = st.tabs([lang['tab1'], lang['tab2'], lang['tab3'], lang['tab4']])
 
 # --- TAB 1: Descriptives ---
@@ -341,24 +340,25 @@ with tab_cfa:
             
             if efa_assignments:
                 st.info(lang['auto_assign_msg'])
-                
-                for item in selected_items:
-                    widget_key = f"cfa_select_{item}"
-                    if widget_key not in st.session_state:
-                        proposed_val = efa_assignments.get(item, "غير مدرج (Not included)")
-                        if proposed_val not in options:
-                            proposed_val = "غير مدرج (Not included)"
-                        st.session_state[widget_key] = proposed_val
             
             assign = {}
             cols = st.columns(2)
             
             for i, item in enumerate(selected_items):
-                widget_key = f"cfa_select_{item}"
+                # 1. جلب التوزيع المحفوظ لكل فقرة
+                assigned_factor = efa_assignments.get(item, "غير مدرج (Not included)")
+                
+                # 2. تحديد الفهرس (index) بشكل صريح بناءً على التوزيع المحفوظ
+                if assigned_factor in options:
+                    idx = options.index(assigned_factor)
+                else:
+                    idx = 0
+                
+                # 3. الاعتماد على المعامل `index` فقط وتجنب استخدام `key` لتلافي تعارض الحالة
                 assign[item] = cols[i%2].selectbox(
                     label=str(item), 
                     options=options, 
-                    key=widget_key
+                    index=idx
                 )
             
             if st.button(lang['run_cfa']):
