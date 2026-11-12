@@ -174,16 +174,17 @@ def cfa_result(data, spec):
     fit_vals = {name: float(fit.get(name, np.nan)) for name in ["chi2", "DoF", "chi2 p-value", "CFI", "TLI", "RMSEA"]}
     params = model.inspect(std_est=True)
     
-    # Map semopy aliases (item_0) back to original items (s1, s2)
+    # Map semopy aliases back to original item names
     rev_aliases = {v: k for k, v in spec["aliases"].items()}
     if 'rval' in params.columns:
         params['rval_orig'] = params['rval'].map(rev_aliases).fillna(params['rval'])
     
     cr_ave_dict = {}
-    if 'Est. Std' in params.columns and 'lval' in params.columns:
-        for factor, factor_items in spec['factor_assignments'].items():
-            f_rows = params[(params['lval'] == factor) & (params['rval_orig'].isin(factor_items))]
-            f_loadings = f_rows['Est. Std'].astype(float).values
+    if 'Est. Std' in params.columns and 'op' in params.columns:
+        # VERY IMPORTANT: Filter ONLY factor loadings (op == '=~') for CR/AVE calculations
+        loadings_df = params[params['op'] == '=~'].copy()
+        for factor in spec['factor_assignments'].keys():
+            f_loadings = loadings_df[loadings_df['lval'] == factor]['Est. Std'].astype(float).values
             if len(f_loadings) > 0:
                 sum_l = np.sum(f_loadings)
                 sum_l2 = np.sum(f_loadings**2)
@@ -292,11 +293,11 @@ with tab_efa:
                 out = efa_result(st.session_state['phase1_data'], selected_items, int(factor_count), rotation)
                 st.session_state['efa_output'] = out
                 
-                # --- AUTO-ASSIGNMENT LOGIC (FIXED) ---
+                # --- AUTO-ASSIGNMENT LOGIC ---
                 labels = [f"Factor_{i+1}" for i in range(out['factor_count'])]
                 item_mapping = {}
                 for item in selected_items:
-                    item_mapping[item] = "غير مدرج (Not included)" # Default
+                    item_mapping[item] = "غير مدرج (Not included)" 
                     if item in out['loadings'].index:
                         loadings_row = out['loadings'].loc[item]
                         max_factor = loadings_row.abs().idxmax()
@@ -370,11 +371,17 @@ with tab_cfa:
                         
                         st.markdown("#### تقديرات معلمات النموذج (Parameter Estimates)")
                         params_df = cfa_out["params"]
-                        display_params = params_df[params_df['lval'].isin(labels)].copy()
+                        # IMPORTANT FIX: Filter only loadings (op == '=~') so the table isn't empty/wrong
+                        display_params = params_df[params_df['op'] == '=~'].copy()
                         display_params = display_params.rename(columns={'lval': 'Factor', 'rval_orig': 'Item'})
                         cols_to_show = ['Factor', 'Item', 'Estimate', 'Est. Std', 'Std. Err', 'z-value', 'p-value']
                         cols_to_show = [c for c in cols_to_show if c in display_params.columns]
                         st.dataframe(display_params[cols_to_show].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
+
+                        # --- Automated Diagnostic System (نظام التشخيص الآلي) ---
+                        weak_items = display_params[display_params['Est. Std'].astype(float) < 0.40]['Item'].tolist()
+                        if weak_items:
+                            st.warning(f"⚠️ **نظام التشخيص الآلي:** تم اكتشاف فقرات ذات ارتباط ضعيف جداً بالنموذج التوكيدي (< 0.40): **{', '.join(map(str, weak_items))}**. \n\n 👉 **الإجراء المطلوب:** يُنصح بشدة بالصعود للأعلى وتغيير حالة هذه الفقرات إلى (غير مدرج) وإعادة التحليل، وذلك لرفع قيمة الصدق التقاربي (AVE) وتحسين مؤشرات المطابقة للنموذج.")
 
                         # --- Validity & Reliability Section ---
                         st.markdown("#### الصدق التقاربي والثبات (Convergent Validity & Reliability)")
@@ -397,11 +404,10 @@ with tab_cfa:
                             val_df = pd.DataFrame(val_data).set_index("العامل (Factor)")
                             st.dataframe(val_df.style.format("{:.3f}"), use_container_width=True)
                             
-                            # التشخيص الآلي للصدق التقاربي
                             if low_ave or low_cr:
-                                st.warning("⚠️ تنبيه تشخيصي: هناك انخفاض في مؤشرات الصدق التقاربي (AVE < 0.50 أو CR < 0.70). يرجى مراجعة الفقرات ذات الارتباط الضعيف وحذفها لتحسين جودة النموذج.")
+                                st.warning("⚠️ **نظام التشخيص الآلي:** هناك انخفاض في مؤشرات الصدق التقاربي (AVE < 0.50 أو CR < 0.70). يرجى مراجعة الفقرات الأقل ارتباطاً وحذفها لتحسين النموذج.")
                             else:
-                                st.success("✅ الصدق التقاربي والموثوقية ممتازة (AVE > 0.50 و CR > 0.70).")
+                                st.success("✅ **نظام التشخيص الآلي:** الصدق التقاربي والموثوقية ممتازة (AVE > 0.50 و CR > 0.70). لا حاجة لحذف أي فقرة.")
                             
                             # --- Discriminant Validity ---
                             st.markdown("#### الصدق التمييزي (Discriminant Validity - Fornell-Larcker)")
@@ -422,7 +428,6 @@ with tab_cfa:
                                     
                             st.dataframe(disc_df.style.format("{:.3f}", na_rep="—"), use_container_width=True)
                             
-                            # التشخيص الآلي للصدق التمييزي
                             disc_passed = True
                             for i, f1 in enumerate(factors_list):
                                 for j, f2 in enumerate(factors_list):
@@ -430,9 +435,9 @@ with tab_cfa:
                                         if abs(disc_df.loc[f1, f2]) > disc_df.loc[f1, f1]:
                                             disc_passed = False
                             if not disc_passed:
-                                st.warning("⚠️ تنبيه تشخيصي: الصدق التمييزي غير متحقق لأن بعض الارتباطات بين العوامل تتجاوز الجذر التربيعي للتباين المستخرج (√AVE). يُنصح بحذف الفقرات المتقاطعة (Cross-loadings).")
+                                st.warning("⚠️ **نظام التشخيص الآلي:** الصدق التمييزي غير متحقق لأن بعض الارتباطات بين العوامل تتجاوز الجذر التربيعي للتباين المستخرج (√AVE). يُنصح بحذف الفقرات المتقاطعة (Cross-loadings) لتصحيح التداخل بين العوامل.")
                             else:
-                                st.success("✅ الصدق التمييزي متحقق: جميع الجذور التربيعية لـ (AVE) في القطر الرئيسي أكبر من الارتباطات بين العوامل.")
+                                st.success("✅ **نظام التشخيص الآلي:** الصدق التمييزي متحقق بنجاح.")
 
                         st.markdown("#### المخطط الهيكلي (Structural Diagram)")
                         dot_code = "digraph CFA {\nrankdir=LR;\nnode [shape=box, style=filled, fillcolor=white];\n"
@@ -444,7 +449,7 @@ with tab_cfa:
                         st.graphviz_chart(dot_code)
 
                     except Exception as e:
-                        st.error(f"⚠️ فشل التحليل التوكيدي: يرجى التأكد من أن البيانات مناسبة لبناء النموذج وأن مصفوفة التغاير صحيحة. (تفاصيل تقنية: {str(e)})")
+                        st.error(f"⚠️ فشل التحليل التوكيدي: يرجى التأكد من أن البيانات مناسبة لبناء النموذج. (تفاصيل الخطأ: {str(e)})")
 
 # --- TAB 4: Report & Charts ---
 with tab_report:
@@ -491,7 +496,7 @@ with tab_report:
         
         if cfa_out:
             fit = cfa_out['fit']
-            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة جيدة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0):.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). تم التحقق من الصدق التمييزي والتقاربي وفق معيار Fornell-Larcker، وتدل هذه المؤشرات على مطابقة النموذج مع البيانات الفعلية للمقياس.\n\n"
+            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة جيدة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0):.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). تم التحقق من الصدق التمييزي والتقاربي وفق معيار Fornell-Larcker لتأكيد جودة المقياس.\n\n"
         
         st.write(report_text)
         st.success("التقرير الأكاديمي أعلاه تمت كتابته آلياً. يمكنك نسخه مباشرة ولصقه في مذكرتك أو بحثك العلمي!")
