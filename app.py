@@ -174,17 +174,17 @@ def cfa_result(data, spec):
     fit_vals = {name: float(fit.get(name, np.nan)) for name in ["chi2", "DoF", "chi2 p-value", "CFI", "TLI", "RMSEA"]}
     params = model.inspect(std_est=True)
     
-    # Map semopy aliases back to original item names
+    # إصلاح الخدعة البرمجية: semopy تضع الفقرة في lval والعامل في rval عند استخدام op == '~'
     rev_aliases = {v: k for k, v in spec["aliases"].items()}
-    if 'rval' in params.columns:
-        params['rval_orig'] = params['rval'].map(rev_aliases).fillna(params['rval'])
+    if 'lval' in params.columns:
+        params['lval_orig'] = params['lval'].map(rev_aliases).fillna(params['lval'])
     
     cr_ave_dict = {}
     if 'Est. Std' in params.columns and 'op' in params.columns:
-        # VERY IMPORTANT: Filter ONLY factor loadings (op == '=~') for CR/AVE calculations
-        loadings_df = params[params['op'] == '=~'].copy()
+        # هنا نجلب التشبعات الصحيحة: العملية هي '~' والخانة اليمنى هي اسم العامل
+        loadings_df = params[params['op'] == '~'].copy()
         for factor in spec['factor_assignments'].keys():
-            f_loadings = loadings_df[loadings_df['lval'] == factor]['Est. Std'].astype(float).values
+            f_loadings = loadings_df[loadings_df['rval'] == factor]['Est. Std'].astype(float).values
             if len(f_loadings) > 0:
                 sum_l = np.sum(f_loadings)
                 sum_l2 = np.sum(f_loadings**2)
@@ -293,7 +293,6 @@ with tab_efa:
                 out = efa_result(st.session_state['phase1_data'], selected_items, int(factor_count), rotation)
                 st.session_state['efa_output'] = out
                 
-                # --- AUTO-ASSIGNMENT LOGIC ---
                 labels = [f"Factor_{i+1}" for i in range(out['factor_count'])]
                 item_mapping = {}
                 for item in selected_items:
@@ -371,9 +370,9 @@ with tab_cfa:
                         
                         st.markdown("#### تقديرات معلمات النموذج (Parameter Estimates)")
                         params_df = cfa_out["params"]
-                        # IMPORTANT FIX: Filter only loadings (op == '=~') so the table isn't empty/wrong
-                        display_params = params_df[params_df['op'] == '=~'].copy()
-                        display_params = display_params.rename(columns={'lval': 'Factor', 'rval_orig': 'Item'})
+                        # التعديل الحاسم: جلب التشبعات حيث العامل في rval والفقرة في lval_orig بناءً على لغة semopy
+                        display_params = params_df[(params_df['op'] == '~') & (params_df['rval'].isin(labels))].copy()
+                        display_params = display_params.rename(columns={'rval': 'Factor', 'lval_orig': 'Item'})
                         cols_to_show = ['Factor', 'Item', 'Estimate', 'Est. Std', 'Std. Err', 'z-value', 'p-value']
                         cols_to_show = [c for c in cols_to_show if c in display_params.columns]
                         st.dataframe(display_params[cols_to_show].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
