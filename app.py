@@ -252,6 +252,12 @@ with tab_efa:
         if n_cases < 50:
             st.error(lang['sample_warning'])
         else:
+            # إضافة مصفوفة الارتباطات قبل التحليل
+            st.markdown("#### مصفوفة الارتباطات (Correlation Matrix)")
+            corr_matrix = st.session_state['phase1_data'][selected_items].corr()
+            st.dataframe(corr_matrix.style.background_gradient(cmap='coolwarm', axis=None).format("{:.3f}"), use_container_width=True)
+            st.markdown("---")
+
             c1, c2 = st.columns(2)
             factor_count = c1.number_input("Factors", min_value=1, value=2)
             rotation = c2.selectbox("Rotation", ["varimax", "oblimin"])
@@ -269,7 +275,7 @@ with tab_efa:
                 metrics[2].metric("Bartlett χ²", f"{out['bartlett_chi2']:.2f}") 
                 metrics[3].metric("Bartlett p", p_str)
                 
-                st.markdown("#### Factor loadings")
+                st.markdown("#### التشبعات العاملية (Factor Loadings)")
                 st.dataframe(out["loadings"].style.format("{:.3f}"), use_container_width=True)
                 
                 st.markdown("#### Item-level KMO")
@@ -296,12 +302,11 @@ with tab_cfa:
             cols = st.columns(2)
             for i, item in enumerate(selected_items):
                 # SMART AUTO-ASSIGNMENT LOGIC
-                default_idx = 0 # Default to "Not included"
+                default_idx = 0 
                 if efa_out and item in efa_out['loadings'].index:
                     loadings_row = efa_out['loadings'].loc[item]
                     max_factor = loadings_row.abs().idxmax()
                     max_val = loadings_row.abs().max()
-                    # Assign to factor if loading is >= 0.30
                     if max_val >= 0.30 and max_factor in labels:
                         default_idx = labels.index(max_factor) + 1
                         
@@ -311,7 +316,6 @@ with tab_cfa:
                 f_assign = {f: [i for i, a in assign.items() if a == f] for f in labels}
                 f_assign = {k: v for k, v in f_assign.items() if len(v) > 0}
                 
-                # Syntax Error Prevention
                 if not f_assign or any(len(v) < 2 for v in f_assign.values()):
                     st.error("⚠️ يرجى تعيين فقرتين على الأقل لكل عامل لتجنب الأخطاء في بناء نموذج المعادلة البنائية.")
                 else:
@@ -330,6 +334,17 @@ with tab_cfa:
                         
                         st.markdown("#### Parameter estimates")
                         st.dataframe(cfa_out["params"].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
+
+                        # رسم المخطط الهيكلي بـ Graphviz
+                        st.markdown("#### المخطط الهيكلي (Structural Diagram / Diagramme structurel)")
+                        dot_code = "digraph CFA {\nrankdir=LR;\nnode [shape=box, style=filled, fillcolor=white];\n"
+                        for factor, items in f_assign.items():
+                            dot_code += f'"{factor}" [shape=ellipse, style=filled, fillcolor="#bae6fd"];\n'
+                            for item in items:
+                                dot_code += f'"{factor}" -> "{item}";\n'
+                        dot_code += "}"
+                        st.graphviz_chart(dot_code)
+
                     except Exception as e:
                         st.error(f"CFA Error: {str(e)}")
 
