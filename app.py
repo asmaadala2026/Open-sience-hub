@@ -141,7 +141,6 @@ st.markdown("""
     [data-testid="stMetric"] { background: #fff; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     h1, h2, h3, h4 { color: #17324d; font-weight: 700; }
     
-    /* ستايل الجداول المخصصة الجذابة للنموذج */
     .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.95rem; text-align: center; }
     .custom-table th { color: white; padding: 12px; font-weight: bold; border: 1px solid #ddd; }
     .custom-table td { padding: 10px; border: 1px solid #e2e8f0; }
@@ -277,7 +276,6 @@ with st.expander(lang['demo_details'], expanded=False):
     st.markdown(lang['demo_intro'])
     col1, col2 = st.columns(2)
     
-    # الجداول الجذابة باستخدام HTML المباشر
     html_table1 = f"""
     <table class="custom-table table-blue">
         <tr><th>{lang['dim_col']}</th><th>{lang['items_col']}</th><th>{lang['var_col']}</th></tr>
@@ -411,9 +409,10 @@ with tab_efa:
                 col_a, col_b = st.columns(2)
                 with col_a:
                     st.markdown(f"#### {lang['anti_image_title']}")
-                    # الحل البرمجي لخطأ التحويل في Pandas مع إضافة حرف a
+                    # بناء مصفوفة النصوص لتجنب أخطاء البانداس
                     anti_image_raw = out["anti_image"]
                     anti_image_str = anti_image_raw.copy().astype(str)
+                    
                     for r in anti_image_raw.index:
                         for c in anti_image_raw.columns:
                             val = anti_image_raw.loc[r, c]
@@ -422,10 +421,12 @@ with tab_efa:
                             else:
                                 anti_image_str.loc[r, c] = f"{val:.3f}"
                     
-                    def highlight_diag(val): 
-                        return 'background-color: #d1fae5; font-weight:bold' if str(val).endswith('a') else ''
-                    
-                    st.dataframe(anti_image_str.style.applymap(highlight_diag), use_container_width=True)
+                    # دالة تلوين متوافقة كلياً (تحل مشكلة AttributeError)
+                    def highlight_anti_diag(df):
+                        attr = 'background-color: #d1fae5; font-weight: bold;'
+                        return pd.DataFrame(np.where(np.eye(df.shape[0], dtype=bool), attr, ''), index=df.index, columns=df.columns)
+
+                    st.dataframe(anti_image_str.style.apply(highlight_anti_diag, axis=None), use_container_width=True)
                 
                 with col_b:
                     st.markdown("#### مصفوفة تحويل المكونات (Transformation Matrix)")
