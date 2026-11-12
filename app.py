@@ -156,6 +156,7 @@ def efa_result(data, items, factor_count, rotation):
         kmo_all, kmo_model, bartlett_chi2, bartlett_p = np.full(len(items), np.nan), np.nan, np.nan, np.nan
     fa = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method='principal')
     fa.fit(complete)
+    # Using strict internal names 'Factor 1', 'Factor 2' for robust mapping
     loadings = pd.DataFrame(fa.loadings_, index=items, columns=[f"Factor {i+1}" for i in range(factor_count)])
     ev, _ = fa.get_eigenvalues()
     return {"n": len(complete), "kmo": kmo_model, "kmo_items": pd.Series(kmo_all, index=items), "bartlett_chi2": bartlett_chi2, "bartlett_p": bartlett_p, "method": "PCA", "rotation": rotation, "factor_count": factor_count, "loadings": loadings, "ev": pd.DataFrame({"Component": range(1, len(ev)+1), "Eigenvalue": ev})}
@@ -163,7 +164,7 @@ def efa_result(data, items, factor_count, rotation):
 def build_cfa_specification(factor_assignments):
     used_items = [item for items in factor_assignments.values() for item in items]
     aliases = {item: f"item_{i}" for i, item in enumerate(used_items)}
-    lines = [f"{factor} =~ " + " + ".join(aliases[item] for item in items) for factor, items in factor_assignments.items()]
+    lines = [f"{factor.replace(' ', '_')} =~ " + " + ".join(aliases[item] for item in items) for factor, items in factor_assignments.items()]
     return {"items": used_items, "aliases": aliases, "engine_syntax": "\n".join(lines), "factor_assignments": factor_assignments}
 
 def cfa_result(data, spec):
@@ -266,9 +267,7 @@ with tab_efa:
                 st.session_state['efa_output'] = out
                 st.success("EFA Completed Successfully!")
                 
-                # Method explicitly shown here
-                st.markdown(f"**طريقة الاستخراج (Extraction Method):** تحليل المكونات الأساسية (Principal Component Analysis - PCA)")
-                st.markdown(f"**طريقة التدوير (Rotation Method):** {rotation}")
+                st.markdown(f"**طريقة الاستخراج (Extraction Method):** تحليل المكونات الأساسية (PCA)")
                 st.markdown("---")
                 
                 p_val = out['bartlett_p']
@@ -295,6 +294,8 @@ with tab_cfa:
             default_cfa_factors = int(efa_out['factor_count']) if efa_out else 2
             
             cfa_factors = st.number_input("CFA Factors", min_value=1, value=default_cfa_factors, key="cfa_factors")
+            
+            # Using strictly uniform names 'Factor 1', 'Factor 2' etc to ensure exact matching
             labels = [f"Factor {i+1}" for i in range(cfa_factors)]
             assign = {}
             
@@ -307,7 +308,7 @@ with tab_cfa:
                 default_idx = 0 
                 if efa_out and item in efa_out['loadings'].index:
                     loadings_row = efa_out['loadings'].loc[item]
-                    max_factor = loadings_row.abs().idxmax()
+                    max_factor = loadings_row.abs().idxmax() # e.g., 'Factor 1'
                     max_val = loadings_row.abs().max()
                     if max_val >= 0.30 and max_factor in labels:
                         default_idx = labels.index(max_factor) + 1
@@ -334,15 +335,16 @@ with tab_cfa:
                         f_cols[2].metric("RMSEA", f"{fit_vals['RMSEA']:.3f}")
                         f_cols[3].metric("χ² (df)", f"{fit_vals['chi2']:.2f} ({fit_vals['DoF']:.0f})")
                         
-                        st.markdown("#### Parameter estimates")
+                        st.markdown("#### Parameter estimates (تقديرات معلمات النموذج)")
                         st.dataframe(cfa_out["params"].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
 
                         st.markdown("#### المخطط الهيكلي (Structural Diagram / Diagramme structurel)")
                         dot_code = "digraph CFA {\nrankdir=LR;\nnode [shape=box, style=filled, fillcolor=white];\n"
                         for factor, items in f_assign.items():
-                            dot_code += f'"{factor}" [shape=ellipse, style=filled, fillcolor="#bae6fd"];\n'
+                            factor_name = factor.replace(" ", "_")
+                            dot_code += f'"{factor_name}" [shape=ellipse, style=filled, fillcolor="#bae6fd", label="{factor}"];\n'
                             for item in items:
-                                dot_code += f'"{factor}" -> "{item}";\n'
+                                dot_code += f'"{factor_name}" -> "{item}";\n'
                         dot_code += "}"
                         st.graphviz_chart(dot_code)
 
