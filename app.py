@@ -127,15 +127,55 @@ translations = {
     }
 }
 
-# --- Styling ---
+# --- Styling & CSS Enhancements ---
 st.markdown("""
     <style>
+    /* تحسين الأزرار الرئيسية */
     div.stButton > button:first-child, div.stDownloadButton > button:first-child, div.stFormSubmitButton > button:first-child {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important; color: white !important; border: none !important;
-        border-radius: 8px !important; font-weight: 700 !important; padding: 0.6rem 1.2rem !important;
-        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3) !important; transition: all 0.3s ease !important; width: 100% !important; border-color: #3b82f6 !important;
+        border-radius: 12px !important; font-weight: 700 !important; font-size: 1.2rem !important; padding: 0.8rem 1.5rem !important;
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4) !important; transition: all 0.3s ease !important; width: 100% !important; border-color: #3b82f6 !important;
     }
-    div.stButton > button:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4) !important; background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important; }
+    div.stButton > button:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 15px rgba(59, 130, 246, 0.5) !important; background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important; }
+    
+    /* تكبير وتجميل منطقة رفع الملفات */
+    [data-testid="stFileUploadDropzone"] {
+        background-color: #f0f9ff !important;
+        border: 2px dashed #0284c7 !important;
+        border-radius: 15px !important;
+        padding: 40px 20px !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1) !important;
+        transition: all 0.3s ease;
+    }
+    [data-testid="stFileUploadDropzone"]:hover {
+        background-color: #e0f2fe !important;
+        border-color: #0369a1 !important;
+    }
+    
+    /* تكبير حجم خط التبويبات Tabs */
+    button[data-baseweb="tab"] {
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
+        padding: 1rem 1.5rem !important;
+    }
+
+    /* كلاس العناوين البارزة (الأشرطة الزرقاء الداكنة) */
+    .highlight-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 10px;
+        margin-top: 25px;
+        margin-bottom: 20px;
+        font-size: 1.25rem;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ستايل الجداول المخصصة لنموذج EGAIS */
     .demo-card { background: linear-gradient(to right, #f0f9ff, #e0f2fe); border: 2px solid #bae6fd; border-right: 8px solid #0284c7; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15); }
     .demo-card h3 { color: #0c4a6e; margin-top: 0; font-weight: 800; font-size: 1.3rem; }
     [data-testid="stMetric"] { background: #fff; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -308,15 +348,15 @@ tab_desc, tab_efa, tab_cfa, tab_report = st.tabs([lang['tab1'], lang['tab2'], la
 
 # --- TAB 1: Descriptives ---
 with tab_desc:
+    st.markdown(f'<div class="highlight-header">📁 {lang["upload_forms"]}</div>', unsafe_allow_html=True)
     st.info(lang['raw_info'])
-    raw_file = st.file_uploader(lang['upload_forms'], type=["csv", "xlsx"])
+    raw_file = st.file_uploader("", type=["csv", "xlsx"])
     if raw_file:
         df_raw = pd.read_csv(raw_file) if raw_file.name.endswith('.csv') else pd.read_excel(raw_file)
         st.session_state['raw_data'] = df_raw
         st.success(f"✅ Data loaded! Total responses: {len(df_raw)}")
         
-        st.markdown("---")
-        st.markdown(f"**{lang['demo_summary']}**")
+        st.markdown(f'<div class="highlight-header">👥 {lang["demo_summary"]}</div>', unsafe_allow_html=True)
         demo_cols = st.multiselect(lang['select_demo'], df_raw.columns, key="demo_cols")
         if demo_cols:
             for col in demo_cols:
@@ -326,14 +366,12 @@ with tab_desc:
                 st.dataframe(freq, use_container_width=True)
                 
         if selected_items:
-            st.markdown("---")
-            st.markdown(f"**{lang['normality_desc']}**")
+            st.markdown(f'<div class="highlight-header">📌 {lang["normality_desc"]}</div>', unsafe_allow_html=True)
             desc_df = df_raw[selected_items].describe().T[['mean', 'std']].round(3)
             desc_df.rename(columns={'mean': 'المتوسط (Mean)', 'std': 'الانحراف (SD)'}, inplace=True)
             st.dataframe(desc_df, use_container_width=True)
                 
-        st.markdown("---")
-        st.markdown(f"#### {lang['ready_split']}")
+        st.markdown(f'<div class="highlight-header">✂️ {lang["ready_split"]}</div>', unsafe_allow_html=True)
         if st.button(lang['split_btn']):
             if len(df_raw) < 50:
                  st.error(lang['sample_error'])
@@ -372,6 +410,7 @@ with tab_efa:
             st.dataframe(corr_matrix.style.background_gradient(cmap='coolwarm', axis=None).format("{:.3f}"), use_container_width=True)
             st.markdown("---")
 
+            st.markdown(f'<div class="highlight-header">⚙️ إعدادات التحليل العاملي الاستكشافي (EFA)</div>', unsafe_allow_html=True)
             c1, c2 = st.columns(2)
             factor_count = c1.number_input("Factors", min_value=1, value=2)
             rotation = c2.selectbox("Rotation", ["varimax", "oblimin"], help=lang['rotation_help'])
@@ -409,7 +448,6 @@ with tab_efa:
                 col_a, col_b = st.columns(2)
                 with col_a:
                     st.markdown(f"#### {lang['anti_image_title']}")
-                    # بناء مصفوفة النصوص لتجنب أخطاء البانداس
                     anti_image_raw = out["anti_image"]
                     anti_image_str = anti_image_raw.copy().astype(str)
                     
@@ -421,7 +459,6 @@ with tab_efa:
                             else:
                                 anti_image_str.loc[r, c] = f"{val:.3f}"
                     
-                    # دالة تلوين متوافقة كلياً (تحل مشكلة AttributeError)
                     def highlight_anti_diag(df):
                         attr = 'background-color: #d1fae5; font-weight: bold;'
                         return pd.DataFrame(np.where(np.eye(df.shape[0], dtype=bool), attr, ''), index=df.index, columns=df.columns)
@@ -442,6 +479,7 @@ with tab_cfa:
         if n_cases_cfa < 50:
             st.error(lang['sample_error'])
         else:
+            st.markdown(f'<div class="highlight-header">⚙️ إعدادات التحليل العاملي التوكيدي (CFA)</div>', unsafe_allow_html=True)
             efa_out = st.session_state.get('efa_output')
             default_cfa_factors = int(efa_out['factor_count']) if efa_out else 2
             cfa_factors = st.number_input("CFA Factors", min_value=1, value=default_cfa_factors, key="cfa_factors")
@@ -463,6 +501,7 @@ with tab_cfa:
                 idx = options.index(assigned_factor) if assigned_factor in options else 0
                 assign[item] = cols[i%2].selectbox(label=str(item), options=options, index=idx)
             
+            st.markdown("<br>", unsafe_allow_html=True)
             if st.button(lang['run_cfa']):
                 f_assign = {f: [i for i, a in assign.items() if a == f] for f in labels}
                 f_assign = {k: v for k, v in f_assign.items() if len(v) > 0}
@@ -600,7 +639,7 @@ with tab_cfa:
 
 # --- TAB 4: Report & Charts ---
 with tab_report:
-    st.markdown(f"### {lang['charts_title']}")
+    st.markdown(f'<div class="highlight-header">📊 {lang["charts_title"]}</div>', unsafe_allow_html=True)
     if st.session_state['raw_data'] is not None:
         df = st.session_state['raw_data']
         col1, col2 = st.columns(2)
@@ -626,8 +665,7 @@ with tab_report:
                 ax2.set_title("متوسطات فقرات المقياس")
                 st.pyplot(fig2)
 
-    st.markdown("---")
-    st.markdown(f"### {lang['report_title']}")
+    st.markdown(f'<div class="highlight-header">📄 {lang["report_title"]}</div>', unsafe_allow_html=True)
     
     efa_out = st.session_state.get('efa_output')
     cfa_out = st.session_state.get('cfa_output')
