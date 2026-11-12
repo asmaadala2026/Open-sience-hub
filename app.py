@@ -64,7 +64,8 @@ translations = {
         'sample_error': '⛔ Error: Sample size is less than 50. Factor analysis cannot be performed due to insufficient data.',
         'auto_assign_msg': '💡 Items have been automatically assigned to factors based on the highest EFA loadings (>0.30).',
         'rotation_help': 'Use Varimax for independent factors, and Oblimin for correlated psychological factors.',
-        'corr_matrix_title': 'Correlation Matrix'
+        'corr_matrix_title': 'Correlation Matrix',
+        'anti_image_title': 'Anti-Image Matrices'
     },
     'العربية': {
         'select_lang': '🌐 اختر اللغة', 'main_title': '💠 PsychoStat Pro',
@@ -92,7 +93,8 @@ translations = {
         'sample_error': '⛔ خطأ: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). تم إيقاف التحليل لعدم كفاية البيانات وتجنب النتائج المضللة.',
         'auto_assign_msg': '💡 تم توزيع الفقرات وبناء نموذج المعادلة البنائية تلقائياً بناءً على أعلى تشبع (أكبر من 0.30) من نتائج التحليل الاستكشافي.',
         'rotation_help': 'استخدم Varimax للعوامل المستقلة، وOblimin للعوامل النفسية المرتبطة.',
-        'corr_matrix_title': 'مصفوفة الارتباطات (Correlation Matrix)'
+        'corr_matrix_title': 'مصفوفة الارتباطات (Correlation Matrix)',
+        'anti_image_title': 'المصفوفة المضادة للارتباط (Anti-Image Matrices)'
     },
     'Français': {
         'select_lang': '🌐 Choisir la langue', 'main_title': '💠 PsychoStat Pro',
@@ -120,7 +122,8 @@ translations = {
         'sample_error': '⛔ Erreur: La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle ne peut pas être effectuée.',
         'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs selon les plus fortes saturations (>0.30).',
         'rotation_help': 'Utilisez Varimax pour les facteurs indépendants, et Oblimin pour les facteurs psychologiques corrélés.',
-        'corr_matrix_title': 'Matrice de Corrélation'
+        'corr_matrix_title': 'Matrice de Corrélation',
+        'anti_image_title': 'Matrices Anti-Image'
     }
 }
 
@@ -252,6 +255,12 @@ def cfa_result(data, spec):
 
     return {"n": len(complete), "fit": fit_vals, "params": params, "cr_ave": cr_ave_dict}
 
+# --- Format Function for Anti-Image Matrix ---
+def format_anti_image(val, is_diag):
+    if is_diag:
+        return f"{val:.3f}a"
+    return f"{val:.3f}"
+
 # --- Header & Example ---
 st.markdown(f"""
     <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white; margin-bottom: 25px;">
@@ -266,10 +275,13 @@ with st.expander(lang['demo_details'], expanded=False):
     st.markdown(lang['demo_intro'])
     col1, col2 = st.columns(2)
     
-    # تلوين وتنسيق الجداول
     def style_demo_table(df):
-        return df.style.set_properties(**{'background-color': '#f0f9ff', 'color': '#0c4a6e', 'border': '1px solid #bae6fd'}) \
-                       .set_table_styles([{'selector': 'th', 'props': [('background-color', '#bae6fd'), ('color', '#0284c7')]}])
+        return df.style.set_properties(**{'background-color': '#f8fafc', 'color': '#0f172a', 'border': '1px solid #cbd5e1'}) \
+                       .set_table_styles([
+                           {'selector': 'th', 'props': [('background-color', '#3b82f6'), ('color', 'white'), ('font-weight', 'bold')]},
+                           {'selector': 'tbody tr:nth-child(even)', 'props': [('background-color', '#e0f2fe')]},
+                           {'selector': 'tbody tr:nth-child(odd)', 'props': [('background-color', '#ffedd5')]}
+                       ])
                        
     df_dims = pd.DataFrame({lang['dim_col']: [lang['dim1'], lang['dim2']], lang['items_col']: [12, 11], lang['var_col']: ["67.04%", "-"]})
     col1.dataframe(style_demo_table(df_dims), hide_index=True, use_container_width=True)
@@ -348,7 +360,6 @@ with tab_efa:
             rel_cols[1].metric("ماكدونالد أوميغا (McDonald's ω)", f"{omega_efa:.3f}")
             st.markdown("---")
 
-            # مصفوفة الارتباط قبل جدول التشبعات
             st.markdown(f"#### {lang['corr_matrix_title']}")
             corr_matrix = st.session_state['phase1_data'][selected_items].corr()
             st.dataframe(corr_matrix.style.background_gradient(cmap='coolwarm', axis=None).format("{:.3f}"), use_container_width=True)
@@ -390,9 +401,15 @@ with tab_efa:
                 
                 col_a, col_b = st.columns(2)
                 with col_a:
-                    st.markdown("#### المصفوفة المضادة للارتباط (Anti-Image Matrices)")
+                    st.markdown(f"#### {lang['anti_image_title']}")
                     def highlight_diag(val): return 'background-color: #d1fae5; font-weight:bold'
-                    st.dataframe(out["anti_image"].style.apply(lambda x: [highlight_diag(v) if x.name == i else '' for i, v in x.items()], axis=1).format("{:.3f}"), use_container_width=True)
+                    # تنسيق مصفوفة Anti-Image لإضافة 'a' للقطر
+                    anti_image_formatted = out["anti_image"].copy()
+                    for idx in anti_image_formatted.index:
+                        for col in anti_image_formatted.columns:
+                            anti_image_formatted.loc[idx, col] = format_anti_image(out["anti_image"].loc[idx, col], is_diag=(idx==col))
+                    
+                    st.dataframe(anti_image_formatted.style.apply(lambda x: [highlight_diag(v) if x.name == i else '' for i, v in x.items()], axis=1), use_container_width=True)
                 
                 with col_b:
                     st.markdown("#### مصفوفة تحويل المكونات (Transformation Matrix)")
