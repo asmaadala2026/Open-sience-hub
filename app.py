@@ -49,16 +49,17 @@ translations = {
         'normality_desc': '2. Descriptive Stats (Mean & SD)', 'select_normality': '📌 Select Scale Items for Analysis:',
         'ready_split': 'Ready for Psychometric Analysis?', 'split_btn': '✂️ Automatically Split Data for EFA & CFA (50/50)',
         'study_overview': 'Study Overview', 'total_cases': 'Total available cases', 'p1_cases': 'Phase 1 cases (EFA)', 'p2_cases': 'Phase 2 cases (CFA)', 'not_loaded': 'Not loaded',
-        'case_study_title': '📖 Case Study: EGAIS by Asmaa Dala',
-        'case_study_desc': 'This validated scale is presented as a demo. Use this platform to analyze your own survey data with high precision.',
-        'case_study_intro': 'This scale (EGAIS) was developed specifically by researcher **Asmaa Dala**. Here are the robust results extracted by the platform:',
+        'demo_title': '📖 Applied Example: EGAIS Scale Results',
+        'demo_desc': 'This validated scale is presented as a demo. Use this platform to analyze your own survey data with high precision.',
+        'demo_intro': 'This scale (EGAIS) was developed specifically by researcher **Asmaa Dala**. Here are the robust results extracted by the platform:',
         'feedback_title': '💬 Feedback & Consultations', 'feedback_desc': 'Share your thoughts or request a consultation.',
         'feedback_rating': 'How was your experience?', 'feedback_text': 'Leave a comment...', 'feedback_submit': 'Send Feedback 🚀', 'feedback_thanks': 'Thank you! Received. 😍',
         'run_efa': 'Run Exploratory Factor Analysis (EFA)', 'run_cfa': 'Run Confirmatory Factor Analysis (CFA)',
         'report_wait': 'Please run EFA and CFA in the previous tabs to generate the automated report.',
         'report_title': 'Automated Academic Report (APA 7)', 'charts_title': 'Visualizations (Charts & Graphs)',
-        'sample_warning': '⚠️ JARS Warning: Sample size is less than 50. Factor analysis requires a larger sample.',
-        'auto_assign_msg': '💡 Items have been automatically assigned to factors based on the highest EFA loadings (>0.30).'
+        'sample_error': '⛔ Error: Sample size is less than 50. Factor analysis cannot be performed due to insufficient data.',
+        'auto_assign_msg': '💡 Items have been automatically assigned to factors based on the highest EFA loadings (>0.30).',
+        'rotation_help': 'Use Varimax for independent factors, and Oblimin for correlated psychological factors.'
     },
     'العربية': {
         'select_lang': '🌐 اختر اللغة', 'main_title': '💠 PsychoStat Pro',
@@ -71,16 +72,40 @@ translations = {
         'normality_desc': '2. الإحصاء الوصفي', 'select_normality': '📌 اختر فقرات المقياس:',
         'ready_split': 'هل أنت جاهز للتحليل السيكومتري؟', 'split_btn': '✂️ تقسيم البيانات تلقائياً لـ EFA و CFA (بنسبة 50/50)',
         'study_overview': 'نظرة عامة على الدراسة', 'total_cases': 'إجمالي الحالات المتاحة', 'p1_cases': 'حالات المرحلة 1 (EFA)', 'p2_cases': 'حالات المرحلة 2 (CFA)', 'not_loaded': 'لم يتم التحميل',
-        'case_study_title': '📖 مثال تطبيقي: نتائج مقياس (EGAIS) للباحثة أسماء دالة',
-        'case_study_desc': 'هذا المقياس المُحكّم معروض كدراسة حالة حقيقية لتوضيح قدرة المنصة.',
-        'case_study_intro': 'تم تطوير مقياس (EGAIS) خصيصاً من قِبل الباحثة **أسماء دالة**. إليكِ النتائج الحقيقية والمبهرة التي استخرجتها المنصة:',
+        'demo_title': '📖 مثال تطبيقي: نتائج مقياس (EGAIS)',
+        'demo_desc': 'هذا المقياس المُحكّم معروض كمثال تطبيقي لتوضيح قدرة المنصة.',
+        'demo_intro': 'تم تطوير مقياس (EGAIS) خصيصاً من قِبل الباحثة **أسماء دالة**. إليكِ النتائج الحقيقية والمبهرة التي استخرجتها المنصة:',
         'feedback_title': '💬 آراء ومقترحات الباحثين', 'feedback_desc': 'يسعدنا سماع رأيك أو ترك استشارتك.',
         'feedback_rating': 'كيف تقيم تجربتك؟', 'feedback_text': 'اكتب تعليقك أو استشارتك...', 'feedback_submit': 'إرسال 🚀', 'feedback_thanks': 'شكراً لك! تم استلام رسالتك. 😍',
         'run_efa': 'إجراء التحليل العاملي الاستكشافي (EFA)', 'run_cfa': 'إجراء التحليل العاملي التوكيدي (CFA) آلياً',
         'report_wait': 'يرجى إجراء التحليل الاستكشافي والتوكيدي في التبويبات السابقة لتوليد التقرير والرسوم البيانية.',
         'report_title': 'التقرير الأكاديمي الآلي (APA 7)', 'charts_title': 'الرسوم البيانية (الأعمدة والدوائر النسبية)',
-        'sample_warning': '⚠️ تنبيه معايير JARS: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). لا يمكن إجراء التحليل العاملي لعدم كفاية البيانات.',
-        'auto_assign_msg': '💡 تم توزيع الفقرات وبناء نموذج المعادلة البنائية تلقائياً بناءً على أعلى تشبع (أكبر من 0.30) من نتائج التحليل الاستكشافي.'
+        'sample_error': '⛔ خطأ: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). تم إيقاف التحليل لعدم كفاية البيانات وتجنب النتائج المضللة.',
+        'auto_assign_msg': '💡 تم توزيع الفقرات وبناء نموذج المعادلة البنائية تلقائياً بناءً على أعلى تشبع (أكبر من 0.30) من نتائج التحليل الاستكشافي.',
+        'rotation_help': 'استخدم Varimax للعوامل المستقلة، وOblimin للعوامل النفسية المرتبطة.'
+    },
+    'Français': {
+        'select_lang': '🌐 Choisir la langue', 'main_title': '💠 PsychoStat Pro',
+        'subtitle': 'Explorez la qualité des mesures psychométriques avec des méthodes transparentes et des résultats exportables.',
+        'developer': 'Développé par: Asmaa Dala',
+        'tab1': '📊 1. Données et Descriptives', 'tab2': '🔍 2. AFE et Fiabilité', 'tab3': '📈 3. AFC et Validité', 'tab4': '📄 4. Rapport et Graphiques',
+        'raw_info': 'Téléchargez vos données (Excel/CSV) pour extraire la démographie et diviser les données pour AFE/AFC.',
+        'upload_forms': 'Télécharger les données du questionnaire',
+        'demo_summary': '1. Résumé Démographique', 'select_demo': 'Sélectionner les variables démographiques:',
+        'normality_desc': '2. Statistiques Descriptives', 'select_normality': '📌 Sélectionner les items de l\'échelle:',
+        'ready_split': 'Prêt pour l\'analyse psychométrique?', 'split_btn': '✂️ Diviser automatiquement les données (AFE/AFC 50/50)',
+        'study_overview': 'Aperçu de l\'étude', 'total_cases': 'Cas totaux', 'p1_cases': 'Cas Phase 1 (AFE)', 'p2_cases': 'Cas Phase 2 (AFC)', 'not_loaded': 'Non chargé',
+        'demo_title': '📖 Exemple Appliqué: Résultats de l\'échelle EGAIS',
+        'demo_desc': 'Cette échelle validée est présentée comme une démonstration.',
+        'demo_intro': 'Cette échelle (EGAIS) a été développée par la chercheuse **Asmaa Dala**.',
+        'feedback_title': '💬 Avis et Consultations', 'feedback_desc': 'Partagez votre avis ou demandez une consultation.',
+        'feedback_rating': 'Comment évaluez-vous votre expérience?', 'feedback_text': 'Laissez un commentaire...', 'feedback_submit': 'Envoyer 🚀', 'feedback_thanks': 'Merci! Bien reçu. 😍',
+        'run_efa': 'Exécuter l\'Analyse Factorielle Exploratoire (AFE)', 'run_cfa': 'Exécuter l\'Analyse Factorielle Confirmatoire (AFC)',
+        'report_wait': 'Veuillez exécuter l\'AFE et l\'AFC pour générer le rapport.',
+        'report_title': 'Rapport Académique Automatisé (APA 7)', 'charts_title': 'Visualisations (Graphiques)',
+        'sample_error': '⛔ Erreur: La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle ne peut pas être effectuée.',
+        'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs selon les plus fortes saturations (>0.30).',
+        'rotation_help': 'Utilisez Varimax pour les facteurs indépendants, et Oblimin pour les facteurs psychologiques corrélés.'
     }
 }
 
@@ -93,15 +118,15 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3) !important; transition: all 0.3s ease !important; width: 100% !important; border-color: #3b82f6 !important;
     }
     div.stButton > button:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4) !important; background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important; }
-    .case-study-card { background: linear-gradient(to right, #f0f9ff, #e0f2fe); border: 2px solid #bae6fd; border-right: 8px solid #0284c7; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15); }
-    .case-study-card h3 { color: #0c4a6e; margin-top: 0; font-weight: 800; font-size: 1.3rem; }
+    .demo-card { background: linear-gradient(to right, #f0f9ff, #e0f2fe); border: 2px solid #bae6fd; border-right: 8px solid #0284c7; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15); }
+    .demo-card h3 { color: #0c4a6e; margin-top: 0; font-weight: 800; font-size: 1.3rem; }
     [data-testid="stMetric"] { background: #fff; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     h1, h2, h3, h4 { color: #17324d; font-weight: 700; }
     </style>
 """, unsafe_allow_html=True)
 
 # --- Sidebar ---
-st.session_state.lang = st.sidebar.selectbox('🌐 Select Language / اختر اللغة', ['العربية', 'English'])
+st.session_state.lang = st.sidebar.selectbox('🌐 Select Language / اختر اللغة / Langue', ['العربية', 'English', 'Français'])
 lang = translations[st.session_state.lang]
 
 with st.sidebar:
@@ -117,7 +142,7 @@ with st.sidebar:
                 st.rerun()
     else:
         st.success(lang['feedback_thanks'])
-        if st.button("إرسال رسالة أخرى"):
+        if st.button("إرسال رسالة أخرى" if st.session_state.lang == 'العربية' else ("Send another" if st.session_state.lang == 'English' else "Envoyer un autre")):
             st.session_state['feedback_submitted'] = False
             st.rerun()
 
@@ -153,11 +178,31 @@ def efa_result(data, items, factor_count, rotation):
         bartlett_chi2, bartlett_p = calculate_bartlett_sphericity(complete)
     except: 
         kmo_all, kmo_model, bartlett_chi2, bartlett_p = np.full(len(items), np.nan), np.nan, np.nan, np.nan
+    
     fa = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method='principal')
     fa.fit(complete)
     loadings = pd.DataFrame(fa.loadings_, index=items, columns=[f"Factor_{i+1}" for i in range(factor_count)])
     ev, _ = fa.get_eigenvalues()
-    return {"n": len(complete), "kmo": kmo_model, "kmo_items": pd.Series(kmo_all, index=items), "bartlett_chi2": bartlett_chi2, "bartlett_p": bartlett_p, "method": "PCA", "rotation": rotation, "factor_count": factor_count, "loadings": loadings, "ev": pd.DataFrame({"Component": range(1, len(ev)+1), "Eigenvalue": ev})}
+    
+    # حساب مصفوفة الارتباط العكسية (Anti-Image) بناءً على طلب المستخدم ومخرجات SPSS
+    corr_matrix = complete.corr()
+    inv_corr = np.linalg.inv(corr_matrix)
+    anti_image_cov = -inv_corr / np.outer(np.sqrt(np.diag(inv_corr)), np.sqrt(np.diag(inv_corr)))
+    np.fill_diagonal(anti_image_cov, kmo_all) # القطر هو KMO لكل فقرة
+    anti_image_df = pd.DataFrame(anti_image_cov, index=items, columns=items)
+    
+    # مصفوفة تحويل المكونات (Transformation Matrix) إن وجدت
+    transform_matrix = None
+    if hasattr(fa, 'rotation_matrix_') and fa.rotation_matrix_ is not None:
+        transform_matrix = pd.DataFrame(fa.rotation_matrix_, 
+                                        index=[f"Comp_{i+1}" for i in range(factor_count)], 
+                                        columns=[f"Comp_{i+1}" for i in range(factor_count)])
+        
+    return {"n": len(complete), "kmo": kmo_model, "kmo_items": pd.Series(kmo_all, index=items), 
+            "bartlett_chi2": bartlett_chi2, "bartlett_p": bartlett_p, "method": "PCA", 
+            "rotation": rotation, "factor_count": factor_count, "loadings": loadings, 
+            "ev": pd.DataFrame({"Component": range(1, len(ev)+1), "Eigenvalue": ev}),
+            "anti_image": anti_image_df, "transformation": transform_matrix}
 
 def build_cfa_specification(factor_assignments):
     used_items = [item for items in factor_assignments.values() for item in items]
@@ -194,7 +239,7 @@ def cfa_result(data, spec):
 
     return {"n": len(complete), "fit": fit_vals, "params": params, "cr_ave": cr_ave_dict}
 
-# --- Header & Case Study ---
+# --- Header & Example ---
 st.markdown(f"""
     <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white; margin-bottom: 25px;">
         <h1 style="margin: 0; font-size: 42px; font-weight: 900;">{lang['main_title']}</h1>
@@ -203,9 +248,9 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown(f"""<div class="case-study-card"><h3>{lang['case_study_title']}</h3><p>{lang['case_study_desc']}</p></div>""", unsafe_allow_html=True)
-with st.expander("🔍 عرض تفاصيل ونتائج المقياس 📊", expanded=False):
-    st.markdown(lang['case_study_intro'])
+st.markdown(f"""<div class="demo-card"><h3>{lang['demo_title']}</h3><p>{lang['demo_desc']}</p></div>""", unsafe_allow_html=True)
+with st.expander("🔍 عرض تفاصيل ونتائج المقياس 📊" if st.session_state.lang == 'العربية' else "🔍 View Scale Results 📊", expanded=False):
+    st.markdown(lang['demo_intro'])
     col1, col2 = st.columns(2)
     col1.dataframe(pd.DataFrame({"الأبعاد": ["القلق", "الفعالية"], "الفقرات": [12, 11], "التباين": ["67.04%", "-"]}), hide_index=True, use_container_width=True)
     col2.dataframe(pd.DataFrame({"المؤشر": ["CR", "AVE", "CFI", "RMSEA"], "النتيجة": ["0.964", "0.562", "0.911", "0.087"]}), hide_index=True, use_container_width=True)
@@ -249,11 +294,15 @@ with tab_desc:
         st.markdown("---")
         st.markdown(f"#### {lang['ready_split']}")
         if st.button(lang['split_btn']):
-            df_shuffled = df_raw.sample(frac=1, random_state=42).reset_index(drop=True)
-            mid = len(df_shuffled) // 2
-            st.session_state['phase1_data'] = df_shuffled.iloc[:mid]
-            st.session_state['phase2_data'] = df_shuffled.iloc[mid:]
-            st.success(f"Split successful! EFA: {mid}, CFA: {len(df_shuffled)-mid}")
+            # شرط حجم العينة الصارم قبل التقسيم
+            if len(df_raw) < 50:
+                 st.error(lang['sample_error'])
+            else:
+                df_shuffled = df_raw.sample(frac=1, random_state=42).reset_index(drop=True)
+                mid = len(df_shuffled) // 2
+                st.session_state['phase1_data'] = df_shuffled.iloc[:mid]
+                st.session_state['phase2_data'] = df_shuffled.iloc[mid:]
+                st.success(f"Split successful! EFA: {mid}, CFA: {len(df_shuffled)-mid}")
 
     st.markdown("---")
     st.markdown(f"#### {lang['study_overview']}")
@@ -268,8 +317,9 @@ with tab_desc:
 with tab_efa:
     if st.session_state['phase1_data'] is not None and selected_items:
         n_cases = len(st.session_state['phase1_data'])
+        # شرط الإيقاف الصارم لـ EFA
         if n_cases < 50:
-            st.error(lang['sample_warning'])
+            st.error(lang['sample_error'])
         else:
             st.markdown("#### الثبات للبيانات الاستكشافية (Reliability - EFA Sample)")
             alpha_efa, omega_efa = calc_alpha_omega(st.session_state['phase1_data'], selected_items)
@@ -278,14 +328,9 @@ with tab_efa:
             rel_cols[1].metric("ماكدونالد أوميغا (McDonald's ω)", f"{omega_efa:.3f}")
             st.markdown("---")
 
-            st.markdown("#### مصفوفة الارتباطات (Correlation Matrix)")
-            corr_matrix = st.session_state['phase1_data'][selected_items].corr()
-            st.dataframe(corr_matrix.style.background_gradient(cmap='coolwarm', axis=None).format("{:.3f}"), use_container_width=True)
-            st.markdown("---")
-
             c1, c2 = st.columns(2)
             factor_count = c1.number_input("Factors", min_value=1, value=2)
-            rotation = c2.selectbox("Rotation", ["varimax", "oblimin"])
+            rotation = c2.selectbox("Rotation", ["varimax", "oblimin"], help=lang['rotation_help'])
             
             if st.button(lang['run_efa']):
                 out = efa_result(st.session_state['phase1_data'], selected_items, int(factor_count), rotation)
@@ -317,15 +362,27 @@ with tab_efa:
                 st.markdown("#### التشبعات العاملية (Factor Loadings)")
                 st.dataframe(out["loadings"].style.format("{:.3f}"), use_container_width=True)
                 
-                st.markdown("#### Item-level KMO")
-                st.dataframe(out["kmo_items"].rename_axis("Item").reset_index().style.format({"KMO": "{:.3f}"}), use_container_width=True)
+                # إضافة المصفوفات الجديدة بناء على طلب المستخدم
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    st.markdown("#### المصفوفة المضادة للارتباط (Anti-Image Matrices)")
+                    def highlight_diag(val): return 'background-color: #d1fae5; font-weight:bold'
+                    st.dataframe(out["anti_image"].style.apply(lambda x: [highlight_diag(v) if x.name == i else '' for i, v in x.items()], axis=1).format("{:.3f}"), use_container_width=True)
+                
+                with col_b:
+                    st.markdown("#### مصفوفة تحويل المكونات (Transformation Matrix)")
+                    if out["transformation"] is not None:
+                        st.dataframe(out["transformation"].style.format("{:.3f}"), use_container_width=True)
+                    else:
+                        st.info("لا توجد مصفوفة تحويل لأن التدوير غير مطبق أو غير مدعوم لهذه الطريقة.")
 
 # --- TAB 3: CFA & Validity ---
 with tab_cfa:
     if st.session_state['phase2_data'] is not None and selected_items:
         n_cases_cfa = len(st.session_state['phase2_data'])
+        # شرط الإيقاف الصارم لـ CFA
         if n_cases_cfa < 50:
-            st.error(lang['sample_warning'])
+            st.error(lang['sample_error'])
         else:
             efa_out = st.session_state.get('efa_output')
             default_cfa_factors = int(efa_out['factor_count']) if efa_out else 2
@@ -337,7 +394,6 @@ with tab_cfa:
             st.markdown("#### توزيع الفقرات على العوامل")
             
             efa_assignments = st.session_state.get('item_assignments') or {}
-            
             if efa_assignments:
                 st.info(lang['auto_assign_msg'])
             
@@ -345,21 +401,9 @@ with tab_cfa:
             cols = st.columns(2)
             
             for i, item in enumerate(selected_items):
-                # 1. جلب التوزيع المحفوظ لكل فقرة
                 assigned_factor = efa_assignments.get(item, "غير مدرج (Not included)")
-                
-                # 2. تحديد الفهرس (index) بشكل صريح بناءً على التوزيع المحفوظ
-                if assigned_factor in options:
-                    idx = options.index(assigned_factor)
-                else:
-                    idx = 0
-                
-                # 3. الاعتماد على المعامل `index` فقط وتجنب استخدام `key` لتلافي تعارض الحالة
-                assign[item] = cols[i%2].selectbox(
-                    label=str(item), 
-                    options=options, 
-                    index=idx
-                )
+                idx = options.index(assigned_factor) if assigned_factor in options else 0
+                assign[item] = cols[i%2].selectbox(label=str(item), options=options, index=idx)
             
             if st.button(lang['run_cfa']):
                 f_assign = {f: [i for i, a in assign.items() if a == f] for f in labels}
@@ -411,6 +455,7 @@ with tab_cfa:
                         
                         st.markdown("#### 1. الصدق التقاربي والثبات (Convergent Validity & Reliability)")
                         
+                        issues_conv = False
                         if cr_ave_data:
                             val_data = []
                             issues_found = [] 
@@ -437,11 +482,13 @@ with tab_cfa:
                             st.dataframe(val_df.style.format("{:.3f}"), use_container_width=True)
                             
                             if issues_found:
+                                issues_conv = True
+                                st.session_state['conv_passed'] = False
                                 st.error("❌ **تحذير معايير JARS:** لم يتحقق الصدق التقاربي أو الثبات في بعض العوامل.")
                                 for issue in issues_found:
                                     st.warning(f"⚠️ {issue}")
-                                st.info("💡 **الحل المقترح:** اصعد للأعلى وقم بتغيير حالة الفقرات ذات التشبع الضعيف (أقل من 0.50) في هذا العامل إلى 'غير مدرج' ثم أعد التحليل.")
                             else:
+                                st.session_state['conv_passed'] = True
                                 st.success("✅ **ممتاز:** جميع قيم الصدق التقاربي (AVE > 0.50) والثبات المركب (CR > 0.70) مطابقة للمعايير.")
 
                         st.markdown("#### 2. الصدق التمييزي (Discriminant Validity - Fornell-Larcker)")
@@ -473,11 +520,12 @@ with tab_cfa:
                                         disc_issues.append(f"الارتباط بين ({f1}) و ({f2}) = {abs(disc_df.loc[f1, f2]):.3f} وهو أعلى من الجذر التربيعي لـ AVE للعامل ({f1}) = {disc_df.loc[f1, f1]:.3f}")
                         
                         if disc_issues:
+                            st.session_state['disc_passed'] = False
                             st.error("❌ **تحذير معايير JARS:** لم يتحقق الصدق التمييزي (معيار Fornell-Larcker).")
                             for d_issue in disc_issues:
                                 st.warning(f"⚠️ التداخل العالي: {d_issue}")
-                            st.info("💡 **الحل المقترح:** هناك تداخل كبير بين هذه العوامل (Cross-loadings). راجع الفقرات المشتركة أو المتقاربة في المعنى بين هذه العوامل وقم بحذف الأضعف منها، أو فكر في دمج العاملين إذا كان التداخل نظرياً منطقياً.")
                         else:
+                            st.session_state['disc_passed'] = True
                             st.success("✅ **ممتاز:** الصدق التمييزي متحقق بنجاح. قيم الجذر التربيعي لـ AVE (في القطر الأخضر) أعلى من جميع الارتباطات الأخرى.")
 
                         st.markdown("#### المخطط الهيكلي (Structural Diagram)")
@@ -537,7 +585,11 @@ with tab_report:
         
         if cfa_out:
             fit = cfa_out['fit']
-            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة جيدة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0):.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). تم التحقق من الصدق التمييزي والتقاربي وفق معيار Fornell-Larcker لتأكيد جودة المقياس.\n\n"
+            # تقرير ذكي يقرأ النتائج الفردية للمستخدم
+            conv_status = "وقد استوفت جميع العوامل المعايير المطلوبة للصدق التقاربي والثبات." if st.session_state.get('conv_passed', True) else "أظهرت النتائج قصوراً في الصدق التقاربي لبعض العوامل (AVE < 0.50)، مما يتطلب مراجعة الفقرات."
+            disc_status = "كما تم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker لتأكيد استقلالية العوامل وجودة البناء." if st.session_state.get('disc_passed', True) else "إلا أنه لم يتم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker بسبب وجود تداخل كبير بين العوامل (Cross-loadings)، مما يقتضي إعادة النظر في هيكل المقياس."
+            
+            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0):.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). {conv_status} {disc_status}\n\n"
         
         st.write(report_text)
-        st.success("التقرير الأكاديمي أعلاه تمت كتابته آلياً. يمكنك نسخه مباشرة ولصقه في مذكرتك أو بحثك العلمي!")
+        st.success("التقرير الأكاديمي أعلاه تمت كتابته آلياً وهو يعكس نتائجك الفعلية. يمكنك نسخه مباشرة!")
