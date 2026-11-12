@@ -252,7 +252,6 @@ with tab_efa:
         if n_cases < 50:
             st.error(lang['sample_warning'])
         else:
-            # إضافة مصفوفة الارتباطات قبل التحليل
             st.markdown("#### مصفوفة الارتباطات (Correlation Matrix)")
             corr_matrix = st.session_state['phase1_data'][selected_items].corr()
             st.dataframe(corr_matrix.style.background_gradient(cmap='coolwarm', axis=None).format("{:.3f}"), use_container_width=True)
@@ -267,7 +266,11 @@ with tab_efa:
                 st.session_state['efa_output'] = out
                 st.success("EFA Completed Successfully!")
                 
-                # APA 7 P-value Formatting
+                # Method explicitly shown here
+                st.markdown(f"**طريقة الاستخراج (Extraction Method):** تحليل المكونات الأساسية (Principal Component Analysis - PCA)")
+                st.markdown(f"**طريقة التدوير (Rotation Method):** {rotation}")
+                st.markdown("---")
+                
                 p_val = out['bartlett_p']
                 p_str = "p < .001" if p_val < 0.001 else f"p = {p_val:.3f}"
                 
@@ -301,7 +304,6 @@ with tab_cfa:
                 
             cols = st.columns(2)
             for i, item in enumerate(selected_items):
-                # SMART AUTO-ASSIGNMENT LOGIC
                 default_idx = 0 
                 if efa_out and item in efa_out['loadings'].index:
                     loadings_row = efa_out['loadings'].loc[item]
@@ -335,7 +337,6 @@ with tab_cfa:
                         st.markdown("#### Parameter estimates")
                         st.dataframe(cfa_out["params"].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
 
-                        # رسم المخطط الهيكلي بـ Graphviz
                         st.markdown("#### المخطط الهيكلي (Structural Diagram / Diagramme structurel)")
                         dot_code = "digraph CFA {\nrankdir=LR;\nnode [shape=box, style=filled, fillcolor=white];\n"
                         for factor, items in f_assign.items():
@@ -389,7 +390,7 @@ with tab_report:
         if efa_out:
             p_val = efa_out['bartlett_p']
             p_str = "p < .001" if p_val < 0.001 else f"p = {p_val:.3f}"
-            report_text += f"**1. التحليل العاملي الاستكشافي (EFA):**\nلضمان صلاحية البيانات للتحليل، أظهر اختبار KMO كفاءة جيدة بقيمة ({efa_out['kmo']:.3f}). وكان اختبار بارتليت دالاً إحصائياً (χ² = {efa_out['bartlett_chi2']:.2f}, {p_str}). تم استخراج ({efa_out['factor_count']}) عوامل باستخدام طريقة ({efa_out['method']}) وتدوير ({efa_out['rotation']}) وفقاً لمعايير APA 7.\n\n"
+            report_text += f"**1. التحليل العاملي الاستكشافي (EFA):**\nلضمان صلاحية البيانات للتحليل، أظهر اختبار KMO كفاءة جيدة بقيمة ({efa_out['kmo']:.3f}). وكان اختبار بارتليت دالاً إحصائياً (χ² = {efa_out['bartlett_chi2']:.2f}, {p_str}). تم استخراج ({efa_out['factor_count']}) عوامل باستخدام طريقة تحليل المكونات الأساسية (PCA) وتدوير ({efa_out['rotation']}) وفقاً لمعايير APA 7.\n\n"
         
         if cfa_out:
             fit = cfa_out['fit']
