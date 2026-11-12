@@ -174,14 +174,12 @@ def cfa_result(data, spec):
     fit_vals = {name: float(fit.get(name, np.nan)) for name in ["chi2", "DoF", "chi2 p-value", "CFI", "TLI", "RMSEA"]}
     params = model.inspect(std_est=True)
     
-    # إصلاح الخدعة البرمجية: semopy تضع الفقرة في lval والعامل في rval عند استخدام op == '~'
     rev_aliases = {v: k for k, v in spec["aliases"].items()}
     if 'lval' in params.columns:
         params['lval_orig'] = params['lval'].map(rev_aliases).fillna(params['lval'])
     
     cr_ave_dict = {}
     if 'Est. Std' in params.columns and 'op' in params.columns:
-        # هنا نجلب التشبعات الصحيحة: العملية هي '~' والخانة اليمنى هي اسم العامل
         loadings_df = params[params['op'] == '~'].copy()
         for factor in spec['factor_assignments'].keys():
             f_loadings = loadings_df[loadings_df['rval'] == factor]['Est. Std'].astype(float).values
@@ -342,8 +340,11 @@ with tab_cfa:
                 
             assign = {}
             cols = st.columns(2)
+            # Protection against empty session state logic
+            item_assigns = st.session_state.get('item_assignments') or {}
+            
             for i, item in enumerate(selected_items):
-                pre_assigned = st.session_state.get('item_assignments', {}).get(item, "غير مدرج (Not included)")
+                pre_assigned = item_assigns.get(item, "غير مدرج (Not included)")
                 idx = options.index(pre_assigned) if pre_assigned in options else 0
                 assign[item] = cols[i%2].selectbox(str(item), options, index=idx, key=f"cfa_{item}")
             
@@ -370,10 +371,16 @@ with tab_cfa:
                         
                         st.markdown("#### تقديرات معلمات النموذج (Parameter Estimates)")
                         params_df = cfa_out["params"]
-                        # التعديل الحاسم: جلب التشبعات حيث العامل في rval والفقرة في lval_orig بناءً على لغة semopy
                         display_params = params_df[(params_df['op'] == '~') & (params_df['rval'].isin(labels))].copy()
                         display_params = display_params.rename(columns={'rval': 'Factor', 'lval_orig': 'Item'})
-                        cols_to_show = ['Factor', 'Item', 'Estimate', 'Est. Std', 'Std. Err', 'z-value', 'p-value']
+                        
+                        # Convert columns to numeric to avoid formatting errors with missing strings like '-'
+                        numeric_cols = ['Estimate', 'Est. Std', 'Std. Err', 'z-value', 'p-value']
+                        for c in numeric_cols:
+                            if c in display_params.columns:
+                                display_params[c] = pd.to_numeric(display_params[c], errors='coerce')
+                        
+                        cols_to_show = ['Factor', 'Item'] + numeric_cols
                         cols_to_show = [c for c in cols_to_show if c in display_params.columns]
                         st.dataframe(display_params[cols_to_show].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
 
@@ -421,7 +428,7 @@ with tab_cfa:
                             for _, row in corrs.iterrows():
                                 f1, f2 = row['lval'], row['rval']
                                 if f1 in factors_list and f2 in factors_list:
-                                    val = float(row['Est. Std'])
+                                    val = float(pd.to_numeric(row['Est. Std'], errors='coerce'))
                                     disc_df.loc[f1, f2] = val
                                     disc_df.loc[f2, f1] = val
                                     
