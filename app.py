@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 import sklearn.utils.validation
 import sklearn.utils
@@ -34,12 +33,12 @@ for key in ['phase1_data', 'phase2_data', 'raw_data', 'efa_output', 'cfa_output'
 if 'feedback_submitted' not in st.session_state: st.session_state['feedback_submitted'] = False
 if 'lang' not in st.session_state: st.session_state.lang = 'العربية'
 
-st.set_page_config(page_title="PsychoStat Pro", page_icon="📊", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="PsychoStat Pro", page_icon="💠", layout="wide", initial_sidebar_state="expanded")
 
 # --- Language Dictionary ---
 translations = {
     'English': {
-        'select_lang': '🌐 Select Language', 'main_title': 'PsychoStat Pro',
+        'select_lang': '🌐 Select Language', 'main_title': '💠 PsychoStat Pro',
         'subtitle': 'Explore measurement quality of attitudes with transparent methods and exportable results.',
         'developer': 'Platform Developer: Asmaa Dala',
         'tab1': '📊 1. Raw Data & Descriptives', 'tab2': '🔍 2. EFA', 'tab3': '📈 3. CFA', 'tab4': '📄 4. Analysis Report & Charts',
@@ -50,16 +49,16 @@ translations = {
         'ready_split': 'Ready for Psychometric Analysis?', 'split_btn': '✂️ Automatically Split Data for EFA & CFA (50/50)',
         'study_overview': 'Study Overview', 'total_cases': 'Total available cases', 'p1_cases': 'Phase 1 cases (EFA)', 'p2_cases': 'Phase 2 cases (CFA)', 'not_loaded': 'Not loaded',
         'case_study_title': '📖 Case Study: EGAIS by Asmaa Dala',
-        'case_study_desc': 'This validated scale is presented as a demo. Use this platform to analyze your own survey data with high precision.',
+        'case_study_desc': 'This validated scale is presented as a demo. Use this platform to analyze your own survey data with high precision 💯.',
         'case_study_intro': 'This scale (EGAIS) was developed specifically by researcher **Asmaa Dala** to measure employee attitudes toward generative AI. Here are the robust results extracted by the platform:',
         'feedback_title': '💬 Feedback & Consultations', 'feedback_desc': 'Share your thoughts or request a consultation.',
-        'feedback_rating': 'How was your experience?', 'feedback_text': 'Leave a comment...', 'feedback_submit': 'Send Feedback', 'feedback_thanks': 'Thank you! Received.',
+        'feedback_rating': 'How was your experience?', 'feedback_text': 'Leave a comment...', 'feedback_submit': 'Send Feedback 🚀', 'feedback_thanks': 'Thank you! Received. 😍',
         'run_efa': 'Run Exploratory Factor Analysis (EFA)', 'run_cfa': 'Run Confirmatory Factor Analysis (CFA)',
         'report_wait': 'Please run EFA and CFA in the previous tabs to generate the automated report.',
         'report_title': 'Automated Academic Report (APA 7)', 'charts_title': 'Visualizations (Charts & Graphs)'
     },
     'العربية': {
-        'select_lang': '🌐 اختر اللغة', 'main_title': 'PsychoStat Pro',
+        'select_lang': '🌐 اختر اللغة', 'main_title': '💠 PsychoStat Pro',
         'subtitle': 'استكشف جودة القياس النفسي مع عينات وأساليب ونتائج علمية دقيقة وقابلة للتصدير.',
         'developer': 'مطورة المنصة: أسماء دالة',
         'tab1': '📊 1. البيانات والإحصاء الوصفي', 'tab2': '🔍 2. التحليل الاستكشافي (EFA)', 'tab3': '📈 3. التحليل التوكيدي (CFA)', 'tab4': '📄 4. التقرير والرسوم البيانية',
@@ -70,33 +69,13 @@ translations = {
         'ready_split': 'هل أنت جاهز للتحليل السيكومتري؟', 'split_btn': '✂️ تقسيم البيانات تلقائياً لـ EFA و CFA (بنسبة 50/50)',
         'study_overview': 'نظرة عامة على الدراسة', 'total_cases': 'إجمالي الحالات المتاحة', 'p1_cases': 'حالات المرحلة 1 (EFA)', 'p2_cases': 'حالات المرحلة 2 (CFA)', 'not_loaded': 'لم يتم التحميل',
         'case_study_title': '📖 مثال تطبيقي: نتائج مقياس (EGAIS) للباحثة أسماء دالة',
-        'case_study_desc': 'هذا المقياس المُحكّم معروض كدراسة حالة حقيقية لتوضيح قدرة المنصة.',
+        'case_study_desc': 'هذا المقياس المُحكّم معروض كدراسة حالة حقيقية لتوضيح قدرة المنصة 💯.',
         'case_study_intro': 'تم تطوير مقياس (EGAIS) خصيصاً من قِبل الباحثة **أسماء دالة** لقياس اتجاهات الموظفين نحو الذكاء الاصطناعي التوليدي. إليكِ النتائج الحقيقية والمبهرة التي استخرجتها المنصة:',
         'feedback_title': '💬 آراء ومقترحات الباحثين', 'feedback_desc': 'يسعدنا سماع رأيك أو ترك استشارتك.',
-        'feedback_rating': 'كيف تقيم تجربتك؟', 'feedback_text': 'اكتب تعليقك أو استشارتك...', 'feedback_submit': 'إرسال', 'feedback_thanks': 'شكراً لك! تم استلام رسالتك.',
+        'feedback_rating': 'كيف تقيم تجربتك؟', 'feedback_text': 'اكتب تعليقك أو استشارتك...', 'feedback_submit': 'إرسال 🚀', 'feedback_thanks': 'شكراً لك! تم استلام رسالتك. 😍',
         'run_efa': 'إجراء التحليل العاملي الاستكشافي (EFA)', 'run_cfa': 'إجراء التحليل العاملي التوكيدي (CFA)',
         'report_wait': 'يرجى إجراء التحليل الاستكشافي والتوكيدي في التبويبات السابقة لتوليد التقرير والرسوم البيانية.',
         'report_title': 'التقرير الأكاديمي الآلي (APA 7)', 'charts_title': 'الرسوم البيانية (الأعمدة والدوائر النسبية)'
-    },
-    'Français': {
-        'select_lang': '🌐 Choisir la langue', 'main_title': 'PsychoStat Pro',
-        'subtitle': 'Explorez la qualité de la mesure des attitudes des employés envers l’IA générative.',
-        'developer': 'Développeuse: Asmaa Dala',
-        'tab1': '📊 1. Données Brutes & Descriptives', 'tab2': '🔍 2. Analyse Exploratoire (EFA)', 'tab3': '📈 3. Analyse Confirmatoire (CFA)', 'tab4': '📄 4. Rapport d\'Analyse',
-        'raw_info': 'Téléchargez vos données brutes (Excel/CSV) pour extraire automatiquement les tableaux et diviser les données.',
-        'upload_forms': 'Télécharger les Données',
-        'demo_summary': '1. Résumé Démographique', 'select_demo': 'Sélectionner les Variables:',
-        'normality_desc': '2. Statistiques Descriptives', 'select_normality': '📌 Sélectionner les items:',
-        'ready_split': 'Prêt pour l\'Analyse ?', 'split_btn': '✂️ Diviser Automatiquement les Données (50/50)',
-        'study_overview': 'Aperçu de l\'Étude', 'total_cases': 'Cas totaux', 'p1_cases': 'Phase 1 (EFA)', 'p2_cases': 'Phase 2 (CFA)', 'not_loaded': 'Non chargé',
-        'case_study_title': '📖 Étude de Cas: Échelle (EGAIS)',
-        'case_study_desc': 'Cette échelle validée est présentée comme démonstration.',
-        'case_study_intro': 'Cette échelle (EGAIS) a été développée spécifiquement par la chercheuse **Asmaa Dala**.',
-        'feedback_title': '💬 Avis & Consultations', 'feedback_desc': 'Partagez vos impressions.',
-        'feedback_rating': 'Votre expérience ?', 'feedback_text': 'Laissez un commentaire...', 'feedback_submit': 'Envoyer', 'feedback_thanks': 'Merci !',
-        'run_efa': 'Lancer l\'Analyse Exploratoire (EFA)', 'run_cfa': 'Lancer l\'Analyse Confirmatoire (CFA)',
-        'report_wait': 'Les rapports seront disponibles ici après avoir exécuté l\'analyse.',
-        'report_title': 'Rapport Automatique APA 7', 'charts_title': 'Graphiques'
     }
 }
 
@@ -116,7 +95,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Sidebar ---
-st.session_state.lang = st.sidebar.selectbox('🌐 Select Language / اختر اللغة', ['العربية', 'English', 'Français'])
+st.session_state.lang = st.sidebar.selectbox('🌐 Select Language / اختر اللغة', ['العربية', 'English'])
 lang = translations[st.session_state.lang]
 
 with st.sidebar:
@@ -125,7 +104,7 @@ with st.sidebar:
     st.caption(lang['feedback_desc'])
     if not st.session_state['feedback_submitted']:
         with st.form("feedback_form"):
-            st.radio(lang['feedback_rating'], ["ممتاز", "جيد", "يحتاج تحسين"])
+            st.radio(lang['feedback_rating'], ["😍 ممتاز (Excellent)", "👍 جيد (Good)", "🤔 يحتاج تحسين (Needs Improvement)"])
             st.text_area(lang['feedback_text'], height=80)
             if st.form_submit_button(lang['feedback_submit']):
                 st.session_state['feedback_submitted'] = True
@@ -166,7 +145,7 @@ st.markdown(f"""
     <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white; margin-bottom: 25px;">
         <h1 style="margin: 0; font-size: 42px; font-weight: 900;">{lang['main_title']}</h1>
         <p style="font-size: 16px; margin-top: 10px;">{lang['subtitle']}</p>
-        <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;">{lang['developer']}</span>
+        <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;">👩‍💻 {lang['developer']}</span>
     </div>
 """, unsafe_allow_html=True)
 
