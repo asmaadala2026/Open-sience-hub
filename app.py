@@ -174,14 +174,12 @@ def cfa_result(data, spec):
     fit_vals = {name: float(fit.get(name, np.nan)) for name in ["chi2", "DoF", "chi2 p-value", "CFI", "TLI", "RMSEA"]}
     params = model.inspect(std_est=True)
     
-    # إصلاح الخدعة البرمجية: semopy تضع الفقرة في lval والعامل في rval عند استخدام op == '~'
     rev_aliases = {v: k for k, v in spec["aliases"].items()}
     if 'lval' in params.columns:
         params['lval_orig'] = params['lval'].map(rev_aliases).fillna(params['lval'])
     
     cr_ave_dict = {}
     if 'Est. Std' in params.columns and 'op' in params.columns:
-        # هنا نجلب التشبعات الصحيحة: العملية هي '~' والخانة اليمنى هي اسم العامل
         loadings_df = params[params['op'] == '~'].copy()
         for factor in spec['factor_assignments'].keys():
             f_loadings = loadings_df[loadings_df['rval'] == factor]['Est. Std'].astype(float).values
@@ -342,8 +340,11 @@ with tab_cfa:
                 
             assign = {}
             cols = st.columns(2)
+            
+            # --- إصلاح مشكلة AttributeError هنا ---
             for i, item in enumerate(selected_items):
-                pre_assigned = st.session_state.get('item_assignments', {}).get(item, "غير مدرج (Not included)")
+                assignments = st.session_state.get('item_assignments') or {}
+                pre_assigned = assignments.get(item, "غير مدرج (Not included)")
                 idx = options.index(pre_assigned) if pre_assigned in options else 0
                 assign[item] = cols[i%2].selectbox(str(item), options, index=idx, key=f"cfa_{item}")
             
@@ -370,74 +371,112 @@ with tab_cfa:
                         
                         st.markdown("#### تقديرات معلمات النموذج (Parameter Estimates)")
                         params_df = cfa_out["params"]
-                        # التعديل الحاسم: جلب التشبعات حيث العامل في rval والفقرة في lval_orig بناءً على لغة semopy
                         display_params = params_df[(params_df['op'] == '~') & (params_df['rval'].isin(labels))].copy()
                         display_params = display_params.rename(columns={'rval': 'Factor', 'lval_orig': 'Item'})
                         cols_to_show = ['Factor', 'Item', 'Estimate', 'Est. Std', 'Std. Err', 'z-value', 'p-value']
                         cols_to_show = [c for c in cols_to_show if c in display_params.columns]
-                        st.dataframe(display_params[cols_to_show].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
+                        
+                        # --- التحويل الإجباري للأعمدة إلى أرقام لتجنب خطأ التنسيق f ---
+                        numeric_cols = ['Estimate', 'Est. Std', 'Std. Err', 'z-value', 'p-value']
+                        for col in numeric_cols:
+                            if col in display_params.columns:
+                                display_params[col] = pd.to_numeric(display_params[col], errors='coerce')
 
-                        # --- Automated Diagnostic System (نظام التشخيص الآلي) ---
-                        weak_items = display_params[display_params['Est. Std'].astype(float) < 0.40]['Item'].tolist()
-                        if weak_items:
-                            st.warning(f"⚠️ **نظام التشخيص الآلي:** تم اكتشاف فقرات ذات ارتباط ضعيف جداً بالنموذج التوكيدي (< 0.40): **{', '.join(map(str, weak_items))}**. \n\n 👉 **الإجراء المطلوب:** يُنصح بشدة بالصعود للأعلى وتغيير حالة هذه الفقرات إلى (غير مدرج) وإعادة التحليل، وذلك لرفع قيمة الصدق التقاربي (AVE) وتحسين مؤشرات المطابقة للنموذج.")
+                        st.dataframe(display_params[cols_to_show].style.format({
+                            "Estimate": "{:.3f}", 
+                            "Est. Std": "{:.3f}", 
+                            "Std. Err": "{:.3f}", 
+                            "z-value": "{:.3f}", 
+                            "p-value": "{:.4f}"
+                        }, na_rep="—"), use_container_width=True)
 
-                        # --- Validity & Reliability Section ---
-                        st.markdown("#### الصدق التقاربي والثبات (Convergent Validity & Reliability)")
+                        # --- Automated Diagnostic System (نظام التشخيص الآلي - JARS/APA 7) ---
+                        st.markdown("---")
+                        st.markdown("### 🛠️ نظام التوجيه والتشخيص الآلي (JARS / APA 7)")
+                        
                         cr_ave_data = cfa_out.get('cr_ave', {})
+                        factors_list = list(f_assign.keys())
+                        
+                        # 1. فحص الصدق التقاربي والثبات (Convergent Validity & Reliability)
+                        st.markdown("#### 1. الصدق التقاربي والثبات (Convergent Validity & Reliability)")
+                        
                         if cr_ave_data:
                             val_data = []
-                            low_ave, low_cr = False, False
+                            issues_found = [] # لتسجيل الأخطاء وتوجيه المستخدم
+                            
                             for factor, metrics in cr_ave_data.items():
                                 alpha, omega = calc_alpha_omega(st.session_state['phase2_data'], f_assign[factor])
+                                cr_val = metrics['CR']
+                                ave_val = metrics['AVE']
+                                
                                 val_data.append({
                                     "العامل (Factor)": factor,
                                     "ألفا كرونباخ (α)": alpha,
                                     "أوميغا (ω)": omega,
-                                    "الثبات المركب (CR)": metrics['CR'],
-                                    "التباين المستخرج (AVE)": metrics['AVE']
+                                    "الثبات المركب (CR)": cr_val,
+                                    "التباين المستخرج (AVE)": ave_val
                                 })
-                                if metrics['AVE'] < 0.50: low_ave = True
-                                if metrics['CR'] < 0.70: low_cr = True
                                 
+                                # فحص المعايير وتسجيل الملاحظات
+                                if ave_val < 0.50:
+                                    issues_found.append(f"العامل **{factor}**: قيمة AVE ({ave_val:.3f}) أقل من 0.50.")
+                                if cr_val < 0.70:
+                                    issues_found.append(f"العامل **{factor}**: قيمة CR ({cr_val:.3f}) أقل من 0.70.")
+                            
                             val_df = pd.DataFrame(val_data).set_index("العامل (Factor)")
                             st.dataframe(val_df.style.format("{:.3f}"), use_container_width=True)
                             
-                            if low_ave or low_cr:
-                                st.warning("⚠️ **نظام التشخيص الآلي:** هناك انخفاض في مؤشرات الصدق التقاربي (AVE < 0.50 أو CR < 0.70). يرجى مراجعة الفقرات الأقل ارتباطاً وحذفها لتحسين النموذج.")
+                            # عرض رسائل التوجيه بناءً على النتائج
+                            if issues_found:
+                                st.error("❌ **تحذير معايير JARS:** لم يتحقق الصدق التقاربي أو الثبات في بعض العوامل.")
+                                for issue in issues_found:
+                                    st.warning(f"⚠️ {issue}")
+                                st.info("💡 **الحل المقترح:** اصعد للأعلى وقم بتغيير حالة الفقرات ذات التشبع الضعيف (أقل من 0.50) في هذا العامل إلى 'غير مدرج' ثم أعد التحليل.")
                             else:
-                                st.success("✅ **نظام التشخيص الآلي:** الصدق التقاربي والموثوقية ممتازة (AVE > 0.50 و CR > 0.70). لا حاجة لحذف أي فقرة.")
-                            
-                            # --- Discriminant Validity ---
-                            st.markdown("#### الصدق التمييزي (Discriminant Validity - Fornell-Larcker)")
-                            factors_list = list(f_assign.keys())
-                            disc_df = pd.DataFrame(index=factors_list, columns=factors_list, dtype=float)
-                            
-                            for f in factors_list:
-                                if f in cr_ave_data:
-                                    disc_df.loc[f, f] = np.sqrt(cr_ave_data[f]['AVE'])
-                                    
-                            corrs = params_df[(params_df['op'] == '~~') & (params_df['lval'] != params_df['rval'])]
-                            for _, row in corrs.iterrows():
-                                f1, f2 = row['lval'], row['rval']
-                                if f1 in factors_list and f2 in factors_list:
-                                    val = float(row['Est. Std'])
-                                    disc_df.loc[f1, f2] = val
-                                    disc_df.loc[f2, f1] = val
-                                    
-                            st.dataframe(disc_df.style.format("{:.3f}", na_rep="—"), use_container_width=True)
-                            
-                            disc_passed = True
-                            for i, f1 in enumerate(factors_list):
-                                for j, f2 in enumerate(factors_list):
-                                    if i != j and pd.notna(disc_df.loc[f1, f2]) and pd.notna(disc_df.loc[f1, f1]):
-                                        if abs(disc_df.loc[f1, f2]) > disc_df.loc[f1, f1]:
-                                            disc_passed = False
-                            if not disc_passed:
-                                st.warning("⚠️ **نظام التشخيص الآلي:** الصدق التمييزي غير متحقق لأن بعض الارتباطات بين العوامل تتجاوز الجذر التربيعي للتباين المستخرج (√AVE). يُنصح بحذف الفقرات المتقاطعة (Cross-loadings) لتصحيح التداخل بين العوامل.")
-                            else:
-                                st.success("✅ **نظام التشخيص الآلي:** الصدق التمييزي متحقق بنجاح.")
+                                st.success("✅ **ممتاز:** جميع قيم الصدق التقاربي (AVE > 0.50) والثبات المركب (CR > 0.70) مطابقة للمعايير.")
 
+                        # 2. فحص الصدق التمييزي (Discriminant Validity - Fornell-Larcker)
+                        st.markdown("#### 2. الصدق التمييزي (Discriminant Validity - Fornell-Larcker)")
+                        
+                        disc_df = pd.DataFrame(index=factors_list, columns=factors_list, dtype=float)
+                        
+                        # ملء القطر بـ جذر AVE
+                        for f in factors_list:
+                            if f in cr_ave_data:
+                                disc_df.loc[f, f] = np.sqrt(cr_ave_data[f]['AVE'])
+                                
+                        # جلب الارتباطات بين العوامل
+                        corrs = params_df[(params_df['op'] == '~~') & (params_df['lval'].isin(factors_list)) & (params_df['rval'].isin(factors_list)) & (params_df['lval'] != params_df['rval'])]
+                        for _, row in corrs.iterrows():
+                            f1, f2 = row['lval'], row['rval']
+                            val = float(row['Est. Std'])
+                            disc_df.loc[f1, f2] = val
+                            disc_df.loc[f2, f1] = val
+                                
+                        # تنسيق الجدول لتمييز القطر الرئيسي (الجذر التربيعي لـ AVE)
+                        def highlight_diag(df):
+                            attr = 'background-color: #d1fae5; font-weight: bold; color: #065f46;'
+                            return pd.DataFrame(np.where(np.eye(df.shape[0], dtype=bool), attr, ''), index=df.index, columns=df.columns)
+                            
+                        st.dataframe(disc_df.style.apply(highlight_diag, axis=None).format("{:.3f}", na_rep="—"), use_container_width=True)
+                        
+                        # التشخيص الآلي للصدق التمييزي
+                        disc_issues = []
+                        for i, f1 in enumerate(factors_list):
+                            for j, f2 in enumerate(factors_list):
+                                if i != j and pd.notna(disc_df.loc[f1, f2]) and pd.notna(disc_df.loc[f1, f1]):
+                                    if abs(disc_df.loc[f1, f2]) > disc_df.loc[f1, f1]:
+                                        disc_issues.append(f"الارتباط بين ({f1}) و ({f2}) = {abs(disc_df.loc[f1, f2]):.3f} وهو أعلى من الجذر التربيعي لـ AVE للعامل ({f1}) = {disc_df.loc[f1, f1]:.3f}")
+                        
+                        if disc_issues:
+                            st.error("❌ **تحذير معايير JARS:** لم يتحقق الصدق التمييزي (معيار Fornell-Larcker).")
+                            for d_issue in disc_issues:
+                                st.warning(f"⚠️ التداخل العالي: {d_issue}")
+                            st.info("💡 **الحل المقترح:** هناك تداخل كبير بين هذه العوامل (Cross-loadings). راجع الفقرات المشتركة أو المتقاربة في المعنى بين هذه العوامل وقم بحذف الأضعف منها، أو فكر في دمج العاملين إذا كان التداخل نظرياً منطقياً.")
+                        else:
+                            st.success("✅ **ممتاز:** الصدق التمييزي متحقق بنجاح. قيم الجذر التربيعي لـ AVE (في القطر الأخضر) أعلى من جميع الارتباطات الأخرى.")
+
+                        # رسم المخطط الهيكلي
                         st.markdown("#### المخطط الهيكلي (Structural Diagram)")
                         dot_code = "digraph CFA {\nrankdir=LR;\nnode [shape=box, style=filled, fillcolor=white];\n"
                         for factor, items in f_assign.items():
