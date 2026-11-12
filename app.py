@@ -29,7 +29,7 @@ sklearn.utils.check_array = _patched
 factor_analyzer.factor_analyzer.check_array = _patched
 
 # --- Initialize Session State ---
-for key in ['phase1_data', 'phase2_data', 'raw_data', 'efa_output', 'cfa_output']:
+for key in ['phase1_data', 'phase2_data', 'raw_data', 'efa_output', 'cfa_output', 'cfa_assignments']:
     if key not in st.session_state: st.session_state[key] = None
 if 'feedback_submitted' not in st.session_state: st.session_state['feedback_submitted'] = False
 if 'lang' not in st.session_state: st.session_state.lang = 'العربية'
@@ -156,7 +156,6 @@ def efa_result(data, items, factor_count, rotation):
         kmo_all, kmo_model, bartlett_chi2, bartlett_p = np.full(len(items), np.nan), np.nan, np.nan, np.nan
     fa = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method='principal')
     fa.fit(complete)
-    # Using strict internal names 'Factor 1', 'Factor 2' for robust mapping
     loadings = pd.DataFrame(fa.loadings_, index=items, columns=[f"Factor {i+1}" for i in range(factor_count)])
     ev, _ = fa.get_eigenvalues()
     return {"n": len(complete), "kmo": kmo_model, "kmo_items": pd.Series(kmo_all, index=items), "bartlett_chi2": bartlett_chi2, "bartlett_p": bartlett_p, "method": "PCA", "rotation": rotation, "factor_count": factor_count, "loadings": loadings, "ev": pd.DataFrame({"Component": range(1, len(ev)+1), "Eigenvalue": ev})}
@@ -167,6 +166,21 @@ def build_cfa_specification(factor_assignments):
     lines = [f"{factor.replace(' ', '_')} =~ " + " + ".join(aliases[item] for item in items) for factor, items in factor_assignments.items()]
     return {"items": used_items, "aliases": aliases, "engine_syntax": "\n".join(lines), "factor_assignments": factor_assignments}
 
+def calculate_reliability(data, items):
+    complete = as_numeric_items(data, items).dropna(axis=0, how="any")
+    if complete.empty or complete.shape[1] < 2:
+        return np.nan, np.nan
+    
+    alpha = pg.cronbach_alpha(data=complete)[0]
+    # Simple omega approximation using pg if available
+    try:
+        omega_res = pg.cronbach_alpha(data=complete) # Temporary fallback if semopy is strictly used for CFA
+        omega = alpha # Placeholder for robust Omega calculation
+    except:
+        omega = np.nan
+        
+    return alpha, omega
+
 def cfa_result(data, spec):
     complete = as_numeric_items(data, spec["items"]).dropna(axis=0, how="any")
     renamed = complete.rename(columns=spec["aliases"])
@@ -174,7 +188,32 @@ def cfa_result(data, spec):
     model.fit(renamed, obj="MLW")
     fit = calc_stats(model).iloc[0]
     fit_vals = {name: float(fit.get(name, np.nan)) for name in ["chi2", "DoF", "chi2 p-value", "CFI", "TLI", "RMSEA"]}
-    return {"n": len(complete), "fit": fit_vals, "params": model.inspect(std_est=True)}
+    params = model.inspect(std_est=True)
+    
+    # Calculate CR and AVE manually from standardized loadings
+    # CR = (sum(std_loadings))^2 / [ (sum(std_loadings))^2 + sum(1 - std_loadings^2) ]
+    # AVE = sum(std_loadings^2) / n_items
+    
+    cr_ave_dict = {}
+    if 'Est. Std' in params.columns and 'lval' in params.columns:
+        # Filter for factor loadings only (op == '=~')
+        loadings_df = params[params['op'] == '=~'].copy()
+        
+        for factor, factor_items in spec['factor_assignments'].items():
+            factor_name = factor.replace(' ', '_')
+            f_loadings = loadings_df[loadings_df['lval'] == factor_name]['Est. Std'].astype(float).values
+            
+            if len(f_loadings) > 0:
+                sum_loadings = np.sum(f_loadings)
+                sum_sq_loadings = np.sum(f_loadings**2)
+                sum_error = np.sum(1 - f_loadings**2)
+                
+                cr = (sum_loadings**2) / ((sum_loadings**2) + sum_error)
+                ave = sum_sq_loadings / len(f_loadings)
+                
+                cr_ave_dict[factor] = {'CR': cr, 'AVE': ave}
+
+    return {"n": len(complete), "fit": fit_vals, "params": params, "cr_ave": cr_ave_dict}
 
 # --- Header & Case Study ---
 st.markdown(f"""
@@ -282,6 +321,24 @@ with tab_efa:
                 
                 st.markdown("#### Item-level KMO")
                 st.dataframe(out["kmo_items"].rename_axis("Item").reset_index().style.format({"KMO": "{:.3f}"}), use_container_width=True)
+                
+                # --- Auto-Assignment Logic Execution ---
+                # This calculates assignments immediately after EFA and stores them in session state
+                labels = [f"Factor {i+1}" for i in range(out['factor_count'])]
+                assignments = {}
+                for item in selected_items:
+                    if item in out['loadings'].index:
+                        loadings_row = out['loadings'].loc[item]
+                        max_factor = loadings_row.abs().idxmax()
+                        max_val = loadings_row.abs().max()
+                        if max_val >= 0.30 and max_factor in labels:
+                            assignments[item] = max_factor
+                        else:
+                            assignments[item] = "Not included"
+                    else:
+                        assignments[item] = "Not included"
+                st.session_state['cfa_assignments'] = assignments
+
 
 # --- TAB 3: CFA ---
 with tab_cfa:
@@ -294,26 +351,29 @@ with tab_cfa:
             default_cfa_factors = int(efa_out['factor_count']) if efa_out else 2
             
             cfa_factors = st.number_input("CFA Factors", min_value=1, value=default_cfa_factors, key="cfa_factors")
-            
-            # Using strictly uniform names 'Factor 1', 'Factor 2' etc to ensure exact matching
             labels = [f"Factor {i+1}" for i in range(cfa_factors)]
-            assign = {}
             
             st.markdown("#### توزيع الفقرات على العوامل")
-            if efa_out:
+            
+            if st.session_state.get('cfa_assignments'):
                 st.info(lang['auto_assign_msg'])
-                
+            
+            assign = {}
             cols = st.columns(2)
             for i, item in enumerate(selected_items):
-                default_idx = 0 
-                if efa_out and item in efa_out['loadings'].index:
-                    loadings_row = efa_out['loadings'].loc[item]
-                    max_factor = loadings_row.abs().idxmax() # e.g., 'Factor 1'
-                    max_val = loadings_row.abs().max()
-                    if max_val >= 0.30 and max_factor in labels:
-                        default_idx = labels.index(max_factor) + 1
-                        
-                assign[item] = cols[i%2].selectbox(str(item), ["غير مدرج (Not included)"] + labels, index=default_idx, key=f"cfa_{item}")
+                # Retrieve the pre-calculated assignment from session state, or default to Not included
+                pre_assigned_factor = "Not included"
+                if st.session_state.get('cfa_assignments'):
+                    pre_assigned_factor = st.session_state['cfa_assignments'].get(item, "Not included")
+                
+                options = ["Not included"] + labels
+                
+                # Determine the index for the selectbox
+                default_idx = 0
+                if pre_assigned_factor in options:
+                    default_idx = options.index(pre_assigned_factor)
+                    
+                assign[item] = cols[i%2].selectbox(str(item), options, index=default_idx, key=f"cfa_box_{item}")
             
             if st.button(lang['run_cfa']):
                 f_assign = {f: [i for i, a in assign.items() if a == f] for f in labels}
@@ -335,8 +395,30 @@ with tab_cfa:
                         f_cols[2].metric("RMSEA", f"{fit_vals['RMSEA']:.3f}")
                         f_cols[3].metric("χ² (df)", f"{fit_vals['chi2']:.2f} ({fit_vals['DoF']:.0f})")
                         
-                        st.markdown("#### Parameter estimates (تقديرات معلمات النموذج)")
-                        st.dataframe(cfa_out["params"].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
+                        st.markdown("#### تقديرات معلمات النموذج (Parameter Estimates)")
+                        params_df = cfa_out["params"]
+                        # Clean up operator column for display
+                        display_params = params_df[params_df['op'] == '=~'].copy()
+                        display_params = display_params.rename(columns={'lval': 'Factor', 'rval': 'Item'})
+                        st.dataframe(display_params[['Factor', 'Item', 'Estimate', 'Est. Std', 'Std. Err', 'z-value', 'p-value']].style.format({"Estimate": "{:.3f}", "Est. Std": "{:.3f}", "Std. Err": "{:.3f}", "z-value": "{:.3f}", "p-value": "{:.4f}"}, na_rep="—"), use_container_width=True)
+
+                        # --- Validity & Reliability Section ---
+                        st.markdown("#### الصدق والثبات (Validity & Reliability)")
+                        cr_ave_data = cfa_out.get('cr_ave', {})
+                        if cr_ave_data:
+                            val_data = []
+                            for factor, metrics in cr_ave_data.items():
+                                factor_items = f_assign[factor]
+                                alpha, _ = calculate_reliability(st.session_state['phase2_data'], factor_items)
+                                val_data.append({
+                                    "العامل (Factor)": factor,
+                                    "ألفا كرونباخ (Cronbach's α)": alpha,
+                                    "الثبات المركب (CR)": metrics['CR'],
+                                    "التباين المستخرج (AVE)": metrics['AVE']
+                                })
+                            val_df = pd.DataFrame(val_data)
+                            st.dataframe(val_df.style.format({"ألفا كرونباخ (Cronbach's α)": "{:.3f}", "الثبات المركب (CR)": "{:.3f}", "التباين المستخرج (AVE)": "{:.3f}"}), use_container_width=True)
+                            st.caption("ملاحظة: يشير التباين المستخرج (AVE) > 0.50 إلى الصدق التقاربي، والثبات المركب (CR) > 0.70 إلى الموثوقية العالية.")
 
                         st.markdown("#### المخطط الهيكلي (Structural Diagram / Diagramme structurel)")
                         dot_code = "digraph CFA {\nrankdir=LR;\nnode [shape=box, style=filled, fillcolor=white];\n"
