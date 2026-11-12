@@ -140,6 +140,14 @@ st.markdown("""
     .demo-card h3 { color: #0c4a6e; margin-top: 0; font-weight: 800; font-size: 1.3rem; }
     [data-testid="stMetric"] { background: #fff; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     h1, h2, h3, h4 { color: #17324d; font-weight: 700; }
+    
+    /* ستايل الجداول المخصصة الجذابة للنموذج */
+    .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.95rem; text-align: center; }
+    .custom-table th { color: white; padding: 12px; font-weight: bold; border: 1px solid #ddd; }
+    .custom-table td { padding: 10px; border: 1px solid #e2e8f0; }
+    .table-blue th { background-color: #0284c7; }
+    .table-orange th { background-color: #ea580c; }
+    .custom-table tr:nth-child(even) { background-color: #f8fafc; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -255,12 +263,6 @@ def cfa_result(data, spec):
 
     return {"n": len(complete), "fit": fit_vals, "params": params, "cr_ave": cr_ave_dict}
 
-# --- Format Function for Anti-Image Matrix ---
-def format_anti_image(val, is_diag):
-    if is_diag:
-        return f"{val:.3f}a"
-    return f"{val:.3f}"
-
 # --- Header & Example ---
 st.markdown(f"""
     <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white; margin-bottom: 25px;">
@@ -275,19 +277,26 @@ with st.expander(lang['demo_details'], expanded=False):
     st.markdown(lang['demo_intro'])
     col1, col2 = st.columns(2)
     
-    def style_demo_table(df):
-        return df.style.set_properties(**{'background-color': '#f8fafc', 'color': '#0f172a', 'border': '1px solid #cbd5e1'}) \
-                       .set_table_styles([
-                           {'selector': 'th', 'props': [('background-color', '#3b82f6'), ('color', 'white'), ('font-weight', 'bold')]},
-                           {'selector': 'tbody tr:nth-child(even)', 'props': [('background-color', '#e0f2fe')]},
-                           {'selector': 'tbody tr:nth-child(odd)', 'props': [('background-color', '#ffedd5')]}
-                       ])
-                       
-    df_dims = pd.DataFrame({lang['dim_col']: [lang['dim1'], lang['dim2']], lang['items_col']: [12, 11], lang['var_col']: ["67.04%", "-"]})
-    col1.dataframe(style_demo_table(df_dims), hide_index=True, use_container_width=True)
+    # الجداول الجذابة باستخدام HTML المباشر
+    html_table1 = f"""
+    <table class="custom-table table-blue">
+        <tr><th>{lang['dim_col']}</th><th>{lang['items_col']}</th><th>{lang['var_col']}</th></tr>
+        <tr><td>{lang['dim1']}</td><td>12</td><td>67.04%</td></tr>
+        <tr><td>{lang['dim2']}</td><td>11</td><td>-</td></tr>
+    </table>
+    """
+    col1.markdown(html_table1, unsafe_allow_html=True)
     
-    df_res = pd.DataFrame({lang['ind_col']: ["CR", "AVE", "CFI", "RMSEA"], lang['res_col']: ["0.964", "0.562", "0.911", "0.087"]})
-    col2.dataframe(style_demo_table(df_res), hide_index=True, use_container_width=True)
+    html_table2 = f"""
+    <table class="custom-table table-orange">
+        <tr><th>{lang['ind_col']}</th><th>{lang['res_col']}</th></tr>
+        <tr><td>CR</td><td>0.964</td></tr>
+        <tr><td>AVE</td><td>0.562</td></tr>
+        <tr><td>CFI</td><td>0.911</td></tr>
+        <tr><td>RMSEA</td><td>0.087</td></tr>
+    </table>
+    """
+    col2.markdown(html_table2, unsafe_allow_html=True)
 
 # --- Global Data & Tabs Definition ---
 selected_items = []
@@ -402,14 +411,21 @@ with tab_efa:
                 col_a, col_b = st.columns(2)
                 with col_a:
                     st.markdown(f"#### {lang['anti_image_title']}")
-                    def highlight_diag(val): return 'background-color: #d1fae5; font-weight:bold'
-                    # تنسيق مصفوفة Anti-Image لإضافة 'a' للقطر
-                    anti_image_formatted = out["anti_image"].copy()
-                    for idx in anti_image_formatted.index:
-                        for col in anti_image_formatted.columns:
-                            anti_image_formatted.loc[idx, col] = format_anti_image(out["anti_image"].loc[idx, col], is_diag=(idx==col))
+                    # الحل البرمجي لخطأ التحويل في Pandas مع إضافة حرف a
+                    anti_image_raw = out["anti_image"]
+                    anti_image_str = anti_image_raw.copy().astype(str)
+                    for r in anti_image_raw.index:
+                        for c in anti_image_raw.columns:
+                            val = anti_image_raw.loc[r, c]
+                            if r == c:
+                                anti_image_str.loc[r, c] = f"{val:.3f}a"
+                            else:
+                                anti_image_str.loc[r, c] = f"{val:.3f}"
                     
-                    st.dataframe(anti_image_formatted.style.apply(lambda x: [highlight_diag(v) if x.name == i else '' for i, v in x.items()], axis=1), use_container_width=True)
+                    def highlight_diag(val): 
+                        return 'background-color: #d1fae5; font-weight:bold' if str(val).endswith('a') else ''
+                    
+                    st.dataframe(anti_image_str.style.applymap(highlight_diag), use_container_width=True)
                 
                 with col_b:
                     st.markdown("#### مصفوفة تحويل المكونات (Transformation Matrix)")
