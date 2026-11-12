@@ -57,7 +57,8 @@ translations = {
         'run_efa': 'Run Exploratory Factor Analysis (EFA)', 'run_cfa': 'Run Confirmatory Factor Analysis (CFA)',
         'report_wait': 'Please run EFA and CFA in the previous tabs to generate the automated report.',
         'report_title': 'Automated Academic Report (APA 7)', 'charts_title': 'Visualizations (Charts & Graphs)',
-        'sample_warning': '⚠️ JARS Warning: Sample size is less than 50. Factor analysis requires a larger sample.'
+        'sample_warning': '⚠️ JARS Warning: Sample size is less than 50. Factor analysis requires a larger sample.',
+        'auto_assign_msg': '💡 Items have been automatically assigned to factors based on the highest EFA loadings (>0.30).'
     },
     'العربية': {
         'select_lang': '🌐 اختر اللغة', 'main_title': '💠 PsychoStat Pro',
@@ -78,7 +79,8 @@ translations = {
         'run_efa': 'إجراء التحليل العاملي الاستكشافي (EFA)', 'run_cfa': 'إجراء التحليل العاملي التوكيدي (CFA)',
         'report_wait': 'يرجى إجراء التحليل الاستكشافي والتوكيدي في التبويبات السابقة لتوليد التقرير والرسوم البيانية.',
         'report_title': 'التقرير الأكاديمي الآلي (APA 7)', 'charts_title': 'الرسوم البيانية (الأعمدة والدوائر النسبية)',
-        'sample_warning': '⚠️ تنبيه معايير JARS: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). لا يمكن إجراء التحليل العاملي لعدم كفاية البيانات.'
+        'sample_warning': '⚠️ تنبيه معايير JARS: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). لا يمكن إجراء التحليل العاملي لعدم كفاية البيانات.',
+        'auto_assign_msg': '💡 تم توزيع الفقرات تلقائياً على العوامل بناءً على أعلى تشبع (أكبر من 0.30) من التحليل الاستكشافي السابق. يمكنك مراجعتها ثم الضغط على زر التحليل.'
     },
     'Français': {
         'select_lang': '🌐 Choisir la langue', 'main_title': '💠 PsychoStat Pro',
@@ -99,7 +101,8 @@ translations = {
         'run_efa': 'Lancer l\'Analyse Exploratoire (EFA)', 'run_cfa': 'Lancer l\'Analyse Confirmatoire (CFA)',
         'report_wait': 'Les rapports seront disponibles ici après avoir exécuté l\'analyse.',
         'report_title': 'Rapport Automatique APA 7', 'charts_title': 'Graphiques',
-        'sample_warning': '⚠️ Attention JARS : La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle n\'est pas recommandée.'
+        'sample_warning': '⚠️ Attention JARS : La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle n\'est pas recommandée.',
+        'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs en fonction de l\'analyse exploratoire.'
     }
 }
 
@@ -279,22 +282,38 @@ with tab_cfa:
         if n_cases_cfa < 50:
             st.error(lang['sample_warning'])
         else:
-            cfa_factors = st.number_input("CFA Factors", min_value=1, value=2, key="cfa_factors")
+            efa_out = st.session_state.get('efa_output')
+            default_cfa_factors = int(efa_out['factor_count']) if efa_out else 2
+            
+            cfa_factors = st.number_input("CFA Factors", min_value=1, value=default_cfa_factors, key="cfa_factors")
             labels = [f"Factor {i+1}" for i in range(cfa_factors)]
             assign = {}
-            st.markdown("#### Assign items to factors / توزيع الفقرات على العوامل")
+            
+            st.markdown("#### توزيع الفقرات على العوامل")
+            if efa_out:
+                st.info(lang['auto_assign_msg'])
+                
             cols = st.columns(2)
             for i, item in enumerate(selected_items):
-                assign[item] = cols[i%2].selectbox(str(item), ["Not included"] + labels)
+                # SMART AUTO-ASSIGNMENT LOGIC
+                default_idx = 0 # Default to "Not included"
+                if efa_out and item in efa_out['loadings'].index:
+                    loadings_row = efa_out['loadings'].loc[item]
+                    max_factor = loadings_row.abs().idxmax()
+                    max_val = loadings_row.abs().max()
+                    # Assign to factor if loading is >= 0.30
+                    if max_val >= 0.30 and max_factor in labels:
+                        default_idx = labels.index(max_factor) + 1
+                        
+                assign[item] = cols[i%2].selectbox(str(item), ["غير مدرج (Not included)"] + labels, index=default_idx, key=f"cfa_{item}")
             
             if st.button(lang['run_cfa']):
                 f_assign = {f: [i for i, a in assign.items() if a == f] for f in labels}
-                # Remove empty factors to prevent Syntax Error
                 f_assign = {k: v for k, v in f_assign.items() if len(v) > 0}
                 
-                # Syntax Error Prevention: Check if factors have at least 2 items
+                # Syntax Error Prevention
                 if not f_assign or any(len(v) < 2 for v in f_assign.values()):
-                    st.error("⚠️ يرجى تعيين فقرتين على الأقل لكل عامل لتجنب خطأ بناء النموذج (Syntax Error).")
+                    st.error("⚠️ يرجى تعيين فقرتين على الأقل لكل عامل لتجنب الأخطاء في بناء نموذج المعادلة البنائية.")
                 else:
                     try:
                         spec = build_cfa_specification(f_assign)
