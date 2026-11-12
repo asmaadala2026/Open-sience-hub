@@ -52,6 +52,10 @@ translations = {
         'demo_title': '📖 Applied Example: EGAIS Scale Results',
         'demo_desc': 'This validated scale is presented as a demo. Use this platform to analyze your own survey data with high precision.',
         'demo_intro': 'This scale (EGAIS) was developed specifically by researcher **Asmaa Dala**. Here are the robust results extracted by the platform:',
+        'demo_details': '🔍 View Scale Details & Results 📊',
+        'dim_col': 'Dimensions', 'items_col': 'Items', 'var_col': 'Variance',
+        'dim1': 'Anxiety', 'dim2': 'Efficacy',
+        'ind_col': 'Indicator', 'res_col': 'Result',
         'feedback_title': '💬 Feedback & Consultations', 'feedback_desc': 'Share your thoughts or request a consultation.',
         'feedback_rating': 'How was your experience?', 'feedback_text': 'Leave a comment...', 'feedback_submit': 'Send Feedback 🚀', 'feedback_thanks': 'Thank you! Received. 😍',
         'run_efa': 'Run Exploratory Factor Analysis (EFA)', 'run_cfa': 'Run Confirmatory Factor Analysis (CFA)',
@@ -59,7 +63,8 @@ translations = {
         'report_title': 'Automated Academic Report (APA 7)', 'charts_title': 'Visualizations (Charts & Graphs)',
         'sample_error': '⛔ Error: Sample size is less than 50. Factor analysis cannot be performed due to insufficient data.',
         'auto_assign_msg': '💡 Items have been automatically assigned to factors based on the highest EFA loadings (>0.30).',
-        'rotation_help': 'Use Varimax for independent factors, and Oblimin for correlated psychological factors.'
+        'rotation_help': 'Use Varimax for independent factors, and Oblimin for correlated psychological factors.',
+        'corr_matrix_title': 'Correlation Matrix'
     },
     'العربية': {
         'select_lang': '🌐 اختر اللغة', 'main_title': '💠 PsychoStat Pro',
@@ -75,6 +80,10 @@ translations = {
         'demo_title': '📖 مثال تطبيقي: نتائج مقياس (EGAIS)',
         'demo_desc': 'هذا المقياس المُحكّم معروض كمثال تطبيقي لتوضيح قدرة المنصة.',
         'demo_intro': 'تم تطوير مقياس (EGAIS) خصيصاً من قِبل الباحثة **أسماء دالة**. إليكِ النتائج الحقيقية والمبهرة التي استخرجتها المنصة:',
+        'demo_details': '🔍 عرض تفاصيل ونتائج المقياس 📊',
+        'dim_col': 'الأبعاد', 'items_col': 'الفقرات', 'var_col': 'التباين',
+        'dim1': 'القلق', 'dim2': 'الفعالية',
+        'ind_col': 'المؤشر', 'res_col': 'النتيجة',
         'feedback_title': '💬 آراء ومقترحات الباحثين', 'feedback_desc': 'يسعدنا سماع رأيك أو ترك استشارتك.',
         'feedback_rating': 'كيف تقيم تجربتك؟', 'feedback_text': 'اكتب تعليقك أو استشارتك...', 'feedback_submit': 'إرسال 🚀', 'feedback_thanks': 'شكراً لك! تم استلام رسالتك. 😍',
         'run_efa': 'إجراء التحليل العاملي الاستكشافي (EFA)', 'run_cfa': 'إجراء التحليل العاملي التوكيدي (CFA) آلياً',
@@ -82,7 +91,8 @@ translations = {
         'report_title': 'التقرير الأكاديمي الآلي (APA 7)', 'charts_title': 'الرسوم البيانية (الأعمدة والدوائر النسبية)',
         'sample_error': '⛔ خطأ: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). تم إيقاف التحليل لعدم كفاية البيانات وتجنب النتائج المضللة.',
         'auto_assign_msg': '💡 تم توزيع الفقرات وبناء نموذج المعادلة البنائية تلقائياً بناءً على أعلى تشبع (أكبر من 0.30) من نتائج التحليل الاستكشافي.',
-        'rotation_help': 'استخدم Varimax للعوامل المستقلة، وOblimin للعوامل النفسية المرتبطة.'
+        'rotation_help': 'استخدم Varimax للعوامل المستقلة، وOblimin للعوامل النفسية المرتبطة.',
+        'corr_matrix_title': 'مصفوفة الارتباطات (Correlation Matrix)'
     },
     'Français': {
         'select_lang': '🌐 Choisir la langue', 'main_title': '💠 PsychoStat Pro',
@@ -98,6 +108,10 @@ translations = {
         'demo_title': '📖 Exemple Appliqué: Résultats de l\'échelle EGAIS',
         'demo_desc': 'Cette échelle validée est présentée comme une démonstration.',
         'demo_intro': 'Cette échelle (EGAIS) a été développée par la chercheuse **Asmaa Dala**.',
+        'demo_details': '🔍 Voir les détails et résultats de l\'échelle 📊',
+        'dim_col': 'Dimensions', 'items_col': 'Items', 'var_col': 'Variance',
+        'dim1': 'Anxiété', 'dim2': 'Efficacité',
+        'ind_col': 'Indicateur', 'res_col': 'Résultat',
         'feedback_title': '💬 Avis et Consultations', 'feedback_desc': 'Partagez votre avis ou demandez une consultation.',
         'feedback_rating': 'Comment évaluez-vous votre expérience?', 'feedback_text': 'Laissez un commentaire...', 'feedback_submit': 'Envoyer 🚀', 'feedback_thanks': 'Merci! Bien reçu. 😍',
         'run_efa': 'Exécuter l\'Analyse Factorielle Exploratoire (AFE)', 'run_cfa': 'Exécuter l\'Analyse Factorielle Confirmatoire (AFC)',
@@ -105,7 +119,8 @@ translations = {
         'report_title': 'Rapport Académique Automatisé (APA 7)', 'charts_title': 'Visualisations (Graphiques)',
         'sample_error': '⛔ Erreur: La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle ne peut pas être effectuée.',
         'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs selon les plus fortes saturations (>0.30).',
-        'rotation_help': 'Utilisez Varimax pour les facteurs indépendants, et Oblimin pour les facteurs psychologiques corrélés.'
+        'rotation_help': 'Utilisez Varimax pour les facteurs indépendants, et Oblimin pour les facteurs psychologiques corrélés.',
+        'corr_matrix_title': 'Matrice de Corrélation'
     }
 }
 
@@ -184,14 +199,12 @@ def efa_result(data, items, factor_count, rotation):
     loadings = pd.DataFrame(fa.loadings_, index=items, columns=[f"Factor_{i+1}" for i in range(factor_count)])
     ev, _ = fa.get_eigenvalues()
     
-    # حساب مصفوفة الارتباط العكسية (Anti-Image) بناءً على طلب المستخدم ومخرجات SPSS
     corr_matrix = complete.corr()
     inv_corr = np.linalg.inv(corr_matrix)
     anti_image_cov = -inv_corr / np.outer(np.sqrt(np.diag(inv_corr)), np.sqrt(np.diag(inv_corr)))
-    np.fill_diagonal(anti_image_cov, kmo_all) # القطر هو KMO لكل فقرة
+    np.fill_diagonal(anti_image_cov, kmo_all)
     anti_image_df = pd.DataFrame(anti_image_cov, index=items, columns=items)
     
-    # مصفوفة تحويل المكونات (Transformation Matrix) إن وجدت
     transform_matrix = None
     if hasattr(fa, 'rotation_matrix_') and fa.rotation_matrix_ is not None:
         transform_matrix = pd.DataFrame(fa.rotation_matrix_, 
@@ -249,11 +262,20 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 st.markdown(f"""<div class="demo-card"><h3>{lang['demo_title']}</h3><p>{lang['demo_desc']}</p></div>""", unsafe_allow_html=True)
-with st.expander("🔍 عرض تفاصيل ونتائج المقياس 📊" if st.session_state.lang == 'العربية' else "🔍 View Scale Results 📊", expanded=False):
+with st.expander(lang['demo_details'], expanded=False):
     st.markdown(lang['demo_intro'])
     col1, col2 = st.columns(2)
-    col1.dataframe(pd.DataFrame({"الأبعاد": ["القلق", "الفعالية"], "الفقرات": [12, 11], "التباين": ["67.04%", "-"]}), hide_index=True, use_container_width=True)
-    col2.dataframe(pd.DataFrame({"المؤشر": ["CR", "AVE", "CFI", "RMSEA"], "النتيجة": ["0.964", "0.562", "0.911", "0.087"]}), hide_index=True, use_container_width=True)
+    
+    # تلوين وتنسيق الجداول
+    def style_demo_table(df):
+        return df.style.set_properties(**{'background-color': '#f0f9ff', 'color': '#0c4a6e', 'border': '1px solid #bae6fd'}) \
+                       .set_table_styles([{'selector': 'th', 'props': [('background-color', '#bae6fd'), ('color', '#0284c7')]}])
+                       
+    df_dims = pd.DataFrame({lang['dim_col']: [lang['dim1'], lang['dim2']], lang['items_col']: [12, 11], lang['var_col']: ["67.04%", "-"]})
+    col1.dataframe(style_demo_table(df_dims), hide_index=True, use_container_width=True)
+    
+    df_res = pd.DataFrame({lang['ind_col']: ["CR", "AVE", "CFI", "RMSEA"], lang['res_col']: ["0.964", "0.562", "0.911", "0.087"]})
+    col2.dataframe(style_demo_table(df_res), hide_index=True, use_container_width=True)
 
 # --- Global Data & Tabs Definition ---
 selected_items = []
@@ -294,7 +316,6 @@ with tab_desc:
         st.markdown("---")
         st.markdown(f"#### {lang['ready_split']}")
         if st.button(lang['split_btn']):
-            # شرط حجم العينة الصارم قبل التقسيم
             if len(df_raw) < 50:
                  st.error(lang['sample_error'])
             else:
@@ -317,7 +338,6 @@ with tab_desc:
 with tab_efa:
     if st.session_state['phase1_data'] is not None and selected_items:
         n_cases = len(st.session_state['phase1_data'])
-        # شرط الإيقاف الصارم لـ EFA
         if n_cases < 50:
             st.error(lang['sample_error'])
         else:
@@ -326,6 +346,12 @@ with tab_efa:
             rel_cols = st.columns(2)
             rel_cols[0].metric("ألفا كرونباخ (Cronbach's α)", f"{alpha_efa:.3f}")
             rel_cols[1].metric("ماكدونالد أوميغا (McDonald's ω)", f"{omega_efa:.3f}")
+            st.markdown("---")
+
+            # مصفوفة الارتباط قبل جدول التشبعات
+            st.markdown(f"#### {lang['corr_matrix_title']}")
+            corr_matrix = st.session_state['phase1_data'][selected_items].corr()
+            st.dataframe(corr_matrix.style.background_gradient(cmap='coolwarm', axis=None).format("{:.3f}"), use_container_width=True)
             st.markdown("---")
 
             c1, c2 = st.columns(2)
@@ -362,7 +388,6 @@ with tab_efa:
                 st.markdown("#### التشبعات العاملية (Factor Loadings)")
                 st.dataframe(out["loadings"].style.format("{:.3f}"), use_container_width=True)
                 
-                # إضافة المصفوفات الجديدة بناء على طلب المستخدم
                 col_a, col_b = st.columns(2)
                 with col_a:
                     st.markdown("#### المصفوفة المضادة للارتباط (Anti-Image Matrices)")
@@ -380,7 +405,6 @@ with tab_efa:
 with tab_cfa:
     if st.session_state['phase2_data'] is not None and selected_items:
         n_cases_cfa = len(st.session_state['phase2_data'])
-        # شرط الإيقاف الصارم لـ CFA
         if n_cases_cfa < 50:
             st.error(lang['sample_error'])
         else:
@@ -585,7 +609,6 @@ with tab_report:
         
         if cfa_out:
             fit = cfa_out['fit']
-            # تقرير ذكي يقرأ النتائج الفردية للمستخدم
             conv_status = "وقد استوفت جميع العوامل المعايير المطلوبة للصدق التقاربي والثبات." if st.session_state.get('conv_passed', True) else "أظهرت النتائج قصوراً في الصدق التقاربي لبعض العوامل (AVE < 0.50)، مما يتطلب مراجعة الفقرات."
             disc_status = "كما تم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker لتأكيد استقلالية العوامل وجودة البناء." if st.session_state.get('disc_passed', True) else "إلا أنه لم يتم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker بسبب وجود تداخل كبير بين العوامل (Cross-loadings)، مما يقتضي إعادة النظر في هيكل المقياس."
             
