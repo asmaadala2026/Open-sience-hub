@@ -44,7 +44,7 @@ translations = {
         'developer': 'Platform Developer: Asmaa Dala',
         'tab1': '📊 1. Raw Data & Descriptives', 'tab2': '🔍 2. EFA & Reliability', 'tab3': '📈 3. CFA & Validity', 'tab4': '📄 4. Analysis Report & Charts',
         'raw_info': 'Upload your survey data (Excel/CSV) to automatically extract demographics and split data for EFA/CFA.',
-        'upload_forms': 'Upload Google Forms Data (Excel/CSV)',
+        'upload_forms': 'Upload Google Forms Data',
         'demo_summary': '1. Demographic Summary', 'select_demo': 'Select Demographic Variables:',
         'normality_desc': '2. Descriptive Stats (Mean & SD)', 'select_normality': '📌 Select Scale Items for Analysis:',
         'ready_split': 'Ready for Psychometric Analysis?', 'split_btn': '✂️ Automatically Split Data for EFA & CFA (50/50)',
@@ -81,28 +81,6 @@ translations = {
         'report_title': 'التقرير الأكاديمي الآلي (APA 7)', 'charts_title': 'الرسوم البيانية (الأعمدة والدوائر النسبية)',
         'sample_warning': '⚠️ تنبيه معايير JARS: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). لا يمكن إجراء التحليل العاملي لعدم كفاية البيانات.',
         'auto_assign_msg': '💡 تم توزيع الفقرات وبناء نموذج المعادلة البنائية تلقائياً بناءً على نتائج التحليل الاستكشافي السابق (أعلى من 0.30).'
-    },
-    'Français': {
-        'select_lang': '🌐 Choisir la langue', 'main_title': '💠 PsychoStat Pro',
-        'subtitle': 'Explorez la qualité de la mesure des attitudes avec des méthodes transparentes.',
-        'developer': 'Développeuse: Asmaa Dala',
-        'tab1': '📊 1. Données Brutes', 'tab2': '🔍 2. Analyse Exploratoire', 'tab3': '📈 3. Analyse Confirmatoire', 'tab4': '📄 4. Rapport d\'Analyse',
-        'raw_info': 'Téléchargez vos données (Excel/CSV) pour extraire les tableaux et diviser les données.',
-        'upload_forms': 'Télécharger les Données',
-        'demo_summary': '1. Résumé Démographique', 'select_demo': 'Sélectionner les Variables:',
-        'normality_desc': '2. Statistiques Descriptives', 'select_normality': '📌 Sélectionner les items:',
-        'ready_split': 'Prêt pour l\'Analyse ?', 'split_btn': '✂️ Diviser Automatiquement les Données (50/50)',
-        'study_overview': 'Aperçu de l\'Étude', 'total_cases': 'Cas totaux', 'p1_cases': 'Phase 1 (EFA)', 'p2_cases': 'Phase 2 (CFA)', 'not_loaded': 'Non chargé',
-        'case_study_title': '📖 Étude de Cas: Échelle (EGAIS)',
-        'case_study_desc': 'Cette échelle validée est présentée comme démonstration.',
-        'case_study_intro': 'Cette échelle (EGAIS) a été développée par la chercheuse **Asmaa Dala**.',
-        'feedback_title': '💬 Avis & Consultations', 'feedback_desc': 'Partagez vos impressions.',
-        'feedback_rating': 'Votre expérience ?', 'feedback_text': 'Laissez un commentaire...', 'feedback_submit': 'Envoyer 🚀', 'feedback_thanks': 'Merci !',
-        'run_efa': 'Lancer l\'Analyse Exploratoire (EFA)', 'run_cfa': 'Lancer l\'Analyse Confirmatoire (CFA)',
-        'report_wait': 'Les rapports seront disponibles ici après avoir exécuté l\'analyse.',
-        'report_title': 'Rapport Automatique APA 7', 'charts_title': 'Graphiques',
-        'sample_warning': '⚠️ Attention JARS : La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle n\'est pas recommandée.',
-        'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs en fonction de l\'analyse exploratoire.'
     }
 }
 
@@ -123,7 +101,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Sidebar ---
-st.session_state.lang = st.sidebar.selectbox('🌐 Select Language / اختر اللغة', ['العربية', 'English', 'Français'])
+lang_options = ['العربية', 'English']
+st.session_state.lang = st.sidebar.selectbox('🌐 Select Language / اختر اللغة', lang_options)
 lang = translations[st.session_state.lang]
 
 with st.sidebar:
@@ -156,14 +135,13 @@ def calc_alpha_omega(df, items):
     except:
         alpha = np.nan
     try:
-        # Approximate McDonald's Omega using PCA loadings
         fa = FactorAnalyzer(n_factors=1, rotation=None)
         fa.fit(complete)
         ld = fa.loadings_.flatten()
         sum_l = np.sum(ld)
         sum_l2 = np.sum(ld**2)
         sum_err = np.sum(1 - ld**2)
-        omega = (sum_l**2) / ((sum_l**2) + sum_err)
+        omega = (sum_l**2) / ((sum_l**2) + sum_err) if ((sum_l**2) + sum_err) > 0 else np.nan
     except:
         omega = np.nan
     return alpha, omega
@@ -177,14 +155,14 @@ def efa_result(data, items, factor_count, rotation):
         kmo_all, kmo_model, bartlett_chi2, bartlett_p = np.full(len(items), np.nan), np.nan, np.nan, np.nan
     fa = FactorAnalyzer(n_factors=factor_count, rotation=rotation, method='principal')
     fa.fit(complete)
-    loadings = pd.DataFrame(fa.loadings_, index=items, columns=[f"Factor_{i+1}" for i in range(factor_count)])
+    # Using strict alphanumeric names to avoid semopy errors
+    loadings = pd.DataFrame(fa.loadings_, index=items, columns=[f"Factor{i+1}" for i in range(factor_count)])
     ev, _ = fa.get_eigenvalues()
     return {"n": len(complete), "kmo": kmo_model, "kmo_items": pd.Series(kmo_all, index=items), "bartlett_chi2": bartlett_chi2, "bartlett_p": bartlett_p, "method": "PCA", "rotation": rotation, "factor_count": factor_count, "loadings": loadings, "ev": pd.DataFrame({"Component": range(1, len(ev)+1), "Eigenvalue": ev})}
 
 def build_cfa_specification(factor_assignments):
     used_items = [item for items in factor_assignments.values() for item in items]
     aliases = {item: f"item_{i}" for i, item in enumerate(used_items)}
-    # Build robust syntax without spaces in factor names
     lines = [f"{factor} =~ " + " + ".join(aliases[item] for item in items) for factor, items in factor_assignments.items()]
     return {"items": used_items, "aliases": aliases, "engine_syntax": "\n".join(lines), "factor_assignments": factor_assignments}
 
@@ -206,7 +184,8 @@ def cfa_result(data, spec):
                 sum_l = np.sum(f_loadings)
                 sum_l2 = np.sum(f_loadings**2)
                 sum_err = np.sum(1 - f_loadings**2)
-                cr = (sum_l**2) / ((sum_l**2) + sum_err)
+                denom = (sum_l**2) + sum_err
+                cr = (sum_l**2) / denom if denom > 0 else np.nan
                 ave = sum_l2 / len(f_loadings)
                 cr_ave_dict[factor] = {'CR': cr, 'AVE': ave}
 
@@ -289,7 +268,6 @@ with tab_efa:
         if n_cases < 50:
             st.error(lang['sample_warning'])
         else:
-            # --- Reliability for EFA Sample ---
             st.markdown("#### الثبات للبيانات الاستكشافية (Reliability - EFA Sample)")
             alpha_efa, omega_efa = calc_alpha_omega(st.session_state['phase1_data'], selected_items)
             rel_cols = st.columns(2)
@@ -310,8 +288,8 @@ with tab_efa:
                 out = efa_result(st.session_state['phase1_data'], selected_items, int(factor_count), rotation)
                 st.session_state['efa_output'] = out
                 
-                # --- Auto-Assignment Logic Background Execution ---
-                labels = [f"Factor_{i+1}" for i in range(out['factor_count'])]
+                # --- AUTO-ASSIGNMENT LOGIC ---
+                labels = [f"Factor{i+1}" for i in range(out['factor_count'])]
                 assignments = {f: [] for f in labels}
                 for item in selected_items:
                     if item in out['loadings'].index:
@@ -320,7 +298,6 @@ with tab_efa:
                         max_val = loadings_row.abs().max()
                         if max_val >= 0.30 and max_factor in labels:
                             assignments[max_factor].append(item)
-                # Save purely assigned dictionary
                 st.session_state['cfa_assignments'] = {k: v for k, v in assignments.items() if len(v) > 0}
                 
                 st.success("EFA Completed Successfully!")
@@ -347,22 +324,19 @@ with tab_cfa:
         if n_cases_cfa < 50:
             st.error(lang['sample_warning'])
         else:
-            # We bypass the manual selectboxes completely if EFA was run, to prevent UI index glitches.
             f_assign = st.session_state.get('cfa_assignments')
             
             if not f_assign:
                 st.warning("يرجى إجراء التحليل الاستكشافي (EFA) أولاً في التبويب السابق ليتم بناء النموذج تلقائياً.")
             else:
                 st.info(lang['auto_assign_msg'])
-                
-                # Show the automated assignments elegantly
                 st.markdown("##### هيكل النموذج المستخرج آلياً:")
                 for factor, items in f_assign.items():
                     st.write(f"**{factor}:** {', '.join(map(str, items))}")
                 
                 if st.button(lang['run_cfa']):
                     if any(len(v) < 2 for v in f_assign.values()):
-                        st.error("⚠️ فشل بناء النموذج: أحد العوامل المستخرجة يحتوي على أقل من فقرتين.")
+                        st.error("⚠️ فشل بناء النموذج: أحد العوامل المستخرجة يحتوي على أقل من فقرتين. تأكد من جودة البيانات.")
                     else:
                         try:
                             spec = build_cfa_specification(f_assign)
@@ -389,6 +363,8 @@ with tab_cfa:
                             cr_ave_data = cfa_out.get('cr_ave', {})
                             if cr_ave_data:
                                 val_data = []
+                                low_ave = False
+                                low_cr = False
                                 for factor, metrics in cr_ave_data.items():
                                     alpha, omega = calc_alpha_omega(st.session_state['phase2_data'], f_assign[factor])
                                     val_data.append({
@@ -398,8 +374,17 @@ with tab_cfa:
                                         "الثبات المركب (CR)": metrics['CR'],
                                         "التباين المستخرج (AVE)": metrics['AVE']
                                     })
+                                    if metrics['AVE'] < 0.50: low_ave = True
+                                    if metrics['CR'] < 0.70: low_cr = True
+                                    
                                 val_df = pd.DataFrame(val_data).set_index("العامل (Factor)")
                                 st.dataframe(val_df.style.format("{:.3f}"), use_container_width=True)
+                                
+                                # Diagnostic feedback for Convergent Validity
+                                if low_ave or low_cr:
+                                    st.warning("⚠️ تنبيه تشخيصي: هناك انخفاض في مؤشرات الصدق التقاربي (AVE < 0.50 أو CR < 0.70). يرجى مراجعة الفقرات ذات التشبعات الضعيفة وحذفها لتحسين النموذج.")
+                                else:
+                                    st.success("✅ الصدق التقاربي والموثوقية ممتازة (AVE > 0.50 و CR > 0.70).")
                                 
                                 # --- Discriminant Validity (Fornell-Larcker) ---
                                 st.markdown("#### الصدق التمييزي (Discriminant Validity - Fornell-Larcker)")
@@ -420,9 +405,20 @@ with tab_cfa:
                                         disc_df.loc[f1, f2] = val
                                         disc_df.loc[f2, f1] = val
                                         
-                                # Format Diagonal distinctively if desired, or just show matrix
                                 st.dataframe(disc_df.style.format("{:.3f}", na_rep="—"), use_container_width=True)
-                                st.caption("ملاحظة: القيم في القطر الرئيسي هي الجذر التربيعي للتباين المستخرج (√AVE). يجب أن تكون أكبر من الارتباطات في نفس العمود/الصف لإثبات الصدق التمييزي.")
+                                
+                                # Diagnostic feedback for Discriminant Validity
+                                disc_passed = True
+                                for i, f1 in enumerate(factors_list):
+                                    for j, f2 in enumerate(factors_list):
+                                        if i != j and pd.notna(disc_df.loc[f1, f2]) and pd.notna(disc_df.loc[f1, f1]):
+                                            if abs(disc_df.loc[f1, f2]) > disc_df.loc[f1, f1]:
+                                                disc_passed = False
+                                
+                                if not disc_passed:
+                                    st.warning("⚠️ تنبيه تشخيصي: الصدق التمييزي غير متحقق لأن بعض الارتباطات بين العوامل تتجاوز الجذر التربيعي للتباين المستخرج (√AVE). ينصح بحذف الفقرات المتقاطعة.")
+                                else:
+                                    st.success("✅ الصدق التمييزي متحقق: جميع الجذور التربيعية لـ (AVE) أكبر من الارتباطات بين العوامل.")
 
                             st.markdown("#### المخطط الهيكلي (Structural Diagram)")
                             dot_code = "digraph CFA {\nrankdir=LR;\nnode [shape=box, style=filled, fillcolor=white];\n"
@@ -434,7 +430,7 @@ with tab_cfa:
                             st.graphviz_chart(dot_code)
 
                         except Exception as e:
-                            st.error(f"CFA Error: {str(e)}")
+                            st.error(f"⚠️ فشل التحليل التوكيدي: يرجى التأكد من جودة البيانات وارتباطاتها. تفاصيل الخطأ: {str(e)}")
 
 # --- TAB 4: Report & Charts ---
 with tab_report:
@@ -481,7 +477,7 @@ with tab_report:
         
         if cfa_out:
             fit = cfa_out['fit']
-            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة جيدة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0):.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). تم التحقق من الصدق التمييزي والتقاربي وفق معيار Fornell-Larcker، وتدل هذه المؤشرات على مطابقة النموذج مع البيانات الفعلية للمقياس.\n\n"
+            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0):.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). تم التحقق من الصدق التمييزي والتقاربي وفق معيار Fornell-Larcker لتأكيد جودة المقياس.\n\n"
         
         st.write(report_text)
         st.success("التقرير الأكاديمي أعلاه تمت كتابته آلياً. يمكنك نسخه مباشرة ولصقه في مذكرتك أو بحثك العلمي!")
