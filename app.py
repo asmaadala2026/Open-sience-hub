@@ -161,6 +161,9 @@ st.markdown("""
     .table-orange th { background-color: #ea580c !important; }
     .custom-table tr:nth-child(even) td { background-color: #f8fafc !important; }
     .custom-table tr:nth-child(odd) td { background-color: #ffffff !important; }
+
+    /* The critical fix for the main header text color */
+    .main-header-box h1, .main-header-box p, .main-header-box span { color: white !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -307,10 +310,10 @@ def cfa_result(data, spec):
 
 # --- Header & Example ---
 st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white !important; margin-bottom: 25px;">
-        <h1 style="margin: 0; font-size: 42px; font-weight: 900; color: white !important;">{lang['main_title']}</h1>
-        <p style="font-size: 16px; margin-top: 10px; color: white !important;">{lang['subtitle']}</p>
-        <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; color: white !important;">👩‍💻 {lang['developer']}</span>
+    <div class="main-header-box" style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white !important; margin-bottom: 25px;">
+        <h1 style="margin: 0; font-size: 42px; font-weight: 900;">{lang['main_title']}</h1>
+        <p style="font-size: 16px; margin-top: 10px;">{lang['subtitle']}</p>
+        <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;">👩‍💻 {lang['developer']}</span>
     </div>
 """, unsafe_allow_html=True)
 
@@ -463,7 +466,7 @@ with tab_efa:
                                 anti_image_str.loc[r, c] = f"{val:.3f}"
                     
                     def highlight_anti_diag(df):
-                        attr = 'background-color: #d1fae5; font-weight: bold; color: #065f46;'
+                        attr = 'background-color: #d1fae5; font-weight: bold;'
                         return pd.DataFrame(np.where(np.eye(df.shape[0], dtype=bool), attr, ''), index=df.index, columns=df.columns)
 
                     st.dataframe(anti_image_str.style.apply(highlight_anti_diag, axis=None), use_container_width=True)
