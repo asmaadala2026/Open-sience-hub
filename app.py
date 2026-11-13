@@ -34,6 +34,7 @@ for key in ['phase1_data', 'phase2_data', 'raw_data', 'efa_output', 'cfa_output'
     if key not in st.session_state: st.session_state[key] = None
 if 'feedback_submitted' not in st.session_state: st.session_state['feedback_submitted'] = False
 if 'feedback_message' not in st.session_state: st.session_state['feedback_message'] = ""
+if 'show_balloons' not in st.session_state: st.session_state['show_balloons'] = False
 if 'lang' not in st.session_state: st.session_state.lang = 'العربية'
 
 st.set_page_config(page_title="PsychoStat Pro", page_icon="💠", layout="wide", initial_sidebar_state="expanded")
@@ -67,7 +68,13 @@ translations = {
         'auto_assign_msg': '💡 Items have been automatically assigned to factors based on the highest EFA loadings (>0.30).',
         'rotation_help': 'Use Varimax for independent factors, and Oblimin for correlated psychological factors.',
         'corr_matrix_title': 'Correlation Matrix',
-        'anti_image_title': 'Anti-Image Matrices'
+        'anti_image_title': 'Anti-Image Matrices',
+        'motivational_replies': [
+            "Thank you! Your contribution is part of our dream to make complex statistical analysis accessible to everyone. Wishing you an inspiring research journey! 🌟",
+            "Received with love! Thanks to your feedback, we are building an open environment that saves time and effort for researchers. Wishing you outstanding research! 🚀",
+            "Deeply grateful for your message! Passionate researchers like you give this platform its true value. Keep shining in the world of knowledge! 🎓",
+            "Thank you for your trust! We are here to make numbers tell your research story beautifully and accurately. Wishing you continued success! 💡"
+        ]
     },
     'العربية': {
         'select_lang': '🌐 اختر اللغة', 'main_title': '💠 PsychoStat Pro',
@@ -96,7 +103,13 @@ translations = {
         'auto_assign_msg': '💡 تم توزيع الفقرات وبناء نموذج المعادلة البنائية تلقائياً بناءً على أعلى تشبع (أكبر من 0.30) من نتائج التحليل الاستكشافي.',
         'rotation_help': 'استخدم Varimax للعوامل المستقلة، وOblimin للعوامل النفسية المرتبطة.',
         'corr_matrix_title': 'مصفوفة الارتباطات (Correlation Matrix)',
-        'anti_image_title': 'المصفوفة المضادة للارتباط (Anti-Image Matrices)'
+        'anti_image_title': 'المصفوفة المضادة للارتباط (Anti-Image Matrices)',
+        'motivational_replies': [
+            "شكراً لك! مساهمتك جزء من حلمنا في جعل التحليل الإحصائي المعقد متاحاً وسهلاً للجميع. مسيرة بحثية موفقة وملهمة! 🌟",
+            "تم الاستلام بكل حب! بفضل تواصلك المستمر، نبني معاً بيئة علمية مفتوحة تختصر الجهد والوقت للباحثين. أبحاثاً متميزة نتمناها لك! 🚀",
+            "ممتنون جداً لرسالتك! وجود باحثين شغوفين مثلك هو ما يعطي لهذه المنصة قيمتها الحقيقية. دمت شعلة للعلم والمعرفة! 🎓",
+            "شكراً لثقتك! نحن هنا لنجعل الأرقام تروي قصة بحثك بأدق وأجمل طريقة دون عناء. تمنياتنا لك بالنجاح والتفوق الدائم! 💡"
+        ]
     },
     'Français': {
         'select_lang': '🌐 Choisir la langue', 'main_title': '💠 PsychoStat Pro',
@@ -125,7 +138,13 @@ translations = {
         'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs selon les plus fortes saturations (>0.30).',
         'rotation_help': 'Utilisez Varimax pour les facteurs indépendants, et Oblimin pour les facteurs psychologiques corrélés.',
         'corr_matrix_title': 'Matrice de Corrélation',
-        'anti_image_title': 'Matrices Anti-Image'
+        'anti_image_title': 'Matrices Anti-Image',
+        'motivational_replies': [
+            "Merci ! Votre contribution fait partie de notre rêve de rendre l'analyse statistique accessible à tous. Un parcours inspirant ! 🌟",
+            "Reçu avec amour ! Grâce à vos retours, nous bâtissons un environnement scientifique ouvert qui fait gagner du temps. Bonnes recherches ! 🚀",
+            "Profondément reconnaissants ! Des chercheurs passionnés comme vous donnent à cette plateforme sa véritable valeur. Brillez dans le savoir ! 🎓",
+            "Merci pour votre confiance ! Nous sommes là pour faire parler les chiffres de votre recherche avec beauté. Plein de succès ! 💡"
+        ]
     }
 }
 
@@ -162,7 +181,6 @@ st.markdown("""
     .custom-table tr:nth-child(even) td { background-color: #f8fafc !important; }
     .custom-table tr:nth-child(odd) td { background-color: #ffffff !important; }
 
-    /* The critical fix for the main header text color */
     .main-header-box h1, .main-header-box p, .main-header-box span { color: white !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -189,17 +207,17 @@ with st.sidebar:
                         writer.writerow(['التاريخ', 'التقييم', 'التعليق'])
                     writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M"), user_rating, user_comment])
                 
-                motivational_replies = [
-                    "شكراً لتقييمك! مساهمتك تدعم رؤيتنا في تعزيز العلم المفتوح. نتمنى لك التوفيق في مسيرتك الأكاديمية! 🎓",
-                    "تم الاستلام! آراؤك كباحث(ة) تلهمنا لتطوير أدوات قياس نفسي أكثر دقة. شكراً لوقتك! 💡",
-                    "ممتنون لتواصلك! دمج الإحصاء بالتقنية يزدهر بمشاركاتكم. مسيرة بحثية موفقة! 🚀",
-                    "شكراً لك! نحن فخورون باستخدامك لمنصة PsychoStat Pro. نتمنى لك أبحاثاً متميزة ونتائج مبهرة! 🌟"
-                ]
-                
-                st.session_state['feedback_message'] = random.choice(motivational_replies)
+                # اختيار الرد التحفيزي بناءً على اللغة الحالية
+                st.session_state['feedback_message'] = random.choice(lang['motivational_replies'])
                 st.session_state['feedback_submitted'] = True
+                st.session_state['show_balloons'] = True # تفعيل البالونات
                 st.rerun()
     else:
+        # إطلاق بالونات الفرح والاحتفال مرة واحدة فقط
+        if st.session_state['show_balloons']:
+            st.balloons()
+            st.session_state['show_balloons'] = False
+            
         st.success(st.session_state['feedback_message'])
         
         if st.button("إرسال رسالة أخرى" if st.session_state.lang == 'العربية' else ("Send another" if st.session_state.lang == 'English' else "Envoyer un autre")):
@@ -310,7 +328,7 @@ def cfa_result(data, spec):
 
 # --- Header & Example ---
 st.markdown(f"""
-    <div class="main-header-box" style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white !important; margin-bottom: 25px;">
+    <div class="main-header-box" style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; margin-bottom: 25px;">
         <h1 style="margin: 0; font-size: 42px; font-weight: 900;">{lang['main_title']}</h1>
         <p style="font-size: 16px; margin-top: 10px;">{lang['subtitle']}</p>
         <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;">👩‍💻 {lang['developer']}</span>
@@ -466,7 +484,7 @@ with tab_efa:
                                 anti_image_str.loc[r, c] = f"{val:.3f}"
                     
                     def highlight_anti_diag(df):
-                        attr = 'background-color: #d1fae5; font-weight: bold;'
+                        attr = 'background-color: #d1fae5; font-weight: bold; color: #065f46;'
                         return pd.DataFrame(np.where(np.eye(df.shape[0], dtype=bool), attr, ''), index=df.index, columns=df.columns)
 
                     st.dataframe(anti_image_str.style.apply(highlight_anti_diag, axis=None), use_container_width=True)
