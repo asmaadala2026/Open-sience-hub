@@ -49,7 +49,7 @@ translations = {
         'raw_info': 'Upload your survey data (Excel/CSV) to automatically extract demographics and split data for EFA/CFA.',
         'upload_forms': 'Upload Google Forms Data',
         'demo_summary': '1. Demographic Summary', 'select_demo': 'Select Demographic Variables:',
-        'normality_desc': '2. Descriptive Stats (Mean & SD)', 'select_normality': '📌 Select Scale Items for Analysis:',
+        'normality_desc': '2. Descriptive Stats & Normality (Mean, SD, Skewness, Kurtosis)', 'select_normality': '📌 Select Scale Items for Analysis:',
         'ready_split': 'Ready for Psychometric Analysis?', 'split_btn': '✂️ Automatically Split Data for EFA & CFA (50/50)',
         'study_overview': 'Study Overview', 'total_cases': 'Total available cases', 'p1_cases': 'Phase 1 cases (EFA)', 'p2_cases': 'Phase 2 cases (CFA)', 'not_loaded': 'Not loaded',
         'demo_title': '📖 Applied Example: EGAIS Scale Results',
@@ -84,7 +84,7 @@ translations = {
         'raw_info': 'قم برفع بيانات الاستبيان (Excel/CSV) لاستخراج الجداول الديموغرافية وتقسيم البيانات لمرحلتي EFA و CFA تلقائياً.',
         'upload_forms': 'رفع ملف بيانات الاستبيان',
         'demo_summary': '1. الملخص الديموغرافي', 'select_demo': 'اختر المتغيرات الديموغرافية:',
-        'normality_desc': '2. الإحصاء الوصفي', 'select_normality': '📌 اختر فقرات المقياس:',
+        'normality_desc': '2. الإحصاء الوصفي والاعتدالية (المتوسط، الانحراف، الالتواء، التفلطح)', 'select_normality': '📌 اختر فقرات المقياس:',
         'ready_split': 'هل أنت جاهز للتحليل السيكومتري؟', 'split_btn': '✂️ تقسيم البيانات تلقائياً لـ EFA و CFA (بنسبة 50/50)',
         'study_overview': 'نظرة عامة على الدراسة', 'total_cases': 'إجمالي الحالات المتاحة', 'p1_cases': 'حالات المرحلة 1 (EFA)', 'p2_cases': 'حالات المرحلة 2 (CFA)', 'not_loaded': 'لم يتم التحميل',
         'demo_title': '📖 مثال تطبيقي: نتائج مقياس (EGAIS)',
@@ -98,7 +98,7 @@ translations = {
         'feedback_rating': 'كيف تقيم تجربتك؟', 'feedback_text': 'اكتب تعليقك أو استشارتك...', 'feedback_submit': 'إرسال 🚀', 'feedback_thanks': 'شكراً لك! تم استلام رسالتك. 😍',
         'run_efa': 'إجراء التحليل العاملي الاستكشافي (EFA)', 'run_cfa': 'إجراء التحليل العاملي التوكيدي (CFA) آلياً',
         'report_wait': 'يرجى إجراء التحليل الاستكشافي والتوكيدي في التبويبات السابقة لتوليد التقرير والرسوم البيانية.',
-        'report_title': 'التقرير الأكاديمي الآلي (APA 7)', 'charts_title': 'الرسوم البيانية (الأعمدة والدوائر النسبية)',
+        'report_title': 'التقرير الأكاديمي الآلي (APA 7)', 'charts_title': 'الرسوم البيانية (الأعمدة والدوائر النسبية ومنحنى غوس)',
         'sample_error': '⛔ خطأ: حجم العينة الحالي صغير جداً (أقل من 50 استجابة). تم إيقاف التحليل لعدم كفاية البيانات وتجنب النتائج المضللة.',
         'auto_assign_msg': '💡 تم توزيع الفقرات وبناء نموذج المعادلة البنائية تلقائياً بناءً على أعلى تشبع (أكبر من 0.30) من نتائج التحليل الاستكشافي.',
         'rotation_help': 'استخدم Varimax للعوامل المستقلة، وOblimin للعوامل النفسية المرتبطة.',
@@ -119,7 +119,7 @@ translations = {
         'raw_info': 'Téléchargez vos données (Excel/CSV) pour extraire la démographie et diviser les données pour AFE/AFC.',
         'upload_forms': 'Télécharger les données du questionnaire',
         'demo_summary': '1. Résumé Démographique', 'select_demo': 'Sélectionner les variables démographiques:',
-        'normality_desc': '2. Statistiques Descriptives', 'select_normality': '📌 Sélectionner les items de l\'échelle:',
+        'normality_desc': '2. Statistiques Descriptives & Normalité (Moyenne, ET, Asymétrie, Aplatissement)', 'select_normality': '📌 Sélectionner les items de l\'échelle:',
         'ready_split': 'Prêt pour l\'analyse psychométrique?', 'split_btn': '✂️ Diviser automatiquement les données (AFE/AFC 50/50)',
         'study_overview': 'Aperçu de l\'étude', 'total_cases': 'Cas totaux', 'p1_cases': 'Cas Phase 1 (AFE)', 'p2_cases': 'Cas Phase 2 (AFC)', 'not_loaded': 'Non chargé',
         'demo_title': '📖 Exemple Appliqué: Résultats de l\'échelle EGAIS',
@@ -133,7 +133,7 @@ translations = {
         'feedback_rating': 'Comment évaluez-vous votre expérience?', 'feedback_text': 'Laissez un commentaire...', 'feedback_submit': 'Envoyer 🚀', 'feedback_thanks': 'Merci! Bien reçu. 😍',
         'run_efa': 'Exécuter l\'Analyse Factorielle Exploratoire (AFE)', 'run_cfa': 'Exécuter l\'Analyse Factorielle Confirmatoire (AFC)',
         'report_wait': 'Veuillez exécuter l\'AFE et l\'AFC pour générer le rapport.',
-        'report_title': 'Rapport Académique Automatisé (APA 7)', 'charts_title': 'Visualisations (Graphiques)',
+        'report_title': 'Rapport Académique Automatisé (APA 7)', 'charts_title': 'Visualisations (Graphiques & Courbe de Gauss)',
         'sample_error': '⛔ Erreur: La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle ne peut pas être effectuée.',
         'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs selon les plus fortes saturations (>0.30).',
         'rotation_help': 'Utilisez Varimax pour les facteurs indépendants, et Oblimin pour les facteurs psychologiques corrélés.',
@@ -207,13 +207,11 @@ with st.sidebar:
                         writer.writerow(['التاريخ', 'التقييم', 'التعليق'])
                     writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M"), user_rating, user_comment])
                 
-                # اختيار الرد التحفيزي بناءً على اللغة الحالية
                 st.session_state['feedback_message'] = random.choice(lang['motivational_replies'])
                 st.session_state['feedback_submitted'] = True
-                st.session_state['show_balloons'] = True # تفعيل البالونات
+                st.session_state['show_balloons'] = True
                 st.rerun()
     else:
-        # إطلاق بالونات الفرح والاحتفال مرة واحدة فقط
         if st.session_state['show_balloons']:
             st.balloons()
             st.session_state['show_balloons'] = False
@@ -370,7 +368,7 @@ if st.session_state['raw_data'] is not None:
 
 tab_desc, tab_efa, tab_cfa, tab_report = st.tabs([lang['tab1'], lang['tab2'], lang['tab3'], lang['tab4']])
 
-# --- TAB 1: Descriptives ---
+# --- TAB 1: Descriptives & Normality ---
 with tab_desc:
     st.markdown(f'<div class="highlight-header">📁 {lang["upload_forms"]}</div>', unsafe_allow_html=True)
     st.info(lang['raw_info'])
@@ -391,9 +389,50 @@ with tab_desc:
                 
         if selected_items:
             st.markdown(f'<div class="highlight-header">📌 {lang["normality_desc"]}</div>', unsafe_allow_html=True)
-            desc_df = df_raw[selected_items].describe().T[['mean', 'std']].round(3)
-            desc_df.rename(columns={'mean': 'المتوسط (Mean)', 'std': 'الانحراف (SD)'}, inplace=True)
+            
+            # حساب الإحصاء الوصفي الشامل (المتوسط، الانحراف، الالتواء، التفلطح)
+            desc_df = df_raw[selected_items].describe().T[['mean', 'std']]
+            desc_df['skewness'] = df_raw[selected_items].skew()
+            desc_df['kurtosis'] = df_raw[selected_items].kurtosis()
+            desc_df = desc_df.round(3)
+            
+            desc_df.rename(columns={
+                'mean': 'المتوسط (Mean)', 
+                'std': 'الانحراف (SD)',
+                'skewness': 'التواء (Skewness)',
+                'kurtosis': 'التفلطح (Kurtosis)'
+            }, inplace=True)
+            
             st.dataframe(desc_df, use_container_width=True)
+            
+            # --- قسم منحنى التوزيع الطبيعي (منحنى غوس) ---
+            st.markdown("---")
+            st.markdown("#### 📊 منحنى التوزيع الطبيعي ومنحنى غوس (Gauss Curve)")
+            st.info("اختر فقرة أدناه لمعاينة شكل توزيعها البياني مطبوعاً عليه منحنى غوس النظري للاعتدالية:")
+            
+            selected_gauss_item = st.selectbox("اختر فقرة المقياس للعرض:", selected_items, key="gauss_item_select")
+            if selected_gauss_item:
+                fig_g, ax_g = plt.subplots(figsize=(8, 4.5))
+                item_data = pd.to_numeric(df_raw[selected_gauss_item], errors='coerce').dropna()
+                
+                # رسم الهيستوجرام الفعلي
+                count, bins, ignored = ax_g.hist(item_data, bins='auto', density=True, alpha=0.6, color='#3b82f6', edgecolor='white', label='التوزيع الفعلي للفقرة')
+                
+                # حساب ومواءمة منحنى غوس (التوزيع الطبيعي)
+                mu, sigma = stats.norm.fit(item_data)
+                xmin, xmax = ax_g.get_xlim()
+                x = np.linspace(xmin, xmax, 100)
+                p = stats.norm.pdf(x, mu, sigma)
+                
+                # رسم المنحنى النظري
+                ax_g.plot(x, p, 'r--', linewidth=2.5, label=f'منحنى غوس (المتوسط={mu:.2f}, الانحراف={sigma:.2f})')
+                
+                ax_g.set_title(f'منحنى التوزيع الطبيعي للفقرة: {selected_gauss_item}', fontsize=13, fontweight='bold', color='#1e3a8a')
+                ax_g.set_xlabel('درجات الاستجابة', fontsize=11)
+                ax_g.set_ylabel('الكثافة الاحتمالية (Density)', fontsize=11)
+                ax_g.legend(loc='upper right')
+                ax_g.grid(True, linestyle='--', alpha=0.5)
+                st.pyplot(fig_g)
                 
         st.markdown(f'<div class="highlight-header">✂️ {lang["ready_split"]}</div>', unsafe_allow_html=True)
         if st.button(lang['split_btn']):
@@ -670,14 +709,16 @@ with tab_report:
         
         with col1:
             st.markdown("**الدوائر النسبية (Pie Charts)**")
-            cat_cols = df.select_dtypes(include=['object']).columns.tolist()
-            if cat_cols:
-                pie_col = st.selectbox("اختر متغيراً للرسم الدائري:", cat_cols)
+            all_cols = df.columns.tolist()
+            potential_demo_cols = [col for col in all_cols if col not in selected_items]
+            
+            if potential_demo_cols:
+                pie_col = st.selectbox("اختر متغيراً ديموغرافياً للرسم الدائري:", potential_demo_cols)
                 fig1, ax1 = plt.subplots(figsize=(4,4))
                 ax1.pie(df[pie_col].value_counts(), labels=df[pie_col].value_counts().index, autopct='%1.1f%%', colors=plt.cm.Set3.colors)
                 st.pyplot(fig1)
             else:
-                st.info("لا توجد متغيرات ديموغرافية نصية (نص/حروف) للرسم.")
+                st.info("لا توجد متغيرات ديموغرافية إضافية للرسم.")
                 
         with col2:
             st.markdown("**الأعمدة البيانية (Bar Charts)**")
@@ -708,7 +749,7 @@ with tab_report:
             conv_status = "وقد استوفت جميع العوامل المعايير المطلوبة للصدق التقاربي والثبات." if st.session_state.get('conv_passed', True) else "أظهرت النتائج قصوراً في الصدق التقاربي لبعض العوامل (AVE < 0.50)، مما يتطلب مراجعة الفقرات."
             disc_status = "كما تم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker لتأكيد استقلالية العوامل وجودة البناء." if st.session_state.get('disc_passed', True) else "إلا أنه لم يتم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker بسبب وجود تداخل كبير بين العوامل (Cross-loadings)، مما يقتضي إعادة النظر في هيكل المقياس."
             
-            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0):.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). {conv_status} {disc_status}\n\n"
+            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0:.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). {conv_status} {disc_status}\n\n"
         
         st.write(report_text)
         st.success("التقرير الأكاديمي أعلاه تمت كتابته آلياً وهو يعكس نتائجك الفعلية. يمكنك نسخه مباشرة!")
