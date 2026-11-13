@@ -133,7 +133,7 @@ translations = {
         'feedback_rating': 'Comment évaluez-vous votre expérience?', 'feedback_text': 'Laissez un commentaire...', 'feedback_submit': 'Envoyer 🚀', 'feedback_thanks': 'Merci! Bien reçu. 😍',
         'run_efa': 'Exécuter l\'Analyse Factorielle Exploratoire (AFE)', 'run_cfa': 'Exécuter l\'Analyse Factorielle Confirmatoire (AFC)',
         'report_wait': 'Veuillez exécuter l\'AFE et l\'AFC pour générer le rapport.',
-        'report_title': 'Rapport Académique Automatisé (APA 7)', 'charts_title': 'Visualisations (Graphiques & Courbe de Gauss)',
+        'report_title': 'Rapport Académique Automatisé (APA 7)', 'charts_title': 'Visualizations (Graphiques & Courbe de Gauss)',
         'sample_error': '⛔ Erreur: La taille de l\'échantillon est inférieure à 50. L\'analyse factorielle ne peut pas être effectuée.',
         'auto_assign_msg': '💡 Les items ont été automatiquement assignés aux facteurs selon les plus fortes saturations (>0.30).',
         'rotation_help': 'Utilisez Varimax pour les facteurs indépendants, et Oblimin pour les facteurs psychologiques corrélés.',
@@ -390,7 +390,6 @@ with tab_desc:
         if selected_items:
             st.markdown(f'<div class="highlight-header">📌 {lang["normality_desc"]}</div>', unsafe_allow_html=True)
             
-            # حساب الإحصاء الوصفي الشامل (المتوسط، الانحراف، الالتواء، التفلطح)
             desc_df = df_raw[selected_items].describe().T[['mean', 'std']]
             desc_df['skewness'] = df_raw[selected_items].skew()
             desc_df['kurtosis'] = df_raw[selected_items].kurtosis()
@@ -405,7 +404,6 @@ with tab_desc:
             
             st.dataframe(desc_df, use_container_width=True)
             
-            # --- قسم منحنى التوزيع الطبيعي (منحنى غوس) ---
             st.markdown("---")
             st.markdown("#### 📊 منحنى التوزيع الطبيعي ومنحنى غوس (Gauss Curve)")
             st.info("اختر فقرة أدناه لمعاينة شكل توزيعها البياني مطبوعاً عليه منحنى غوس النظري للاعتدالية:")
@@ -415,16 +413,13 @@ with tab_desc:
                 fig_g, ax_g = plt.subplots(figsize=(8, 4.5))
                 item_data = pd.to_numeric(df_raw[selected_gauss_item], errors='coerce').dropna()
                 
-                # رسم الهيستوجرام الفعلي
                 count, bins, ignored = ax_g.hist(item_data, bins='auto', density=True, alpha=0.6, color='#3b82f6', edgecolor='white', label='التوزيع الفعلي للفقرة')
                 
-                # حساب ومواءمة منحنى غوس (التوزيع الطبيعي)
                 mu, sigma = stats.norm.fit(item_data)
                 xmin, xmax = ax_g.get_xlim()
                 x = np.linspace(xmin, xmax, 100)
                 p = stats.norm.pdf(x, mu, sigma)
                 
-                # رسم المنحنى النظري
                 ax_g.plot(x, p, 'r--', linewidth=2.5, label=f'منحنى غوس (المتوسط={mu:.2f}, الانحراف={sigma:.2f})')
                 
                 ax_g.set_title(f'منحنى التوزيع الطبيعي للفقرة: {selected_gauss_item}', fontsize=13, fontweight='bold', color='#1e3a8a')
@@ -749,7 +744,8 @@ with tab_report:
             conv_status = "وقد استوفت جميع العوامل المعايير المطلوبة للصدق التقاربي والثبات." if st.session_state.get('conv_passed', True) else "أظهرت النتائج قصوراً في الصدق التقاربي لبعض العوامل (AVE < 0.50)، مما يتطلب مراجعة الفقرات."
             disc_status = "كما تم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker لتأكيد استقلالية العوامل وجودة البناء." if st.session_state.get('disc_passed', True) else "إلا أنه لم يتم التحقق من الصدق التمييزي وفق معيار Fornell-Larcker بسبب وجود تداخل كبير بين العوامل (Cross-loadings)، مما يقتضي إعادة النظر في هيكل المقياس."
             
-            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI',0:.3f})، وقيمة TLI = ({fit.get('TLI',0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA',0):.3f}). {conv_status} {disc_status}\n\n"
+            # --- تم تصحيح الخطأ هنا بإضافة المسافة والقوس الصحيح مع التنسيق {.3f} ---
+            report_text += f"**2. التحليل العاملي التوكيدي (CFA):**\nللتأكد من صدق البناء ووفقاً لمعايير JARS، تم تطبيق نموذج CFA. أظهرت النتائج مؤشرات مطابقة للمتغيرات الكامنة: $\chi^2({fit['DoF']:.0f}) = {fit['chi2']:.2f}$، ومؤشر المطابقة المقارن CFI = ({fit.get('CFI', 0):.3f})، وقيمة TLI = ({fit.get('TLI', 0):.3f})، ومؤشر جذر متوسط مربع الخطأ RMSEA = ({fit.get('RMSEA', 0):.3f}). {conv_status} {disc_status}\n\n"
         
         st.write(report_text)
         st.success("التقرير الأكاديمي أعلاه تمت كتابته آلياً وهو يعكس نتائجك الفعلية. يمكنك نسخه مباشرة!")
