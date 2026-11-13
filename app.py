@@ -3,7 +3,8 @@ from __future__ import annotations
 import sklearn.utils.validation
 import sklearn.utils
 import factor_analyzer.factor_analyzer
-import io, hashlib, re, tempfile
+import io, hashlib, re, tempfile, csv, os, random
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlsplit
@@ -32,6 +33,7 @@ factor_analyzer.factor_analyzer.check_array = _patched
 for key in ['phase1_data', 'phase2_data', 'raw_data', 'efa_output', 'cfa_output', 'item_assignments']:
     if key not in st.session_state: st.session_state[key] = None
 if 'feedback_submitted' not in st.session_state: st.session_state['feedback_submitted'] = False
+if 'feedback_message' not in st.session_state: st.session_state['feedback_message'] = ""
 if 'lang' not in st.session_state: st.session_state.lang = 'العربية'
 
 st.set_page_config(page_title="PsychoStat Pro", page_icon="💠", layout="wide", initial_sidebar_state="expanded")
@@ -130,7 +132,6 @@ translations = {
 # --- Styling & CSS Enhancements ---
 st.markdown("""
     <style>
-    /* تحسين الأزرار الرئيسية */
     div.stButton > button:first-child, div.stDownloadButton > button:first-child, div.stFormSubmitButton > button:first-child {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important; color: white !important; border: none !important;
         border-radius: 12px !important; font-weight: 700 !important; font-size: 1.2rem !important; padding: 0.8rem 1.5rem !important;
@@ -138,55 +139,28 @@ st.markdown("""
     }
     div.stButton > button:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 15px rgba(59, 130, 246, 0.5) !important; background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important; }
     
-    /* تكبير وتجميل منطقة رفع الملفات */
     [data-testid="stFileUploadDropzone"] {
-        background-color: #f0f9ff !important;
-        border: 2px dashed #0284c7 !important;
-        border-radius: 15px !important;
-        padding: 40px 20px !important;
-        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1) !important;
-        transition: all 0.3s ease;
+        background-color: #f0f9ff !important; border: 2px dashed #0284c7 !important; border-radius: 15px !important; padding: 40px 20px !important; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1) !important;
     }
-    [data-testid="stFileUploadDropzone"]:hover {
-        background-color: #e0f2fe !important;
-        border-color: #0369a1 !important;
-    }
+    [data-testid="stFileUploadDropzone"] * { color: #0c4a6e !important; }
     
-    /* تكبير حجم خط التبويبات Tabs */
-    button[data-baseweb="tab"] {
-        font-size: 1.15rem !important;
-        font-weight: 600 !important;
-        padding: 1rem 1.5rem !important;
-    }
+    button[data-baseweb="tab"] { font-size: 1.15rem !important; font-weight: 600 !important; padding: 1rem 1.5rem !important; }
 
-    /* كلاس العناوين البارزة (الأشرطة الزرقاء الداكنة) */
     .highlight-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-        color: white;
-        padding: 12px 25px;
-        border-radius: 10px;
-        margin-top: 25px;
-        margin-bottom: 20px;
-        font-size: 1.25rem;
-        font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%) !important; color: white !important; padding: 12px 25px; border-radius: 10px; margin-top: 25px; margin-bottom: 20px; font-size: 1.25rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px;
     }
 
-    /* ستايل الجداول المخصصة لنموذج EGAIS */
-    .demo-card { background: linear-gradient(to right, #f0f9ff, #e0f2fe); border: 2px solid #bae6fd; border-right: 8px solid #0284c7; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15); }
-    .demo-card h3 { color: #0c4a6e; margin-top: 0; font-weight: 800; font-size: 1.3rem; }
-    [data-testid="stMetric"] { background: #fff; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    h1, h2, h3, h4 { color: #17324d; font-weight: 700; }
+    .demo-card { background: linear-gradient(to right, #f0f9ff, #e0f2fe) !important; border: 2px solid #bae6fd !important; border-right: 8px solid #0284c7 !important; border-radius: 12px !important; padding: 25px !important; margin-bottom: 25px !important; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15) !important; }
+    .demo-card h3, .demo-card p { color: #0f172a !important; }
+    .demo-card h3 { color: #0c4a6e !important; margin-top: 0; font-weight: 800; font-size: 1.3rem; }
     
     .custom-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.95rem; text-align: center; }
-    .custom-table th { color: white; padding: 12px; font-weight: bold; border: 1px solid #ddd; }
-    .custom-table td { padding: 10px; border: 1px solid #e2e8f0; }
-    .table-blue th { background-color: #0284c7; }
-    .table-orange th { background-color: #ea580c; }
-    .custom-table tr:nth-child(even) { background-color: #f8fafc; }
+    .custom-table th { color: white !important; padding: 12px; font-weight: bold; border: 1px solid #ddd; }
+    .custom-table td { padding: 10px; border: 1px solid #e2e8f0; color: #0f172a !important; }
+    .table-blue th { background-color: #0284c7 !important; }
+    .table-orange th { background-color: #ea580c !important; }
+    .custom-table tr:nth-child(even) td { background-color: #f8fafc !important; }
+    .custom-table tr:nth-child(odd) td { background-color: #ffffff !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -198,18 +172,47 @@ with st.sidebar:
     st.markdown("---")
     st.markdown(f"### {lang['feedback_title']}")
     st.caption(lang['feedback_desc'])
+    
     if not st.session_state['feedback_submitted']:
         with st.form("feedback_form"):
-            st.radio(lang['feedback_rating'], ["😍 ممتاز (Excellent)", "👍 جيد (Good)", "🤔 يحتاج تحسين (Improvement)"])
-            st.text_area(lang['feedback_text'], height=80)
+            user_rating = st.radio(lang['feedback_rating'], ["😍 ممتاز (Excellent)", "👍 جيد (Good)", "🤔 يحتاج تحسين (Improvement)"])
+            user_comment = st.text_area(lang['feedback_text'], height=80)
+            
             if st.form_submit_button(lang['feedback_submit']):
+                file_exists = os.path.isfile('researcher_feedback.csv')
+                with open('researcher_feedback.csv', 'a', encoding='utf-8', newline='') as f:
+                    writer = csv.writer(f)
+                    if not file_exists:
+                        writer.writerow(['التاريخ', 'التقييم', 'التعليق'])
+                    writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M"), user_rating, user_comment])
+                
+                motivational_replies = [
+                    "شكراً لتقييمك! مساهمتك تدعم رؤيتنا في تعزيز العلم المفتوح. نتمنى لك التوفيق في مسيرتك الأكاديمية! 🎓",
+                    "تم الاستلام! آراؤك كباحث(ة) تلهمنا لتطوير أدوات قياس نفسي أكثر دقة. شكراً لوقتك! 💡",
+                    "ممتنون لتواصلك! دمج الإحصاء بالتقنية يزدهر بمشاركاتكم. مسيرة بحثية موفقة! 🚀",
+                    "شكراً لك! نحن فخورون باستخدامك لمنصة PsychoStat Pro. نتمنى لك أبحاثاً متميزة ونتائج مبهرة! 🌟"
+                ]
+                
+                st.session_state['feedback_message'] = random.choice(motivational_replies)
                 st.session_state['feedback_submitted'] = True
                 st.rerun()
     else:
-        st.success(lang['feedback_thanks'])
+        st.success(st.session_state['feedback_message'])
+        
         if st.button("إرسال رسالة أخرى" if st.session_state.lang == 'العربية' else ("Send another" if st.session_state.lang == 'English' else "Envoyer un autre")):
             st.session_state['feedback_submitted'] = False
             st.rerun()
+            
+    st.markdown("---")
+    with st.expander("🛠️ Admin Panel (للمطورة فقط)"):
+        admin_pwd = st.text_input("كلمة المرور (Password):", type="password")
+        if admin_pwd == "asmaa2026":
+            st.success("مرحباً أسماء! هذه تعليقات الباحثين:")
+            if os.path.exists('researcher_feedback.csv'):
+                df_feed = pd.read_csv('researcher_feedback.csv')
+                st.dataframe(df_feed, use_container_width=True)
+            else:
+                st.info("لا توجد تعليقات حتى الآن.")
 
 # --- Functions ---
 def as_numeric_items(data, items): 
@@ -304,10 +307,10 @@ def cfa_result(data, spec):
 
 # --- Header & Example ---
 st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white; margin-bottom: 25px;">
-        <h1 style="margin: 0; font-size: 42px; font-weight: 900;">{lang['main_title']}</h1>
-        <p style="font-size: 16px; margin-top: 10px;">{lang['subtitle']}</p>
-        <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;">👩‍💻 {lang['developer']}</span>
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #3b82f6 100%); padding: 40px 30px; border-radius: 20px; text-align: center; color: white !important; margin-bottom: 25px;">
+        <h1 style="margin: 0; font-size: 42px; font-weight: 900; color: white !important;">{lang['main_title']}</h1>
+        <p style="font-size: 16px; margin-top: 10px; color: white !important;">{lang['subtitle']}</p>
+        <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; color: white !important;">👩‍💻 {lang['developer']}</span>
     </div>
 """, unsafe_allow_html=True)
 
@@ -460,7 +463,7 @@ with tab_efa:
                                 anti_image_str.loc[r, c] = f"{val:.3f}"
                     
                     def highlight_anti_diag(df):
-                        attr = 'background-color: #d1fae5; font-weight: bold;'
+                        attr = 'background-color: #d1fae5; font-weight: bold; color: #065f46;'
                         return pd.DataFrame(np.where(np.eye(df.shape[0], dtype=bool), attr, ''), index=df.index, columns=df.columns)
 
                     st.dataframe(anti_image_str.style.apply(highlight_anti_diag, axis=None), use_container_width=True)
